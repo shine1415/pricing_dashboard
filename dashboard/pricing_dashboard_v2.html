@@ -879,14 +879,14 @@
             <div class="hero-inner">
                 <div>
                     <div class="eyebrow">Pricing Experiment Monitor</div>
-                    <h1>See the winner before you dive into the details.</h1>
+                    <h1>See the pricing recommendation before you dive into the details.</h1>
                     <p class="hero-subtitle" id="heroSubtitle">
-                        Compare the male pricing segments with March 19, 2026 as the clean analysis cutoff and the right period logic applied for each region.
+                        Pick a segment to review the pricing periods, the chart, and the recommended next step.
                     </p>
                     <div class="hero-meta">
-                        <span class="meta-pill">Sequential test: Jan 12 to Mar 19, 2026</span>
-                        <span class="meta-pill">Correct P-values only</span>
-                        <span class="meta-pill">8 segments: iOS and Android across Poor, Mid, Rich, and Dev</span>
+                        <span class="meta-pill">Study window: Dec 19, 2025 to Mar 19, 2026</span>
+                        <span class="meta-pill">A/B periods use correct P-values</span>
+                        <span class="meta-pill">8 segments across iOS and Android</span>
                     </div>
                 </div>
 
@@ -1690,18 +1690,32 @@
             return metric || getEmptySummaryMetric();
         }
 
+        function buildFriendlySegmentNote(segment) {
+            if (segment.periodModel === 'three_periods_production') {
+                return 'Two A/B test periods followed by one single live price period through Mar 19, 2026.';
+            }
+            if (segment.periodModel === 'three_periods') {
+                return 'Three A/B periods, with the transition days removed so the comparisons stay clean.';
+            }
+            if (segment.mode === 'production') {
+                return 'One A/B test period followed by one single live price period through Mar 19, 2026.';
+            }
+            return 'Two A/B periods through Mar 19, 2026, with the transition day removed.';
+        }
+
         function selectSegment(segmentKey) {
             currentSegment = segmentConfigs[segmentKey];
             const totalUsersText = currentSegment.mode === 'production'
                 ? `P1 A/B users: ${(currentSegment.totalUsers.A + currentSegment.totalUsers.B).toLocaleString()} · P2 production users: ${currentSegment.productionUsers.toLocaleString()}`
                 : `Users: ${(currentSegment.totalUsers.A + currentSegment.totalUsers.B).toLocaleString()} total`;
+            const friendlyNote = buildFriendlySegmentNote(currentSegment);
 
             document.getElementById('heroHeadline').textContent = `${currentSegment.shortName} selected`;
             document.getElementById('heroCallout').textContent = currentSegment.overview;
-            document.getElementById('heroSubtitle').textContent = `${currentSegment.name}. ${currentSegment.note}`;
+            document.getElementById('heroSubtitle').textContent = `${currentSegment.name}. ${friendlyNote}`;
             document.getElementById('segmentMeta').textContent = currentSegment.name;
             document.getElementById('sampleMeta').textContent = totalUsersText;
-            document.getElementById('qualityMeta').textContent = currentSegment.note;
+            document.getElementById('qualityMeta').textContent = friendlyNote;
             document.getElementById('infoStrip').style.display = 'block';
 
             document.getElementById('overviewTitle').textContent = 'Decision';
