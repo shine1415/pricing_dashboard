@@ -1,0 +1,8 @@
+Region,Group,Exposures,Converters,CVR,Revenue,Revenue/User,Optimal Pricing
+Poor,A,7246,755,10.42%,"€4,972",€0.69,P5-P28 (€2.49-€13.99 weekly)
+Poor,B,7209,855,11.86%,"€5,810",€0.81,P5-P28 (€2.49-€13.99 weekly)
+Poor,Lift,,+13.2%,+13.8%,+16.9%,+16.9%,Adopt Group B pricing
+,,,,,,,
+Rich,A,4052,801,19.77%,"€22,908",€5.65,P18-P40 (€8.99-€19.99 weekly)
+Rich,B,4042,884,21.87%,"€23,220",€5.75,P18-P40 (€8.99-€19.99 weekly)
+Rich,Lift,,+10.4%,+10.6%,+1.4%,+1.8%,Adopt Group B pricing

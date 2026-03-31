@@ -1,0 +1,16 @@
+Region,Period,Group,CVR,Note
+Poor,Period 1 (Jan 12-30),A,"3.85% (56/1,456)",High prices (P14-P36)
+Poor,Period 1 (Jan 12-30),B,"4.76% (69/1,450)",Lower prices (P5-P28)
+Poor,Period 1,Lift,+23.7%,B wins consistently
+Poor,,,,
+Poor,Period 2 (Jan 31-Mar 24),A,"5.88% (124/2,108)",Adopted P1 B prices
+Poor,Period 2 (Jan 31-Mar 24),B,"7.28% (154/2,116)",Even lower (P12-P20)
+Poor,Period 2,Lift,+23.7%,B maintains advantage
+,,,,
+Rich,Period 1 (Jan 12-30),A,8.15% (52/638),High prices (P24-P46)
+Rich,Period 1 (Jan 12-30),B,7.57% (52/687),Slightly higher (P25-P47)
+Rich,Period 1,Lift,-7.1%,A slightly better
+Rich,,,,
+Rich,Period 2 (Jan 31-Mar 24),A,13.75% (110/800),Kept P1 A prices
+Rich,Period 2 (Jan 31-Mar 24),B,18.02% (158/877),Much lower (P18-P40)
+Rich,Period 2,Lift,+31.0%,Lower prices win big

@@ -1,0 +1,453 @@
+# Pricing A/B Test Dashboard - Project Brief
+
+## Project Overview
+Interactive dashboard analyzing a two-period sequential pricing A/B test for dua.com (Albanian dating app) targeting male users across iOS/Android and Poor/Rich regions.
+
+**Test Duration:** Jan 12 - Mar 19, 2026 (67 days total)
+- **Period 1:** Jan 12-30 (19 days) - Initial pricing exploration
+- **Period 2:** Jan 31-Mar 19 (48 days) - Refined pricing based on Period 1 winners
+
+**Critical Data Cutoff:** March 19, 2026
+- March 20-24 EXCLUDED due to Ramadan promotion contamination
+- Original dataset went to Mar 24, but last clean data is Mar 19
+
+---
+
+## Test Structure
+
+### Segments (4 total)
+1. **Male | iOS | Poor Region** (Albania, Kosovo, North Macedonia, etc.)
+   - Group A: 7,024 users | 737 converters | 10.49% CVR
+   - Group B: 6,971 users | 836 converters | 11.99% CVR
+   
+2. **Male | iOS | Rich Region** (Germany, US, UK, Switzerland, etc.)
+   - Group A: 3,939 users | 784 converters | 19.90% CVR
+   - Group B: 3,915 users | 862 converters | 22.02% CVR
+
+3. **Male | Android | Poor Region**
+   - Group A: 2,454 users | 167 converters | 6.81% CVR
+   - Group B: 2,467 users | 208 converters | 8.43% CVR
+
+4. **Male | Android | Rich Region**
+   - Group A: 906 users | 148 converters | 16.34% CVR
+   - Group B: 995 users | 191 converters | 19.20% CVR
+
+### Pricing Strategy
+**Poor Region:**
+- Period 1: Group A = P14-P36 (€6.99-€17.99), Group B = P5-P28 (€2.49-€13.99)
+- Period 2: Group A = P5-P28, Group B = P12-P20 (€5.99-€9.99)
+- Ages 18-24 ran as AA test (both groups P5-P10) in Period 2
+
+**Rich Region:**
+- Period 1: Group A = P24-P46 (€11.99-€22.99), Group B = P25-P47 (€12.49-€23.49)
+- Period 2: Group A = P24-P46 (unchanged), Group B = P18-P40 (€8.99-€19.99)
+
+---
+
+## Data Sources
+
+### Primary Dataset
+**File:** `pricing_matrix_export_data.csv` (~500MB)
+**Location:** `/home/claude/pricing_matrix_export_data.csv`
+
+**Key Fields:**
+- `cognito_user_id` - Unique user identifier
+- `date` - Format: DD.MM.YYYY (e.g., "12.01.2026")
+- `gender` - 'M' or 'F' (we filter for 'M')
+- `age` - User age (18-40)
+- `os` - 'ios' or 'android'
+- `region` - 'poor' or 'rich'
+- `ab_type` - 'A' or 'B'
+- `abchosen` - Filter for value 2 (correct A/B assignment)
+- `ct_p_value` - Price point shown to user (5, 10, 12, 14, 18, 20, 24, 25, 28, 30, 36, 40, 46, 47)
+- `apval` - What Group A should see for this age/period
+- `bpval` - What Group B should see for this age/period
+- `did_subscription_started` - 1 if user converted, 0 otherwise
+- `purchase_type` - 'Subscription Started' (activation) or 'Subscription Reactivated' (reactivation)
+
+**Data Quality Filter:**
+```python
+# Only include rows where ct_p_value matches apval/bpval
+def check_p_value(row):
+    if row['ab_type'] == 'A':
+        return row['ct_p_value'] == row['apval']
+    elif row['ab_type'] == 'B':
+        return row['ct_p_value'] == row['bpval']
+    return False
+
+df['is_correct_pvalue'] = df.apply(check_p_value, axis=1)
+df = df[df['is_correct_pvalue'] == True]
+```
+
+### Pricing Tables
+**Poor Region:**
+```python
+pricing_table_poor = {
+    5: 2.49, 6: 2.99, 7: 3.49, 8: 3.99, 9: 4.49, 
+    10: 4.99, 12: 5.99, 14: 6.99, 20: 9.99, 28: 13.99, 36: 17.99
+}
+```
+
+**Rich Region:**
+```python
+pricing_table_rich = {
+    5: 2.49, 6: 2.99, 7: 3.49, 8: 3.99, 9: 4.49, 10: 4.99, 
+    12: 5.99, 14: 6.99, 18: 8.99, 20: 9.99, 24: 11.99, 25: 12.49, 
+    28: 13.99, 30: 14.99, 36: 17.99, 40: 19.99, 46: 22.99, 47: 23.49
+}
+```
+
+### Generated Dashboard Files
+**CSV Files (in `/mnt/user-data/outputs/`):**
+
+1. **Revenue/User Data (for main chart):**
+   - `dashboard_data_poor_region.csv` - iOS Poor
+   - `dashboard_data_rich_region.csv` - iOS Rich
+   - `dashboard_data_poor_region_android.csv` - Android Poor
+   - `dashboard_data_rich_region_android.csv` - Android Rich
+   
+   **Structure:** date, group, age, purchase_type, users, exposures, converted_users, events, revenue, user_cvr, revenue_per_user
+
+2. **Daily CVR Data (for accurate CVR chart):**
+   - `daily_cvr_ios_poor_mar19.csv`
+   - `daily_cvr_ios_rich_mar19.csv`
+   - `daily_cvr_android_poor_mar19.csv`
+   - `daily_cvr_android_rich_mar19.csv`
+   
+   **Structure:** date, group, unique_users, unique_converters, daily_cvr
+
+3. **Reports:**
+   - `test_report_male_ios_poor_mar19.md`
+   - `test_report_male_ios_rich_mar19.md`
+   - `test_report_male_android_poor_mar19.md`
+   - `test_report_male_android_rich_mar19.md`
+
+---
+
+## Dashboard Features (Sophisticated Version)
+
+### 1. Segment Selection
+- Dropdown with 4 options (iOS Poor/Rich, Android Poor/Rich)
+- Updates all sections dynamically
+
+### 2. Controls
+- **Age Filter:** All Ages, 18, 19, 20, ..., 40
+- **Purchase Type:** All, Activation, Reactivation
+- **Metric:** Daily CVR (%), Revenue/User (€), Revenue (€), Users, Converters
+- **Smoothing:** None, 7-day MA, 14-day MA
+- **Trendlines:** Show/Hide
+- **Events:** Show/Hide
+
+### 3. Metrics Cards
+- Group A CVR
+- Group B CVR
+- CVR Lift (B vs A)
+- Revenue/User (A | B)
+- Revenue Lift (B vs A)
+
+### 4. Interactive Chart (Plotly)
+- Line chart with markers
+- 7-day smoothing by default
+- Optional trendlines
+- Event overlays with toggleable legend
+
+### 5. Event Timeline (Embedded in Chart)
+**Categories:**
+- 🔴 **Negative (Suppressors):**
+  - Jan 14-30: Female UX Issue
+  - Feb 4-9: Paywall Experiment (every open)
+  - Mar 20-24: Massive Promo Offers (EXCLUDED from analysis)
+
+- 🟠 **Mixed Impact:**
+  - Jan 19-Mar 24: Profile Builder (50-80 likes)
+  - Feb 10-16: Free Female Premium
+  - Mar 17-24: Female A/B Test (20 vs 30 likes)
+
+- 🟣 **Cultural:**
+  - Feb 17-Mar 19: Ramadan (fasting period)
+
+- 🟢 **Positive:**
+  - Jan 30: Period 2 Starts
+  - Mar 5: Backend Fix (better recommendations)
+
+- 🔵 **iOS Releases:**
+  - Jan 15: v2.3.1
+  - Feb 12: v2.4.0
+  - Mar 10: v2.4.2
+
+**Event Legend:**
+- Checkbox per event
+- Click to toggle event overlay on/off
+- Color-coded by category
+
+### 6. Period Comparison Analysis
+**Visual table showing:**
+
+**Period 1 (Jan 12-30) — 19 days**
+| Metric | Group A | Group B |
+|--------|---------|---------|
+| CVR | X.XX% | X.XX% |
+| Revenue/User Total | €X.XX | €X.XX |
+| Revenue/User/Day | €0.00XX | €0.00XX |
+
+**Period 2 (Jan 31-Mar 19) — 48 days**
+| Metric | Group A | Group B |
+|--------|---------|---------|
+| CVR | X.XX% | X.XX% |
+| Revenue/User Total | €X.XX | €X.XX |
+| Revenue/User/Day | €0.00XX | €0.00XX |
+| **vs Period 1** | ✅ +X% / ❌ -X% | ✅ +X% / ❌ -X% |
+
+**Key Insight Box:**
+"⚠️ CRITICAL: Period 1 (19 days) vs Period 2 (48 days) — Period 2 is 2.5x longer!
+Revenue/User/Day normalizes for period length. Raw totals are misleading when periods have different durations."
+
+### 7. Price Points Table
+**Shows for selected age group:**
+- Period 1 pricing (Jan 12-30)
+- Period 2 pricing (Jan 31-Mar 19)
+- AA markers for ages 18-24 in Period 2 Poor Region
+
+**Example (All Ages view):**
+| Age Range | Period 1 A | Period 1 B | Period 2 A | Period 2 B |
+|-----------|------------|------------|------------|------------|
+| 18-21 | P14-P17 | P5 | P5 (AA) | P5 (AA) |
+| 22-24 | P18-P20 | P10 | P10 (AA) | P10 (AA) |
+| 25-29 | P21-P25 | P14 | P14 | P12 |
+| 30-34 | P26-P30 | P20 | P20 | P12 |
+| 35-40 | P31-P36 | P28 | P28 | P20 |
+
+### 8. Executive Report (Tabbed)
+**Three tabs that change dynamically per segment:**
+
+**Tab 1: "What Happened"**
+- Context about the test
+- Period 1 vs Period 2 strategy
+- Key events that affected results
+
+**Tab 2: "Results"**
+- CVR comparison
+- Revenue comparison
+- Period analysis
+- Key findings
+
+**Tab 3: "Recommendation"**
+- Final pricing recommendation
+- Implementation notes
+- Next steps
+
+**Report Loading:**
+- Loads from markdown files dynamically
+- Parses sections: Executive Summary, Key Results, Recommendation
+- Shows "Report unavailable" if file missing
+
+---
+
+## Period Stats Data Structure
+
+**Hardcoded in dashboard for period comparison:**
+
+```javascript
+const periodStatsData = {
+    'ios_poor_A': {
+        p1: {users: 4139, converters: 188, cvr: 4.54, revPerUser: 0.13},
+        p2: {users: 6090, converters: 586, cvr: 9.62, revPerUser: 0.73}
+    },
+    'ios_poor_B': {
+        p1: {users: 4035, converters: 281, cvr: 6.96, revPerUser: 0.48},
+        p2: {users: 5993, converters: 608, cvr: 10.15, revPerUser: 0.62}
+    },
+    'ios_rich_A': {
+        p1: {users: 2538, converters: 300, cvr: 11.82, revPerUser: 0.67},
+        p2: {users: 3420, converters: 576, cvr: 16.84, revPerUser: 1.27}
+    },
+    'ios_rich_B': {
+        p1: {users: 2452, converters: 286, cvr: 11.66, revPerUser: 0.46},
+        p2: {users: 3360, converters: 666, cvr: 19.82, revPerUser: 1.62}
+    },
+    'android_poor_A': {
+        p1: {users: 1456, converters: 56, cvr: 3.85, revPerUser: 0.05},
+        p2: {users: 2032, converters: 122, cvr: 6.0, revPerUser: 0.58}
+    },
+    'android_poor_B': {
+        p1: {users: 1450, converters: 69, cvr: 4.76, revPerUser: 0.44},
+        p2: {users: 2035, converters: 148, cvr: 7.27, revPerUser: 0.56}
+    },
+    'android_rich_A': {
+        p1: {users: 638, converters: 52, cvr: 8.15, revPerUser: 0.45},
+        p2: {users: 783, converters: 109, cvr: 13.92, revPerUser: 0.64}
+    },
+    'android_rich_B': {
+        p1: {users: 687, converters: 52, cvr: 7.57, revPerUser: 0.28},
+        p2: {users: 858, converters: 155, cvr: 18.07, revPerUser: 0.63}
+    }
+};
+```
+
+---
+
+## Key Metrics Formulas
+
+### CVR Calculation
+```python
+# Overall CVR (cumulative)
+cvr = (unique_converters / unique_users) * 100
+
+# Daily CVR (for chart)
+daily_cvr = (unique_converters_on_date / unique_users_on_date) * 100
+```
+
+### Revenue Calculation
+```python
+def get_revenue(row, pricing_table):
+    if row['did_subscription_started'] != 1:
+        return 0
+    p_value = int(row['ct_p_value'])
+    return pricing_table.get(p_value, 0)
+```
+
+### Revenue Per User Per Day
+```python
+revenue_per_user_per_day = total_revenue / unique_users / days_in_period
+```
+
+**This is the normalized metric used for period comparison since Period 1 (19d) and Period 2 (48d) have different lengths.**
+
+---
+
+## Critical Issues & Solutions
+
+### Issue 1: CVR Mismatch
+**Problem:** Dashboard CSV had `users` field = daily exposures (counts same user multiple times), not unique users.
+
+**Solution:** Created separate daily CVR files with:
+```
+date, group, unique_users, unique_converters, daily_cvr
+```
+
+Dashboard loads both:
+- Main CSV for revenue/users data
+- Daily CVR CSV for accurate CVR chart
+
+### Issue 2: March 19 Cutoff
+**Problem:** March 20-24 had massive promotional offers that contaminated results.
+
+**Solution:** 
+- Apply date filter: `df = df[df['date_parsed'] <= pd.to_datetime('2026-03-19')]`
+- Updated all metrics, user counts, and period lengths
+- Period 2 changed from 53 days → 48 days
+
+### Issue 3: Period Length Bias
+**Problem:** Period 2 (48 days) is 2.5x longer than Period 1 (19 days), making raw revenue totals misleading.
+
+**Solution:** Normalize by "Revenue Per User Per Day" for fair comparison.
+
+### Issue 4: AA Test Ages
+**Problem:** Ages 18-24 in Poor Region ran as AA test (both groups P5-P10) in Period 2.
+
+**Solution:** Mark with "(AA)" indicator in price points table.
+
+---
+
+## File Structure
+
+```
+/home/claude/
+├── pricing_matrix_export_data.csv        # Main dataset (500MB)
+└── [analysis scripts]
+
+/mnt/user-data/outputs/
+├── pricing_dashboard.html                # Current dashboard (simplified)
+├── pricing_dashboard_backup_*.html       # Backups
+│
+├── dashboard_data_poor_region.csv        # iOS Poor data
+├── dashboard_data_rich_region.csv        # iOS Rich data
+├── dashboard_data_poor_region_android.csv
+├── dashboard_data_rich_region_android.csv
+│
+├── daily_cvr_ios_poor_mar19.csv         # Daily CVR files (Mar 19 cutoff)
+├── daily_cvr_ios_rich_mar19.csv
+├── daily_cvr_android_poor_mar19.csv
+├── daily_cvr_android_rich_mar19.csv
+│
+├── test_report_male_ios_poor_mar19.md   # Reports
+├── test_report_male_ios_rich_mar19.md
+├── test_report_male_android_poor_mar19.md
+├── test_report_male_android_rich_mar19.md
+│
+├── complete_metrics_mar19.csv            # Summary metrics
+├── MAR19_CUTOFF_SUMMARY.md              # Cutoff explanation
+├── DASHBOARD_CHANGELOG.md                # Change history
+├── CHANGE_MANAGEMENT_PROTOCOL.md         # Process documentation
+└── DASHBOARD_FILE_GUIDE.md              # File reference
+
+/mnt/transcripts/
+├── 2026-03-26-11-13-37-pricing-ab-test-dashboard-analysis.txt
+├── 2026-03-26-12-33-05-pricing-ab-test-rich-region-analysis.txt
+├── 2026-03-26-13-47-21-pricing-test-period-analysis-correction.txt
+└── 2026-03-30-12-20-22-dashboard-mar19-cutoff-rebuild.txt
+```
+
+---
+
+## Dashboard Rebuild Requirements
+
+### Must-Have Features
+1. ✅ Segment selector (4 segments)
+2. ✅ Age + Purchase Type + Metric filters
+3. ✅ Smoothing + Trendlines + Events toggles
+4. ✅ 5 metric cards (A CVR, B CVR, Lift, Rev/User, Rev Lift)
+5. ✅ Plotly interactive chart with event overlays
+6. ✅ Event timeline with checkboxes (embedded in chart area)
+7. ✅ Period comparison table with normalized metrics
+8. ✅ Price points table with AA markers
+9. ✅ Executive report with 3 tabs (What Happened / Results / Recommendation)
+
+### Data Sources to Use
+- **Main data:** `dashboard_data_*.csv` files
+- **CVR data:** `daily_cvr_*_mar19.csv` files
+- **Reports:** `test_report_*_mar19.md` files
+- **Period stats:** Hardcoded JavaScript object (provided above)
+
+### Styling
+- Dark theme (#0a0a0a background, #1a1a1a panels)
+- Blue (#3b82f6) for Group A
+- Green (#10b981) for Group B
+- Orange (#f59e0b) for warnings
+- Purple (#8b5cf6) for info
+
+### Date Handling
+- **Format:** YYYY-MM-DD for filtering
+- **Cutoff:** 2026-03-19 (exclude Mar 20-24)
+- **Period 1:** 2026-01-12 to 2026-01-30 (19 days)
+- **Period 2:** 2026-01-31 to 2026-03-19 (48 days)
+
+---
+
+## Next Steps for Claude Code
+
+1. **Load existing dashboard** (if available) or build from scratch
+2. **Verify all CSV files** are present and correctly formatted
+3. **Implement all features** from the sophisticated version
+4. **Test with each segment** to ensure data loads correctly
+5. **Validate period comparison** shows normalized metrics
+6. **Confirm event timeline** is embedded in chart, not separate
+7. **Check report tabs** load markdown content dynamically
+8. **Document all changes** in DASHBOARD_CHANGELOG.md
+
+---
+
+## Contact & Context
+
+**User:** Ardit Trikshiqi
+**Role:** Monetization Lead at dua.com
+**Context:** This analysis determines final pricing strategy for male users across all platforms/regions. Results will inform production pricing rollout.
+
+**Critical Success Factors:**
+- Accurate CVR calculations (use daily CVR files, not main CSV user counts)
+- Normalized period comparison (Revenue/User/Day, not raw totals)
+- Clear visual distinction between periods
+- Event overlay to explain metric changes
+- Segment-specific reports with actionable recommendations
+
+**This dashboard is production-critical and will be presented to leadership.**

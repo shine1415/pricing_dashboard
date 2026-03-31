@@ -1,0 +1,16 @@
+Region,Period,Group,CVR,Note
+Poor,Period 1 (Jan 12-30),A,2.59%,High prices (P14-P36)
+Poor,Period 1 (Jan 12-30),B,3.90%,Lower prices (P5-P28)
+Poor,Period 1,Lift,+50.6%,B wins decisively
+Poor,,,,
+Poor,Period 2 (Jan 31-Mar 24),A,8.35%,Adopted P1 B prices
+Poor,Period 2 (Jan 31-Mar 24),B,8.74%,Even lower (P12-P20 for ages 25-40)
+Poor,Period 2,Lift,+4.7%,Going lower hurts revenue
+,,,,
+Rich,Period 1 (Jan 12-30),A,7.40%,High prices (P24-P46)
+Rich,Period 1 (Jan 12-30),B,7.08%,Slightly higher (P25-P47)
+Rich,Period 1,Lift,-4.3%,A slightly better
+Rich,,,,
+Rich,Period 2 (Jan 31-Mar 24),A,14.63%,Kept P1 A prices
+Rich,Period 2 (Jan 31-Mar 24),B,17.05%,Much lower (P18-P40)
+Rich,Period 2,Lift,+16.5%,Lower prices win both CVR + revenue

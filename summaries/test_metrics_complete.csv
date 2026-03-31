@@ -1,0 +1,25 @@
+METRIC,Poor Region A,Poor Region B,Rich Region A,Rich Region B
+,,,,
+=== USER METRICS ===,,,,
+Unique Exposures,"7,246","7,209","4,052","4,042"
+Unique Converters,755,855,801,884
+User CVR,10.42%,11.86%,19.77%,21.87%
+,,,,
+=== PACKAGE METRICS ===,,,,
+Total Packages Sold,853,993,"1,029","1,151"
+Packages per Converter,1.13x,1.16x,1.28x,1.30x
+Repeat Purchasers,74,100,158,188
+Repeat Rate,9.8%,11.7%,19.7%,21.3%
+,,,,
+=== REVENUE METRICS ===,,,,
+Total Revenue,"€4,972","€5,810","€22,908","€23,220"
+Revenue per User,€0.69,€0.81,€5.65,€5.75
+Revenue per Package,€5.83,€5.85,€22.27,€20.17
+,,,,
+=== KEY INSIGHTS ===,,,,
+User CVR Lift,,+13.8%,,+10.6%
+Package Volume Lift,,+16.4%,,+11.9%
+Revenue Lift,,+16.9%,,+1.4%
+,,,,
+Note: User CVR = Unique converters / Unique exposures,,,,
+Note: Package metrics include repeat purchases,,,,

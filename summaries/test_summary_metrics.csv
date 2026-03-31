@@ -1,0 +1,17 @@
+Metric,Poor Region A,Poor Region B,Rich Region A,Rich Region B
+Unique Exposures,"7,246","7,209","4,052","4,042"
+Unique Converters,755,855,801,884
+CVR,10.42%,11.86%,19.77%,21.87%
+CVR Lift,,+13.8%,,+10.6%
+Total Revenue (EUR),"4,972","5,810","22,908","23,220"
+Revenue/User (EUR),0.69,0.81,5.65,5.75
+Revenue Lift,,+16.9%,,+1.4%
+Winner,,Group B,,Group B
+,,,,
+Data Quality,,,,
+Users Excluded (Wrong P-values),55,84,31,59
+% Excluded,0.8%,1.2%,0.8%,1.4%
+,,,,
+Recommendation,,,,
+Optimal Pricing,P5-P28,P5-P28,P18-P40,P18-P40
+Price Range (Weekly),€2.49-€13.99,€2.49-€13.99,€8.99-€19.99,€8.99-€19.99

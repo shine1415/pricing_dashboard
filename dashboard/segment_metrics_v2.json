@@ -1,0 +1,2330 @@
+{
+  "poor": {
+    "overall": {
+      "All": {
+        "A": {
+          "users": 7931,
+          "converters": 908,
+          "conversion_events": 1073,
+          "cvr": 11.4487,
+          "revenue": 12666.91,
+          "revPerUser": 1.5971,
+          "revPerUserDay": 0.0179
+        },
+        "B": {
+          "users": 7829,
+          "converters": 983,
+          "conversion_events": 1213,
+          "cvr": 12.5559,
+          "revenue": 12019.41,
+          "revPerUser": 1.5352,
+          "revPerUserDay": 0.0172
+        }
+      },
+      "Weekly": {
+        "A": {
+          "users": 7931,
+          "converters": 668,
+          "conversion_events": 803,
+          "cvr": 8.4226,
+          "revenue": 7161.54,
+          "revPerUser": 0.903,
+          "revPerUserDay": 0.0101
+        },
+        "B": {
+          "users": 7829,
+          "converters": 700,
+          "conversion_events": 872,
+          "cvr": 8.9411,
+          "revenue": 6312.42,
+          "revPerUser": 0.8063,
+          "revPerUserDay": 0.0091
+        }
+      },
+      "Monthly": {
+        "A": {
+          "users": 7931,
+          "converters": 204,
+          "conversion_events": 213,
+          "cvr": 2.5722,
+          "revenue": 3639.94,
+          "revPerUser": 0.459,
+          "revPerUserDay": 0.0052
+        },
+        "B": {
+          "users": 7829,
+          "converters": 255,
+          "conversion_events": 267,
+          "cvr": 3.2571,
+          "revenue": 3831.73,
+          "revPerUser": 0.4894,
+          "revPerUserDay": 0.0055
+        }
+      },
+      "3 Months": {
+        "A": {
+          "users": 7931,
+          "converters": 56,
+          "conversion_events": 56,
+          "cvr": 0.7061,
+          "revenue": 1865.44,
+          "revPerUser": 0.2352,
+          "revPerUserDay": 0.0026
+        },
+        "B": {
+          "users": 7829,
+          "converters": 74,
+          "conversion_events": 74,
+          "cvr": 0.9452,
+          "revenue": 1875.26,
+          "revPerUser": 0.2395,
+          "revPerUserDay": 0.0027
+        }
+      }
+    },
+    "periods": {
+      "period1": {
+        "All": {
+          "A": {
+            "users": 4241,
+            "converters": 248,
+            "conversion_events": 260,
+            "cvr": 5.8477,
+            "revenue": 3766.97,
+            "revPerUser": 0.8882,
+            "revPerUserDay": 0.037
+          },
+          "B": {
+            "users": 4200,
+            "converters": 246,
+            "conversion_events": 262,
+            "cvr": 5.8571,
+            "revenue": 3857.46,
+            "revPerUser": 0.9184,
+            "revPerUserDay": 0.0383
+          }
+        },
+        "Weekly": {
+          "A": {
+            "users": 4241,
+            "converters": 197,
+            "conversion_events": 209,
+            "cvr": 4.6451,
+            "revenue": 2394.41,
+            "revPerUser": 0.5646,
+            "revPerUserDay": 0.0235
+          },
+          "B": {
+            "users": 4200,
+            "converters": 199,
+            "conversion_events": 213,
+            "cvr": 4.7381,
+            "revenue": 2538.87,
+            "revPerUser": 0.6045,
+            "revPerUserDay": 0.0252
+          }
+        },
+        "Monthly": {
+          "A": {
+            "users": 4241,
+            "converters": 46,
+            "conversion_events": 46,
+            "cvr": 1.0846,
+            "revenue": 1132.61,
+            "revPerUser": 0.2671,
+            "revPerUserDay": 0.0111
+          },
+          "B": {
+            "users": 4200,
+            "converters": 44,
+            "conversion_events": 44,
+            "cvr": 1.0476,
+            "revenue": 1092.64,
+            "revPerUser": 0.2602,
+            "revPerUserDay": 0.0108
+          }
+        },
+        "3 Months": {
+          "A": {
+            "users": 4241,
+            "converters": 5,
+            "conversion_events": 5,
+            "cvr": 0.1179,
+            "revenue": 239.95,
+            "revPerUser": 0.0566,
+            "revPerUserDay": 0.0024
+          },
+          "B": {
+            "users": 4200,
+            "converters": 5,
+            "conversion_events": 5,
+            "cvr": 0.119,
+            "revenue": 225.95,
+            "revPerUser": 0.0538,
+            "revPerUserDay": 0.0022
+          }
+        }
+      },
+      "period2": {
+        "All": {
+          "A": {
+            "users": 4023,
+            "converters": 172,
+            "conversion_events": 174,
+            "cvr": 4.2754,
+            "revenue": 2664.78,
+            "revPerUser": 0.6624,
+            "revPerUserDay": 0.039
+          },
+          "B": {
+            "users": 3937,
+            "converters": 264,
+            "conversion_events": 271,
+            "cvr": 6.7056,
+            "revenue": 2533.43,
+            "revPerUser": 0.6435,
+            "revPerUserDay": 0.0379
+          }
+        },
+        "Weekly": {
+          "A": {
+            "users": 4023,
+            "converters": 135,
+            "conversion_events": 137,
+            "cvr": 3.3557,
+            "revenue": 1594.14,
+            "revPerUser": 0.3963,
+            "revPerUserDay": 0.0233
+          },
+          "B": {
+            "users": 3937,
+            "converters": 185,
+            "conversion_events": 192,
+            "cvr": 4.699,
+            "revenue": 1273.22,
+            "revPerUser": 0.3234,
+            "revPerUserDay": 0.019
+          }
+        },
+        "Monthly": {
+          "A": {
+            "users": 4023,
+            "converters": 27,
+            "conversion_events": 27,
+            "cvr": 0.6711,
+            "revenue": 632.73,
+            "revPerUser": 0.1573,
+            "revPerUserDay": 0.0093
+          },
+          "B": {
+            "users": 3937,
+            "converters": 68,
+            "conversion_events": 68,
+            "cvr": 1.7272,
+            "revenue": 930.32,
+            "revPerUser": 0.2363,
+            "revPerUserDay": 0.0139
+          }
+        },
+        "3 Months": {
+          "A": {
+            "users": 4023,
+            "converters": 9,
+            "conversion_events": 9,
+            "cvr": 0.2237,
+            "revenue": 437.91,
+            "revPerUser": 0.1089,
+            "revPerUserDay": 0.0064
+          },
+          "B": {
+            "users": 3937,
+            "converters": 11,
+            "conversion_events": 11,
+            "cvr": 0.2794,
+            "revenue": 329.89,
+            "revPerUser": 0.0838,
+            "revPerUserDay": 0.0049
+          }
+        }
+      },
+      "period3": {
+        "All": {
+          "A": {
+            "users": 6090,
+            "converters": 586,
+            "conversion_events": 639,
+            "cvr": 9.6223,
+            "revenue": 6235.16,
+            "revPerUser": 1.0238,
+            "revPerUserDay": 0.0213
+          },
+          "B": {
+            "users": 5993,
+            "converters": 608,
+            "conversion_events": 680,
+            "cvr": 10.1452,
+            "revenue": 5628.52,
+            "revPerUser": 0.9392,
+            "revPerUserDay": 0.0196
+          }
+        },
+        "Weekly": {
+          "A": {
+            "users": 6090,
+            "converters": 410,
+            "conversion_events": 457,
+            "cvr": 6.7323,
+            "revenue": 3172.98,
+            "revPerUser": 0.521,
+            "revPerUserDay": 0.0109
+          },
+          "B": {
+            "users": 5993,
+            "converters": 410,
+            "conversion_events": 467,
+            "cvr": 6.8413,
+            "revenue": 2500.33,
+            "revPerUser": 0.4172,
+            "revPerUserDay": 0.0087
+          }
+        },
+        "Monthly": {
+          "A": {
+            "users": 6090,
+            "converters": 138,
+            "conversion_events": 140,
+            "cvr": 2.266,
+            "revenue": 1874.6,
+            "revPerUser": 0.3078,
+            "revPerUserDay": 0.0064
+          },
+          "B": {
+            "users": 5993,
+            "converters": 151,
+            "conversion_events": 155,
+            "cvr": 2.5196,
+            "revenue": 1808.77,
+            "revPerUser": 0.3018,
+            "revPerUserDay": 0.0063
+          }
+        },
+        "3 Months": {
+          "A": {
+            "users": 6090,
+            "converters": 42,
+            "conversion_events": 42,
+            "cvr": 0.6897,
+            "revenue": 1187.58,
+            "revPerUser": 0.195,
+            "revPerUserDay": 0.0041
+          },
+          "B": {
+            "users": 5993,
+            "converters": 58,
+            "conversion_events": 58,
+            "cvr": 0.9678,
+            "revenue": 1319.42,
+            "revPerUser": 0.2202,
+            "revPerUserDay": 0.0046
+          }
+        }
+      }
+    }
+  },
+  "android_poor": {
+    "overall": {
+      "All": {
+        "B": {
+          "users": 3220,
+          "converters": 258,
+          "conversion_events": 318,
+          "cvr": 8.0124,
+          "revenue": 3766.77,
+          "revPerUser": 1.1698,
+          "revPerUserDay": 0.0131
+        },
+        "A": {
+          "users": 3248,
+          "converters": 202,
+          "conversion_events": 257,
+          "cvr": 6.2192,
+          "revenue": 3349.67,
+          "revPerUser": 1.0313,
+          "revPerUserDay": 0.0116
+        }
+      },
+      "Weekly": {
+        "B": {
+          "users": 3220,
+          "converters": 172,
+          "conversion_events": 213,
+          "cvr": 5.3416,
+          "revenue": 1898.43,
+          "revPerUser": 0.5896,
+          "revPerUserDay": 0.0066
+        },
+        "A": {
+          "users": 3248,
+          "converters": 143,
+          "conversion_events": 185,
+          "cvr": 4.4027,
+          "revenue": 1764.28,
+          "revPerUser": 0.5432,
+          "revPerUserDay": 0.0061
+        }
+      },
+      "Monthly": {
+        "B": {
+          "users": 3220,
+          "converters": 85,
+          "conversion_events": 88,
+          "cvr": 2.6398,
+          "revenue": 1502.15,
+          "revPerUser": 0.4665,
+          "revPerUserDay": 0.0052
+        },
+        "A": {
+          "users": 3248,
+          "converters": 57,
+          "conversion_events": 58,
+          "cvr": 1.7549,
+          "revenue": 1069.53,
+          "revPerUser": 0.3293,
+          "revPerUserDay": 0.0037
+        }
+      },
+      "3 Months": {
+        "B": {
+          "users": 3220,
+          "converters": 17,
+          "conversion_events": 17,
+          "cvr": 0.528,
+          "revenue": 366.18,
+          "revPerUser": 0.1137,
+          "revPerUserDay": 0.0013
+        },
+        "A": {
+          "users": 3248,
+          "converters": 13,
+          "conversion_events": 13,
+          "cvr": 0.4002,
+          "revenue": 515.87,
+          "revPerUser": 0.1588,
+          "revPerUserDay": 0.0018
+        }
+      }
+    },
+    "periods": {
+      "period1": {
+        "All": {
+          "B": {
+            "users": 1889,
+            "converters": 84,
+            "conversion_events": 88,
+            "cvr": 4.4468,
+            "revenue": 1255.12,
+            "revPerUser": 0.6644,
+            "revPerUserDay": 0.0277
+          },
+          "A": {
+            "users": 1855,
+            "converters": 57,
+            "conversion_events": 63,
+            "cvr": 3.0728,
+            "revenue": 851.87,
+            "revPerUser": 0.4592,
+            "revPerUserDay": 0.0191
+          }
+        },
+        "Weekly": {
+          "B": {
+            "users": 1889,
+            "converters": 64,
+            "conversion_events": 67,
+            "cvr": 3.388,
+            "revenue": 786.33,
+            "revPerUser": 0.4163,
+            "revPerUserDay": 0.0173
+          },
+          "A": {
+            "users": 1855,
+            "converters": 44,
+            "conversion_events": 50,
+            "cvr": 2.372,
+            "revenue": 509.0,
+            "revPerUser": 0.2744,
+            "revPerUserDay": 0.0114
+          }
+        },
+        "Monthly": {
+          "B": {
+            "users": 1889,
+            "converters": 21,
+            "conversion_events": 21,
+            "cvr": 1.1117,
+            "revenue": 468.79,
+            "revPerUser": 0.2482,
+            "revPerUserDay": 0.0103
+          },
+          "A": {
+            "users": 1855,
+            "converters": 12,
+            "conversion_events": 12,
+            "cvr": 0.6469,
+            "revenue": 286.88,
+            "revPerUser": 0.1547,
+            "revPerUserDay": 0.0064
+          }
+        },
+        "3 Months": {
+          "B": {
+            "users": 1889,
+            "converters": 0,
+            "conversion_events": 0,
+            "cvr": 0.0,
+            "revenue": 0.0,
+            "revPerUser": 0.0,
+            "revPerUserDay": 0.0
+          },
+          "A": {
+            "users": 1855,
+            "converters": 1,
+            "conversion_events": 1,
+            "cvr": 0.0539,
+            "revenue": 55.99,
+            "revPerUser": 0.0302,
+            "revPerUserDay": 0.0013
+          }
+        }
+      },
+      "period2": {
+        "All": {
+          "B": {
+            "users": 1400,
+            "converters": 63,
+            "conversion_events": 63,
+            "cvr": 4.5,
+            "revenue": 826.22,
+            "revPerUser": 0.5902,
+            "revPerUserDay": 0.0347
+          },
+          "A": {
+            "users": 1399,
+            "converters": 55,
+            "conversion_events": 57,
+            "cvr": 3.9314,
+            "revenue": 879.05,
+            "revPerUser": 0.6283,
+            "revPerUserDay": 0.037
+          }
+        },
+        "Weekly": {
+          "B": {
+            "users": 1400,
+            "converters": 39,
+            "conversion_events": 39,
+            "cvr": 2.7857,
+            "revenue": 371.11,
+            "revPerUser": 0.2651,
+            "revPerUserDay": 0.0156
+          },
+          "A": {
+            "users": 1399,
+            "converters": 41,
+            "conversion_events": 43,
+            "cvr": 2.9307,
+            "revenue": 461.19,
+            "revPerUser": 0.3297,
+            "revPerUserDay": 0.0194
+          }
+        },
+        "Monthly": {
+          "B": {
+            "users": 1400,
+            "converters": 20,
+            "conversion_events": 20,
+            "cvr": 1.4286,
+            "revenue": 404.8,
+            "revPerUser": 0.2891,
+            "revPerUserDay": 0.017
+          },
+          "A": {
+            "users": 1399,
+            "converters": 10,
+            "conversion_events": 10,
+            "cvr": 0.7148,
+            "revenue": 211.9,
+            "revPerUser": 0.1515,
+            "revPerUserDay": 0.0089
+          }
+        },
+        "3 Months": {
+          "B": {
+            "users": 1400,
+            "converters": 4,
+            "conversion_events": 4,
+            "cvr": 0.2857,
+            "revenue": 50.31,
+            "revPerUser": 0.0359,
+            "revPerUserDay": 0.0021
+          },
+          "A": {
+            "users": 1399,
+            "converters": 4,
+            "conversion_events": 4,
+            "cvr": 0.2859,
+            "revenue": 205.96,
+            "revPerUser": 0.1472,
+            "revPerUserDay": 0.0087
+          }
+        }
+      },
+      "period3": {
+        "All": {
+          "B": {
+            "users": 2035,
+            "converters": 148,
+            "conversion_events": 167,
+            "cvr": 7.2727,
+            "revenue": 1685.42,
+            "revPerUser": 0.8282,
+            "revPerUserDay": 0.0173
+          },
+          "A": {
+            "users": 2032,
+            "converters": 122,
+            "conversion_events": 137,
+            "cvr": 6.0039,
+            "revenue": 1618.75,
+            "revPerUser": 0.7966,
+            "revPerUserDay": 0.0166
+          }
+        },
+        "Weekly": {
+          "B": {
+            "users": 2035,
+            "converters": 91,
+            "conversion_events": 107,
+            "cvr": 4.4717,
+            "revenue": 740.99,
+            "revPerUser": 0.3641,
+            "revPerUserDay": 0.0076
+          },
+          "A": {
+            "users": 2032,
+            "converters": 80,
+            "conversion_events": 92,
+            "cvr": 3.937,
+            "revenue": 794.09,
+            "revPerUser": 0.3908,
+            "revPerUserDay": 0.0081
+          }
+        },
+        "Monthly": {
+          "B": {
+            "users": 2035,
+            "converters": 46,
+            "conversion_events": 47,
+            "cvr": 2.2604,
+            "revenue": 628.56,
+            "revPerUser": 0.3089,
+            "revPerUserDay": 0.0064
+          },
+          "A": {
+            "users": 2032,
+            "converters": 36,
+            "conversion_events": 36,
+            "cvr": 1.7717,
+            "revenue": 570.75,
+            "revPerUser": 0.2809,
+            "revPerUserDay": 0.0059
+          }
+        },
+        "3 Months": {
+          "B": {
+            "users": 2035,
+            "converters": 13,
+            "conversion_events": 13,
+            "cvr": 0.6388,
+            "revenue": 315.87,
+            "revPerUser": 0.1552,
+            "revPerUserDay": 0.0032
+          },
+          "A": {
+            "users": 2032,
+            "converters": 8,
+            "conversion_events": 8,
+            "cvr": 0.3937,
+            "revenue": 253.92,
+            "revPerUser": 0.125,
+            "revPerUserDay": 0.0026
+          }
+        }
+      }
+    }
+  },
+  "mid_ios": {
+    "overall": {
+      "All": {
+        "P": {
+          "users": 2475,
+          "converters": 252,
+          "conversion_events": 281,
+          "cvr": 10.1818,
+          "revenue": 4467.46,
+          "revPerUser": 1.805,
+          "revPerUserDay": 0.0201
+        },
+        "A": {
+          "users": 1185,
+          "converters": 168,
+          "conversion_events": 182,
+          "cvr": 14.1772,
+          "revenue": 2754.44,
+          "revPerUser": 2.3244,
+          "revPerUserDay": 0.0258
+        },
+        "B": {
+          "users": 1176,
+          "converters": 163,
+          "conversion_events": 182,
+          "cvr": 13.8605,
+          "revenue": 2729.05,
+          "revPerUser": 2.3206,
+          "revPerUserDay": 0.0258
+        }
+      },
+      "Weekly": {
+        "P": {
+          "users": 2475,
+          "converters": 190,
+          "conversion_events": 217,
+          "cvr": 7.6768,
+          "revenue": 2567.39,
+          "revPerUser": 1.0373,
+          "revPerUserDay": 0.0115
+        },
+        "A": {
+          "users": 1185,
+          "converters": 130,
+          "conversion_events": 140,
+          "cvr": 10.9705,
+          "revenue": 1574.54,
+          "revPerUser": 1.3287,
+          "revPerUserDay": 0.0148
+        },
+        "B": {
+          "users": 1176,
+          "converters": 132,
+          "conversion_events": 150,
+          "cvr": 11.2245,
+          "revenue": 1799.13,
+          "revPerUser": 1.5299,
+          "revPerUserDay": 0.017
+        }
+      },
+      "Monthly": {
+        "P": {
+          "users": 2475,
+          "converters": 49,
+          "conversion_events": 49,
+          "cvr": 1.9798,
+          "revenue": 1235.49,
+          "revPerUser": 0.4992,
+          "revPerUserDay": 0.0055
+        },
+        "A": {
+          "users": 1185,
+          "converters": 35,
+          "conversion_events": 35,
+          "cvr": 2.9536,
+          "revenue": 831.97,
+          "revPerUser": 0.7021,
+          "revPerUserDay": 0.0078
+        },
+        "B": {
+          "users": 1176,
+          "converters": 28,
+          "conversion_events": 28,
+          "cvr": 2.381,
+          "revenue": 701.95,
+          "revPerUser": 0.5969,
+          "revPerUserDay": 0.0066
+        }
+      },
+      "3 Months": {
+        "P": {
+          "users": 2475,
+          "converters": 15,
+          "conversion_events": 15,
+          "cvr": 0.6061,
+          "revenue": 664.58,
+          "revPerUser": 0.2685,
+          "revPerUserDay": 0.003
+        },
+        "A": {
+          "users": 1185,
+          "converters": 7,
+          "conversion_events": 7,
+          "cvr": 0.5907,
+          "revenue": 347.93,
+          "revPerUser": 0.2936,
+          "revPerUserDay": 0.0033
+        },
+        "B": {
+          "users": 1176,
+          "converters": 4,
+          "conversion_events": 4,
+          "cvr": 0.3401,
+          "revenue": 227.96,
+          "revPerUser": 0.1938,
+          "revPerUserDay": 0.0022
+        }
+      }
+    },
+    "periods": {
+      "period1": {
+        "All": {
+          "A": {
+            "users": 1185,
+            "converters": 168,
+            "conversion_events": 182,
+            "cvr": 14.1772,
+            "revenue": 2754.44,
+            "revPerUser": 2.3244,
+            "revPerUserDay": 0.0553
+          },
+          "B": {
+            "users": 1176,
+            "converters": 163,
+            "conversion_events": 182,
+            "cvr": 13.8605,
+            "revenue": 2729.05,
+            "revPerUser": 2.3206,
+            "revPerUserDay": 0.0553
+          }
+        },
+        "Weekly": {
+          "A": {
+            "users": 1185,
+            "converters": 130,
+            "conversion_events": 140,
+            "cvr": 10.9705,
+            "revenue": 1574.54,
+            "revPerUser": 1.3287,
+            "revPerUserDay": 0.0316
+          },
+          "B": {
+            "users": 1176,
+            "converters": 132,
+            "conversion_events": 150,
+            "cvr": 11.2245,
+            "revenue": 1799.13,
+            "revPerUser": 1.5299,
+            "revPerUserDay": 0.0364
+          }
+        },
+        "Monthly": {
+          "A": {
+            "users": 1185,
+            "converters": 35,
+            "conversion_events": 35,
+            "cvr": 2.9536,
+            "revenue": 831.97,
+            "revPerUser": 0.7021,
+            "revPerUserDay": 0.0167
+          },
+          "B": {
+            "users": 1176,
+            "converters": 28,
+            "conversion_events": 28,
+            "cvr": 2.381,
+            "revenue": 701.95,
+            "revPerUser": 0.5969,
+            "revPerUserDay": 0.0142
+          }
+        },
+        "3 Months": {
+          "A": {
+            "users": 1185,
+            "converters": 7,
+            "conversion_events": 7,
+            "cvr": 0.5907,
+            "revenue": 347.93,
+            "revPerUser": 0.2936,
+            "revPerUserDay": 0.007
+          },
+          "B": {
+            "users": 1176,
+            "converters": 4,
+            "conversion_events": 4,
+            "cvr": 0.3401,
+            "revenue": 227.96,
+            "revPerUser": 0.1938,
+            "revPerUserDay": 0.0046
+          }
+        }
+      },
+      "period2": {
+        "All": {
+          "P": {
+            "users": 2475,
+            "converters": 252,
+            "conversion_events": 281,
+            "cvr": 10.1818,
+            "revenue": 4467.46,
+            "revPerUser": 1.805,
+            "revPerUserDay": 0.0376
+          }
+        },
+        "Weekly": {
+          "P": {
+            "users": 2475,
+            "converters": 190,
+            "conversion_events": 217,
+            "cvr": 7.6768,
+            "revenue": 2567.39,
+            "revPerUser": 1.0373,
+            "revPerUserDay": 0.0216
+          }
+        },
+        "Monthly": {
+          "P": {
+            "users": 2475,
+            "converters": 49,
+            "conversion_events": 49,
+            "cvr": 1.9798,
+            "revenue": 1235.49,
+            "revPerUser": 0.4992,
+            "revPerUserDay": 0.0104
+          }
+        },
+        "3 Months": {
+          "P": {
+            "users": 2475,
+            "converters": 15,
+            "conversion_events": 15,
+            "cvr": 0.6061,
+            "revenue": 664.58,
+            "revPerUser": 0.2685,
+            "revPerUserDay": 0.0056
+          }
+        }
+      }
+    }
+  },
+  "dev_ios": {
+    "overall": {
+      "All": {
+        "P": {
+          "users": 13012,
+          "converters": 1879,
+          "conversion_events": 2316,
+          "cvr": 14.4405,
+          "revenue": 46046.34,
+          "revPerUser": 3.5388,
+          "revPerUserDay": 0.0393
+        },
+        "B": {
+          "users": 6350,
+          "converters": 1178,
+          "conversion_events": 1418,
+          "cvr": 18.5512,
+          "revenue": 28366.69,
+          "revPerUser": 4.4672,
+          "revPerUserDay": 0.0496
+        },
+        "A": {
+          "users": 6480,
+          "converters": 1107,
+          "conversion_events": 1306,
+          "cvr": 17.0833,
+          "revenue": 25039.73,
+          "revPerUser": 3.8642,
+          "revPerUserDay": 0.0429
+        }
+      },
+      "Weekly": {
+        "P": {
+          "users": 13012,
+          "converters": 1410,
+          "conversion_events": 1776,
+          "cvr": 10.8362,
+          "revenue": 26802.69,
+          "revPerUser": 2.0598,
+          "revPerUserDay": 0.0229
+        },
+        "B": {
+          "users": 6350,
+          "converters": 886,
+          "conversion_events": 1091,
+          "cvr": 13.9528,
+          "revenue": 16410.94,
+          "revPerUser": 2.5844,
+          "revPerUserDay": 0.0287
+        },
+        "A": {
+          "users": 6480,
+          "converters": 845,
+          "conversion_events": 1020,
+          "cvr": 13.0401,
+          "revenue": 14774.75,
+          "revPerUser": 2.2801,
+          "revPerUserDay": 0.0253
+        }
+      },
+      "Monthly": {
+        "P": {
+          "users": 13012,
+          "converters": 444,
+          "conversion_events": 460,
+          "cvr": 3.4122,
+          "revenue": 14456.4,
+          "revPerUser": 1.111,
+          "revPerUserDay": 0.0123
+        },
+        "B": {
+          "users": 6350,
+          "converters": 265,
+          "conversion_events": 271,
+          "cvr": 4.1732,
+          "revenue": 8360.29,
+          "revPerUser": 1.3166,
+          "revPerUserDay": 0.0146
+        },
+        "A": {
+          "users": 6480,
+          "converters": 237,
+          "conversion_events": 239,
+          "cvr": 3.6574,
+          "revenue": 7211.44,
+          "revPerUser": 1.1129,
+          "revPerUserDay": 0.0124
+        }
+      },
+      "3 Months": {
+        "P": {
+          "users": 13012,
+          "converters": 75,
+          "conversion_events": 75,
+          "cvr": 0.5764,
+          "revenue": 4787.25,
+          "revPerUser": 0.3679,
+          "revPerUserDay": 0.0041
+        },
+        "B": {
+          "users": 6350,
+          "converters": 54,
+          "conversion_events": 54,
+          "cvr": 0.8504,
+          "revenue": 3595.46,
+          "revPerUser": 0.5662,
+          "revPerUserDay": 0.0063
+        },
+        "A": {
+          "users": 6480,
+          "converters": 46,
+          "conversion_events": 46,
+          "cvr": 0.7099,
+          "revenue": 3053.54,
+          "revPerUser": 0.4712,
+          "revPerUserDay": 0.0052
+        }
+      }
+    },
+    "periods": {
+      "period1": {
+        "All": {
+          "B": {
+            "users": 6350,
+            "converters": 1178,
+            "conversion_events": 1418,
+            "cvr": 18.5512,
+            "revenue": 28366.69,
+            "revPerUser": 4.4672,
+            "revPerUserDay": 0.1064
+          },
+          "A": {
+            "users": 6480,
+            "converters": 1107,
+            "conversion_events": 1306,
+            "cvr": 17.0833,
+            "revenue": 25039.73,
+            "revPerUser": 3.8642,
+            "revPerUserDay": 0.092
+          }
+        },
+        "Weekly": {
+          "B": {
+            "users": 6350,
+            "converters": 886,
+            "conversion_events": 1091,
+            "cvr": 13.9528,
+            "revenue": 16410.94,
+            "revPerUser": 2.5844,
+            "revPerUserDay": 0.0615
+          },
+          "A": {
+            "users": 6480,
+            "converters": 845,
+            "conversion_events": 1020,
+            "cvr": 13.0401,
+            "revenue": 14774.75,
+            "revPerUser": 2.2801,
+            "revPerUserDay": 0.0543
+          }
+        },
+        "Monthly": {
+          "B": {
+            "users": 6350,
+            "converters": 265,
+            "conversion_events": 271,
+            "cvr": 4.1732,
+            "revenue": 8360.29,
+            "revPerUser": 1.3166,
+            "revPerUserDay": 0.0313
+          },
+          "A": {
+            "users": 6480,
+            "converters": 237,
+            "conversion_events": 239,
+            "cvr": 3.6574,
+            "revenue": 7211.44,
+            "revPerUser": 1.1129,
+            "revPerUserDay": 0.0265
+          }
+        },
+        "3 Months": {
+          "B": {
+            "users": 6350,
+            "converters": 54,
+            "conversion_events": 54,
+            "cvr": 0.8504,
+            "revenue": 3595.46,
+            "revPerUser": 0.5662,
+            "revPerUserDay": 0.0135
+          },
+          "A": {
+            "users": 6480,
+            "converters": 46,
+            "conversion_events": 46,
+            "cvr": 0.7099,
+            "revenue": 3053.54,
+            "revPerUser": 0.4712,
+            "revPerUserDay": 0.0112
+          }
+        }
+      },
+      "period2": {
+        "All": {
+          "P": {
+            "users": 13012,
+            "converters": 1879,
+            "conversion_events": 2316,
+            "cvr": 14.4405,
+            "revenue": 46046.34,
+            "revPerUser": 3.5388,
+            "revPerUserDay": 0.0737
+          }
+        },
+        "Weekly": {
+          "P": {
+            "users": 13012,
+            "converters": 1410,
+            "conversion_events": 1776,
+            "cvr": 10.8362,
+            "revenue": 26802.69,
+            "revPerUser": 2.0598,
+            "revPerUserDay": 0.0429
+          }
+        },
+        "Monthly": {
+          "P": {
+            "users": 13012,
+            "converters": 444,
+            "conversion_events": 460,
+            "cvr": 3.4122,
+            "revenue": 14456.4,
+            "revPerUser": 1.111,
+            "revPerUserDay": 0.0231
+          }
+        },
+        "3 Months": {
+          "P": {
+            "users": 13012,
+            "converters": 75,
+            "conversion_events": 75,
+            "cvr": 0.5764,
+            "revenue": 4787.25,
+            "revPerUser": 0.3679,
+            "revPerUserDay": 0.0077
+          }
+        }
+      }
+    }
+  },
+  "rich": {
+    "overall": {
+      "All": {
+        "A": {
+          "users": 4419,
+          "converters": 1020,
+          "conversion_events": 1416,
+          "cvr": 23.0821,
+          "revenue": 29455.59,
+          "revPerUser": 6.6657,
+          "revPerUserDay": 0.0741
+        },
+        "B": {
+          "users": 4380,
+          "converters": 1082,
+          "conversion_events": 1528,
+          "cvr": 24.7032,
+          "revenue": 29132.21,
+          "revPerUser": 6.6512,
+          "revPerUserDay": 0.0739
+        }
+      },
+      "Weekly": {
+        "A": {
+          "users": 4419,
+          "converters": 794,
+          "conversion_events": 1121,
+          "cvr": 17.9679,
+          "revenue": 17629.54,
+          "revPerUser": 3.9895,
+          "revPerUserDay": 0.0443
+        },
+        "B": {
+          "users": 4380,
+          "converters": 822,
+          "conversion_events": 1205,
+          "cvr": 18.7671,
+          "revenue": 17251.58,
+          "revPerUser": 3.9387,
+          "revPerUserDay": 0.0438
+        }
+      },
+      "Monthly": {
+        "A": {
+          "users": 4419,
+          "converters": 220,
+          "conversion_events": 240,
+          "cvr": 4.9785,
+          "revenue": 8073.03,
+          "revPerUser": 1.8269,
+          "revPerUserDay": 0.0203
+        },
+        "B": {
+          "users": 4380,
+          "converters": 229,
+          "conversion_events": 255,
+          "cvr": 5.2283,
+          "revenue": 7878.13,
+          "revPerUser": 1.7987,
+          "revPerUserDay": 0.02
+        }
+      },
+      "3 Months": {
+        "A": {
+          "users": 4419,
+          "converters": 51,
+          "conversion_events": 52,
+          "cvr": 1.1541,
+          "revenue": 3753.02,
+          "revPerUser": 0.8493,
+          "revPerUserDay": 0.0094
+        },
+        "B": {
+          "users": 4380,
+          "converters": 62,
+          "conversion_events": 62,
+          "cvr": 1.4155,
+          "revenue": 4002.5,
+          "revPerUser": 0.9138,
+          "revPerUserDay": 0.0102
+        }
+      }
+    },
+    "periods": {
+      "period1": {
+        "All": {
+          "B": {
+            "users": 2746,
+            "converters": 569,
+            "conversion_events": 713,
+            "cvr": 20.721,
+            "revenue": 14400.78,
+            "revPerUser": 5.2443,
+            "revPerUserDay": 0.1249
+          },
+          "A": {
+            "users": 2829,
+            "converters": 599,
+            "conversion_events": 719,
+            "cvr": 21.1736,
+            "revenue": 14619.45,
+            "revPerUser": 5.1677,
+            "revPerUserDay": 0.123
+          }
+        },
+        "Weekly": {
+          "B": {
+            "users": 2746,
+            "converters": 439,
+            "conversion_events": 571,
+            "cvr": 15.9869,
+            "revenue": 8768.08,
+            "revPerUser": 3.193,
+            "revPerUserDay": 0.076
+          },
+          "A": {
+            "users": 2829,
+            "converters": 466,
+            "conversion_events": 571,
+            "cvr": 16.4723,
+            "revenue": 8731.35,
+            "revPerUser": 3.0864,
+            "revPerUserDay": 0.0735
+          }
+        },
+        "Monthly": {
+          "B": {
+            "users": 2746,
+            "converters": 110,
+            "conversion_events": 112,
+            "cvr": 4.0058,
+            "revenue": 3918.72,
+            "revPerUser": 1.4271,
+            "revPerUserDay": 0.034
+          },
+          "A": {
+            "users": 2829,
+            "converters": 121,
+            "conversion_events": 121,
+            "cvr": 4.2771,
+            "revenue": 4128.96,
+            "revPerUser": 1.4595,
+            "revPerUserDay": 0.0348
+          }
+        },
+        "3 Months": {
+          "B": {
+            "users": 2746,
+            "converters": 26,
+            "conversion_events": 26,
+            "cvr": 0.9468,
+            "revenue": 1713.98,
+            "revPerUser": 0.6242,
+            "revPerUserDay": 0.0149
+          },
+          "A": {
+            "users": 2829,
+            "converters": 24,
+            "conversion_events": 24,
+            "cvr": 0.8484,
+            "revenue": 1759.14,
+            "revPerUser": 0.6218,
+            "revPerUserDay": 0.0148
+          }
+        }
+      },
+      "period2": {
+        "All": {
+          "A": {
+            "users": 3420,
+            "converters": 576,
+            "conversion_events": 697,
+            "cvr": 16.8421,
+            "revenue": 14836.15,
+            "revPerUser": 4.3381,
+            "revPerUserDay": 0.0904
+          },
+          "B": {
+            "users": 3360,
+            "converters": 666,
+            "conversion_events": 815,
+            "cvr": 19.8214,
+            "revenue": 14731.42,
+            "revPerUser": 4.3844,
+            "revPerUserDay": 0.0913
+          }
+        },
+        "Weekly": {
+          "A": {
+            "users": 3420,
+            "converters": 449,
+            "conversion_events": 550,
+            "cvr": 13.1287,
+            "revenue": 8898.19,
+            "revPerUser": 2.6018,
+            "revPerUserDay": 0.0542
+          },
+          "B": {
+            "users": 3360,
+            "converters": 502,
+            "conversion_events": 634,
+            "cvr": 14.9405,
+            "revenue": 8483.5,
+            "revPerUser": 2.5249,
+            "revPerUserDay": 0.0526
+          }
+        },
+        "Monthly": {
+          "A": {
+            "users": 3420,
+            "converters": 115,
+            "conversion_events": 119,
+            "cvr": 3.3626,
+            "revenue": 3944.06,
+            "revPerUser": 1.1532,
+            "revPerUserDay": 0.024
+          },
+          "B": {
+            "users": 3360,
+            "converters": 137,
+            "conversion_events": 143,
+            "cvr": 4.0774,
+            "revenue": 3959.41,
+            "revPerUser": 1.1784,
+            "revPerUserDay": 0.0245
+          }
+        },
+        "3 Months": {
+          "A": {
+            "users": 3420,
+            "converters": 28,
+            "conversion_events": 28,
+            "cvr": 0.8187,
+            "revenue": 1993.89,
+            "revPerUser": 0.583,
+            "revPerUserDay": 0.0121
+          },
+          "B": {
+            "users": 3360,
+            "converters": 36,
+            "conversion_events": 36,
+            "cvr": 1.0714,
+            "revenue": 2288.52,
+            "revPerUser": 0.6811,
+            "revPerUserDay": 0.0142
+          }
+        }
+      }
+    }
+  },
+  "mid_android": {
+    "overall": {
+      "All": {
+        "P": {
+          "users": 1390,
+          "converters": 93,
+          "conversion_events": 101,
+          "cvr": 6.6906,
+          "revenue": 1663.27,
+          "revPerUser": 1.1966,
+          "revPerUserDay": 0.0134
+        },
+        "B": {
+          "users": 607,
+          "converters": 39,
+          "conversion_events": 42,
+          "cvr": 6.425,
+          "revenue": 765.14,
+          "revPerUser": 1.2605,
+          "revPerUserDay": 0.0142
+        },
+        "A": {
+          "users": 588,
+          "converters": 34,
+          "conversion_events": 39,
+          "cvr": 5.7823,
+          "revenue": 733.78,
+          "revPerUser": 1.2479,
+          "revPerUserDay": 0.014
+        }
+      },
+      "Weekly": {
+        "P": {
+          "users": 1390,
+          "converters": 62,
+          "conversion_events": 66,
+          "cvr": 4.4604,
+          "revenue": 707.91,
+          "revPerUser": 0.5093,
+          "revPerUserDay": 0.0057
+        },
+        "B": {
+          "users": 607,
+          "converters": 27,
+          "conversion_events": 29,
+          "cvr": 4.4481,
+          "revenue": 364.27,
+          "revPerUser": 0.6001,
+          "revPerUserDay": 0.0067
+        },
+        "A": {
+          "users": 588,
+          "converters": 26,
+          "conversion_events": 29,
+          "cvr": 4.4218,
+          "revenue": 375.95,
+          "revPerUser": 0.6394,
+          "revPerUserDay": 0.0072
+        }
+      },
+      "Monthly": {
+        "P": {
+          "users": 1390,
+          "converters": 27,
+          "conversion_events": 27,
+          "cvr": 1.9424,
+          "revenue": 565.44,
+          "revPerUser": 0.4068,
+          "revPerUserDay": 0.0046
+        },
+        "B": {
+          "users": 607,
+          "converters": 10,
+          "conversion_events": 10,
+          "cvr": 1.6474,
+          "revenue": 244.9,
+          "revPerUser": 0.4035,
+          "revPerUserDay": 0.0045
+        },
+        "A": {
+          "users": 588,
+          "converters": 5,
+          "conversion_events": 5,
+          "cvr": 0.8503,
+          "revenue": 142.95,
+          "revPerUser": 0.2431,
+          "revPerUserDay": 0.0027
+        }
+      },
+      "3 Months": {
+        "P": {
+          "users": 1390,
+          "converters": 8,
+          "conversion_events": 8,
+          "cvr": 0.5755,
+          "revenue": 389.92,
+          "revPerUser": 0.2805,
+          "revPerUserDay": 0.0032
+        },
+        "B": {
+          "users": 607,
+          "converters": 3,
+          "conversion_events": 3,
+          "cvr": 0.4942,
+          "revenue": 155.97,
+          "revPerUser": 0.257,
+          "revPerUserDay": 0.0029
+        },
+        "A": {
+          "users": 588,
+          "converters": 5,
+          "conversion_events": 5,
+          "cvr": 0.8503,
+          "revenue": 214.88,
+          "revPerUser": 0.3654,
+          "revPerUserDay": 0.0041
+        }
+      }
+    },
+    "periods": {
+      "period1": {
+        "All": {
+          "B": {
+            "users": 460,
+            "converters": 22,
+            "conversion_events": 22,
+            "cvr": 4.7826,
+            "revenue": 374.34,
+            "revPerUser": 0.8138,
+            "revPerUserDay": 0.0326
+          },
+          "A": {
+            "users": 447,
+            "converters": 20,
+            "conversion_events": 20,
+            "cvr": 4.4743,
+            "revenue": 274.97,
+            "revPerUser": 0.6151,
+            "revPerUserDay": 0.0246
+          }
+        },
+        "Weekly": {
+          "B": {
+            "users": 460,
+            "converters": 17,
+            "conversion_events": 17,
+            "cvr": 3.6957,
+            "revenue": 216.39,
+            "revPerUser": 0.4704,
+            "revPerUserDay": 0.0188
+          },
+          "A": {
+            "users": 447,
+            "converters": 18,
+            "conversion_events": 18,
+            "cvr": 4.0268,
+            "revenue": 230.06,
+            "revPerUser": 0.5147,
+            "revPerUserDay": 0.0206
+          }
+        },
+        "Monthly": {
+          "B": {
+            "users": 460,
+            "converters": 4,
+            "conversion_events": 4,
+            "cvr": 0.8696,
+            "revenue": 107.96,
+            "revPerUser": 0.2347,
+            "revPerUserDay": 0.0094
+          },
+          "A": {
+            "users": 447,
+            "converters": 0,
+            "conversion_events": 0,
+            "cvr": 0.0,
+            "revenue": 0.0,
+            "revPerUser": 0.0,
+            "revPerUserDay": 0.0
+          }
+        },
+        "3 Months": {
+          "B": {
+            "users": 460,
+            "converters": 1,
+            "conversion_events": 1,
+            "cvr": 0.2174,
+            "revenue": 49.99,
+            "revPerUser": 0.1087,
+            "revPerUserDay": 0.0043
+          },
+          "A": {
+            "users": 447,
+            "converters": 2,
+            "conversion_events": 2,
+            "cvr": 0.4474,
+            "revenue": 44.91,
+            "revPerUser": 0.1005,
+            "revPerUserDay": 0.004
+          }
+        }
+      },
+      "period2": {
+        "All": {
+          "B": {
+            "users": 448,
+            "converters": 20,
+            "conversion_events": 20,
+            "cvr": 4.4643,
+            "revenue": 390.8,
+            "revPerUser": 0.8723,
+            "revPerUserDay": 0.0545
+          },
+          "A": {
+            "users": 434,
+            "converters": 17,
+            "conversion_events": 19,
+            "cvr": 3.9171,
+            "revenue": 458.81,
+            "revPerUser": 1.0572,
+            "revPerUserDay": 0.0661
+          }
+        },
+        "Weekly": {
+          "B": {
+            "users": 448,
+            "converters": 12,
+            "conversion_events": 12,
+            "cvr": 2.6786,
+            "revenue": 147.88,
+            "revPerUser": 0.3301,
+            "revPerUserDay": 0.0206
+          },
+          "A": {
+            "users": 434,
+            "converters": 10,
+            "conversion_events": 11,
+            "cvr": 2.3041,
+            "revenue": 145.89,
+            "revPerUser": 0.3362,
+            "revPerUserDay": 0.021
+          }
+        },
+        "Monthly": {
+          "B": {
+            "users": 448,
+            "converters": 6,
+            "conversion_events": 6,
+            "cvr": 1.3393,
+            "revenue": 136.94,
+            "revPerUser": 0.3057,
+            "revPerUserDay": 0.0191
+          },
+          "A": {
+            "users": 434,
+            "converters": 5,
+            "conversion_events": 5,
+            "cvr": 1.1521,
+            "revenue": 142.95,
+            "revPerUser": 0.3294,
+            "revPerUserDay": 0.0206
+          }
+        },
+        "3 Months": {
+          "B": {
+            "users": 448,
+            "converters": 2,
+            "conversion_events": 2,
+            "cvr": 0.4464,
+            "revenue": 105.98,
+            "revPerUser": 0.2366,
+            "revPerUserDay": 0.0148
+          },
+          "A": {
+            "users": 434,
+            "converters": 3,
+            "conversion_events": 3,
+            "cvr": 0.6912,
+            "revenue": 169.97,
+            "revPerUser": 0.3916,
+            "revPerUserDay": 0.0245
+          }
+        }
+      },
+      "period3": {
+        "All": {
+          "P": {
+            "users": 1390,
+            "converters": 93,
+            "conversion_events": 101,
+            "cvr": 6.6906,
+            "revenue": 1663.27,
+            "revPerUser": 1.1966,
+            "revPerUserDay": 0.0249
+          }
+        },
+        "Weekly": {
+          "P": {
+            "users": 1390,
+            "converters": 62,
+            "conversion_events": 66,
+            "cvr": 4.4604,
+            "revenue": 707.91,
+            "revPerUser": 0.5093,
+            "revPerUserDay": 0.0106
+          }
+        },
+        "Monthly": {
+          "P": {
+            "users": 1390,
+            "converters": 27,
+            "conversion_events": 27,
+            "cvr": 1.9424,
+            "revenue": 565.44,
+            "revPerUser": 0.4068,
+            "revPerUserDay": 0.0085
+          }
+        },
+        "3 Months": {
+          "P": {
+            "users": 1390,
+            "converters": 8,
+            "conversion_events": 8,
+            "cvr": 0.5755,
+            "revenue": 389.92,
+            "revPerUser": 0.2805,
+            "revPerUserDay": 0.0058
+          }
+        }
+      }
+    }
+  },
+  "dev_android": {
+    "overall": {
+      "All": {
+        "P": {
+          "users": 3746,
+          "converters": 407,
+          "conversion_events": 463,
+          "cvr": 10.8649,
+          "revenue": 8277.75,
+          "revPerUser": 2.2098,
+          "revPerUserDay": 0.0248
+        },
+        "B": {
+          "users": 1767,
+          "converters": 191,
+          "conversion_events": 219,
+          "cvr": 10.8093,
+          "revenue": 4206.96,
+          "revPerUser": 2.3808,
+          "revPerUserDay": 0.0268
+        },
+        "A": {
+          "users": 1766,
+          "converters": 174,
+          "conversion_events": 201,
+          "cvr": 9.8528,
+          "revenue": 3890.8,
+          "revPerUser": 2.2032,
+          "revPerUserDay": 0.0248
+        }
+      },
+      "Weekly": {
+        "P": {
+          "users": 3746,
+          "converters": 257,
+          "conversion_events": 291,
+          "cvr": 6.8607,
+          "revenue": 3366.21,
+          "revPerUser": 0.8986,
+          "revPerUserDay": 0.0101
+        },
+        "B": {
+          "users": 1767,
+          "converters": 118,
+          "conversion_events": 138,
+          "cvr": 6.678,
+          "revenue": 1820.76,
+          "revPerUser": 1.0304,
+          "revPerUserDay": 0.0116
+        },
+        "A": {
+          "users": 1766,
+          "converters": 117,
+          "conversion_events": 138,
+          "cvr": 6.6251,
+          "revenue": 1892.43,
+          "revPerUser": 1.0716,
+          "revPerUserDay": 0.012
+        }
+      },
+      "Monthly": {
+        "P": {
+          "users": 3746,
+          "converters": 126,
+          "conversion_events": 133,
+          "cvr": 3.3636,
+          "revenue": 3101.92,
+          "revPerUser": 0.8281,
+          "revPerUserDay": 0.0093
+        },
+        "B": {
+          "users": 1767,
+          "converters": 64,
+          "conversion_events": 64,
+          "cvr": 3.622,
+          "revenue": 1646.36,
+          "revPerUser": 0.9317,
+          "revPerUserDay": 0.0105
+        },
+        "A": {
+          "users": 1766,
+          "converters": 51,
+          "conversion_events": 53,
+          "cvr": 2.8879,
+          "revenue": 1438.47,
+          "revPerUser": 0.8145,
+          "revPerUserDay": 0.0092
+        }
+      },
+      "3 Months": {
+        "P": {
+          "users": 3746,
+          "converters": 39,
+          "conversion_events": 39,
+          "cvr": 1.0411,
+          "revenue": 1809.61,
+          "revPerUser": 0.4831,
+          "revPerUserDay": 0.0054
+        },
+        "B": {
+          "users": 1767,
+          "converters": 16,
+          "conversion_events": 16,
+          "cvr": 0.9055,
+          "revenue": 739.84,
+          "revPerUser": 0.4187,
+          "revPerUserDay": 0.0047
+        },
+        "A": {
+          "users": 1766,
+          "converters": 10,
+          "conversion_events": 10,
+          "cvr": 0.5663,
+          "revenue": 559.9,
+          "revPerUser": 0.317,
+          "revPerUserDay": 0.0036
+        }
+      }
+    },
+    "periods": {
+      "period1": {
+        "All": {
+          "B": {
+            "users": 1377,
+            "converters": 116,
+            "conversion_events": 127,
+            "cvr": 8.4241,
+            "revenue": 2449.38,
+            "revPerUser": 1.7788,
+            "revPerUserDay": 0.0712
+          },
+          "A": {
+            "users": 1390,
+            "converters": 123,
+            "conversion_events": 136,
+            "cvr": 8.8489,
+            "revenue": 2693.95,
+            "revPerUser": 1.9381,
+            "revPerUserDay": 0.0775
+          }
+        },
+        "Weekly": {
+          "B": {
+            "users": 1377,
+            "converters": 79,
+            "conversion_events": 88,
+            "cvr": 5.7371,
+            "revenue": 1270.76,
+            "revPerUser": 0.9228,
+            "revPerUserDay": 0.0369
+          },
+          "A": {
+            "users": 1390,
+            "converters": 82,
+            "conversion_events": 92,
+            "cvr": 5.8993,
+            "revenue": 1238.39,
+            "revPerUser": 0.8909,
+            "revPerUserDay": 0.0356
+          }
+        },
+        "Monthly": {
+          "B": {
+            "users": 1377,
+            "converters": 34,
+            "conversion_events": 34,
+            "cvr": 2.4691,
+            "revenue": 944.66,
+            "revPerUser": 0.686,
+            "revPerUserDay": 0.0274
+          },
+          "A": {
+            "users": 1390,
+            "converters": 34,
+            "conversion_events": 34,
+            "cvr": 2.446,
+            "revenue": 895.66,
+            "revPerUser": 0.6444,
+            "revPerUserDay": 0.0258
+          }
+        },
+        "3 Months": {
+          "B": {
+            "users": 1377,
+            "converters": 4,
+            "conversion_events": 4,
+            "cvr": 0.2905,
+            "revenue": 233.96,
+            "revPerUser": 0.1699,
+            "revPerUserDay": 0.0068
+          },
+          "A": {
+            "users": 1390,
+            "converters": 10,
+            "conversion_events": 10,
+            "cvr": 0.7194,
+            "revenue": 559.9,
+            "revPerUser": 0.4028,
+            "revPerUserDay": 0.0161
+          }
+        }
+      },
+      "period2": {
+        "All": {
+          "B": {
+            "users": 1360,
+            "converters": 91,
+            "conversion_events": 92,
+            "cvr": 6.6912,
+            "revenue": 1757.58,
+            "revPerUser": 1.2923,
+            "revPerUserDay": 0.0808
+          },
+          "A": {
+            "users": 1353,
+            "converters": 63,
+            "conversion_events": 65,
+            "cvr": 4.6563,
+            "revenue": 1196.85,
+            "revPerUser": 0.8846,
+            "revPerUserDay": 0.0553
+          }
+        },
+        "Weekly": {
+          "B": {
+            "users": 1360,
+            "converters": 49,
+            "conversion_events": 50,
+            "cvr": 3.6029,
+            "revenue": 550.0,
+            "revPerUser": 0.4044,
+            "revPerUserDay": 0.0253
+          },
+          "A": {
+            "users": 1353,
+            "converters": 44,
+            "conversion_events": 46,
+            "cvr": 3.252,
+            "revenue": 654.04,
+            "revPerUser": 0.4834,
+            "revPerUserDay": 0.0302
+          }
+        },
+        "Monthly": {
+          "B": {
+            "users": 1360,
+            "converters": 30,
+            "conversion_events": 30,
+            "cvr": 2.2059,
+            "revenue": 701.7,
+            "revPerUser": 0.516,
+            "revPerUserDay": 0.0323
+          },
+          "A": {
+            "users": 1353,
+            "converters": 19,
+            "conversion_events": 19,
+            "cvr": 1.4043,
+            "revenue": 542.81,
+            "revPerUser": 0.4012,
+            "revPerUserDay": 0.0251
+          }
+        },
+        "3 Months": {
+          "B": {
+            "users": 1360,
+            "converters": 12,
+            "conversion_events": 12,
+            "cvr": 0.8824,
+            "revenue": 505.88,
+            "revPerUser": 0.372,
+            "revPerUserDay": 0.0232
+          },
+          "A": {
+            "users": 1353,
+            "converters": 0,
+            "conversion_events": 0,
+            "cvr": 0.0,
+            "revenue": 0.0,
+            "revPerUser": 0.0,
+            "revPerUserDay": 0.0
+          }
+        }
+      },
+      "period3": {
+        "All": {
+          "P": {
+            "users": 3746,
+            "converters": 407,
+            "conversion_events": 463,
+            "cvr": 10.8649,
+            "revenue": 8277.75,
+            "revPerUser": 2.2098,
+            "revPerUserDay": 0.046
+          }
+        },
+        "Weekly": {
+          "P": {
+            "users": 3746,
+            "converters": 257,
+            "conversion_events": 291,
+            "cvr": 6.8607,
+            "revenue": 3366.21,
+            "revPerUser": 0.8986,
+            "revPerUserDay": 0.0187
+          }
+        },
+        "Monthly": {
+          "P": {
+            "users": 3746,
+            "converters": 126,
+            "conversion_events": 133,
+            "cvr": 3.3636,
+            "revenue": 3101.92,
+            "revPerUser": 0.8281,
+            "revPerUserDay": 0.0173
+          }
+        },
+        "3 Months": {
+          "P": {
+            "users": 3746,
+            "converters": 39,
+            "conversion_events": 39,
+            "cvr": 1.0411,
+            "revenue": 1809.61,
+            "revPerUser": 0.4831,
+            "revPerUserDay": 0.0101
+          }
+        }
+      }
+    }
+  },
+  "android_rich": {
+    "overall": {
+      "All": {
+        "B": {
+          "users": 1120,
+          "converters": 239,
+          "conversion_events": 304,
+          "cvr": 21.3393,
+          "revenue": 5551.59,
+          "revPerUser": 4.9568,
+          "revPerUserDay": 0.0551
+        },
+        "A": {
+          "users": 1006,
+          "converters": 206,
+          "conversion_events": 266,
+          "cvr": 20.4771,
+          "revenue": 5306.83,
+          "revPerUser": 5.2752,
+          "revPerUserDay": 0.0586
+        }
+      },
+      "Weekly": {
+        "B": {
+          "users": 1120,
+          "converters": 160,
+          "conversion_events": 207,
+          "cvr": 14.2857,
+          "revenue": 2636.23,
+          "revPerUser": 2.3538,
+          "revPerUserDay": 0.0262
+        },
+        "A": {
+          "users": 1006,
+          "converters": 141,
+          "conversion_events": 181,
+          "cvr": 14.0159,
+          "revenue": 2516.35,
+          "revPerUser": 2.5013,
+          "revPerUserDay": 0.0278
+        }
+      },
+      "Monthly": {
+        "B": {
+          "users": 1120,
+          "converters": 69,
+          "conversion_events": 74,
+          "cvr": 6.1607,
+          "revenue": 1635.3,
+          "revPerUser": 1.4601,
+          "revPerUserDay": 0.0162
+        },
+        "A": {
+          "users": 1006,
+          "converters": 67,
+          "conversion_events": 74,
+          "cvr": 6.66,
+          "revenue": 2134.59,
+          "revPerUser": 2.1219,
+          "revPerUserDay": 0.0236
+        }
+      },
+      "3 Months": {
+        "B": {
+          "users": 1120,
+          "converters": 23,
+          "conversion_events": 23,
+          "cvr": 2.0536,
+          "revenue": 1280.06,
+          "revPerUser": 1.1429,
+          "revPerUserDay": 0.0127
+        },
+        "A": {
+          "users": 1006,
+          "converters": 10,
+          "conversion_events": 10,
+          "cvr": 0.994,
+          "revenue": 655.9,
+          "revPerUser": 0.652,
+          "revPerUserDay": 0.0072
+        }
+      }
+    },
+    "periods": {
+      "period1": {
+        "All": {
+          "B": {
+            "users": 851,
+            "converters": 122,
+            "conversion_events": 133,
+            "cvr": 14.3361,
+            "revenue": 2727.04,
+            "revPerUser": 3.2045,
+            "revPerUserDay": 0.0763
+          },
+          "A": {
+            "users": 768,
+            "converters": 123,
+            "conversion_events": 146,
+            "cvr": 16.0156,
+            "revenue": 2722.21,
+            "revPerUser": 3.5445,
+            "revPerUserDay": 0.0844
+          }
+        },
+        "Weekly": {
+          "B": {
+            "users": 851,
+            "converters": 90,
+            "conversion_events": 99,
+            "cvr": 10.5758,
+            "revenue": 1506.68,
+            "revPerUser": 1.7705,
+            "revPerUserDay": 0.0422
+          },
+          "A": {
+            "users": 768,
+            "converters": 82,
+            "conversion_events": 99,
+            "cvr": 10.6771,
+            "revenue": 1293.36,
+            "revPerUser": 1.6841,
+            "revPerUserDay": 0.0401
+          }
+        },
+        "Monthly": {
+          "B": {
+            "users": 851,
+            "converters": 26,
+            "conversion_events": 26,
+            "cvr": 3.0552,
+            "revenue": 694.44,
+            "revPerUser": 0.816,
+            "revPerUserDay": 0.0194
+          },
+          "A": {
+            "users": 768,
+            "converters": 40,
+            "conversion_events": 43,
+            "cvr": 5.2083,
+            "revenue": 1218.89,
+            "revPerUser": 1.5871,
+            "revPerUserDay": 0.0378
+          }
+        },
+        "3 Months": {
+          "B": {
+            "users": 851,
+            "converters": 8,
+            "conversion_events": 8,
+            "cvr": 0.9401,
+            "revenue": 525.92,
+            "revPerUser": 0.618,
+            "revPerUserDay": 0.0147
+          },
+          "A": {
+            "users": 768,
+            "converters": 3,
+            "conversion_events": 3,
+            "cvr": 0.3906,
+            "revenue": 209.97,
+            "revPerUser": 0.2734,
+            "revPerUserDay": 0.0065
+          }
+        }
+      },
+      "period2": {
+        "All": {
+          "B": {
+            "users": 858,
+            "converters": 155,
+            "conversion_events": 171,
+            "cvr": 18.0653,
+            "revenue": 2824.55,
+            "revPerUser": 3.292,
+            "revPerUserDay": 0.0686
+          },
+          "A": {
+            "users": 783,
+            "converters": 109,
+            "conversion_events": 120,
+            "cvr": 13.9208,
+            "revenue": 2584.62,
+            "revPerUser": 3.3009,
+            "revPerUserDay": 0.0688
+          }
+        },
+        "Weekly": {
+          "B": {
+            "users": 858,
+            "converters": 98,
+            "conversion_events": 108,
+            "cvr": 11.4219,
+            "revenue": 1129.55,
+            "revPerUser": 1.3165,
+            "revPerUserDay": 0.0274
+          },
+          "A": {
+            "users": 783,
+            "converters": 75,
+            "conversion_events": 82,
+            "cvr": 9.5785,
+            "revenue": 1222.99,
+            "revPerUser": 1.5619,
+            "revPerUserDay": 0.0325
+          }
+        },
+        "Monthly": {
+          "B": {
+            "users": 858,
+            "converters": 47,
+            "conversion_events": 48,
+            "cvr": 5.4779,
+            "revenue": 940.86,
+            "revPerUser": 1.0966,
+            "revPerUserDay": 0.0228
+          },
+          "A": {
+            "users": 783,
+            "converters": 30,
+            "conversion_events": 31,
+            "cvr": 3.8314,
+            "revenue": 915.7,
+            "revPerUser": 1.1695,
+            "revPerUserDay": 0.0244
+          }
+        },
+        "3 Months": {
+          "B": {
+            "users": 858,
+            "converters": 15,
+            "conversion_events": 15,
+            "cvr": 1.7483,
+            "revenue": 754.14,
+            "revPerUser": 0.879,
+            "revPerUserDay": 0.0183
+          },
+          "A": {
+            "users": 783,
+            "converters": 7,
+            "conversion_events": 7,
+            "cvr": 0.894,
+            "revenue": 445.93,
+            "revPerUser": 0.5695,
+            "revPerUserDay": 0.0119
+          }
+        }
+      }
+    }
+  }
+}
