@@ -264,6 +264,92 @@
             display: block;
         }
 
+        .all-regions-sections {
+            display: grid;
+            gap: 22px;
+        }
+        .all-regions-section {
+            display: grid;
+            gap: 12px;
+        }
+        .all-regions-section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9eb0b9;
+        }
+        .all-regions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+        .region-summary-card {
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            cursor: pointer;
+            transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        }
+        .region-summary-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(243,185,78,0.28);
+            background: rgba(255,255,255,0.05);
+        }
+        .region-summary-card.active {
+            border-color: rgba(243,185,78,0.52);
+            background: rgba(243,185,78,0.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+        }
+        .region-summary-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .region-summary-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f5f7f8;
+        }
+        .region-summary-structure {
+            font-size: 12px;
+            color: #9eb0b9;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .region-summary-call {
+            font-size: 14px;
+            color: #dce6ea;
+            line-height: 1.45;
+            margin-bottom: 12px;
+        }
+        .region-summary-meta {
+            display: grid;
+            gap: 8px;
+        }
+        .region-summary-meta .fact-row {
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 8px;
+        }
+        .region-summary-support {
+            font-size: 13px;
+            line-height: 1.4;
+            color: #9eb0b9;
+            font-weight: 500;
+        }
+        @media (max-width: 1100px) {
+            .all-regions-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        @media (max-width: 700px) {
+            .all-regions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -958,12 +1044,23 @@
         </section>
 
         <div class="tab-bar">
-            <button class="tab-btn active" data-tab="overview">Overview</button>
+            <button class="tab-btn active" data-tab="allregions">All Regions</button>
+            <button class="tab-btn" data-tab="overview">Overview</button>
             <button class="tab-btn" data-tab="timeseries">Time Series</button>
             <button class="tab-btn" data-tab="logic">Pricing Logic</button>
         </div>
 
-        <section class="tab-panel active" id="tab-overview">
+        <section class="tab-panel active" id="tab-allregions">
+            <div class="panel-card">
+                <h3>All Region Recommendations</h3>
+                <p class="panel-copy">Use this page as the executive summary. Each card shows the current recommendation for one segment, and you can open a segment directly from here.</p>
+                <div class="all-regions-sections" id="allRegionsGrid">
+                    <div class="empty-state">Loading region summaries.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tab-panel" id="tab-overview">
             <div class="kpi-grid" id="metrics">
                 <div class="metric-card"><div class="empty-state">Choose a segment to load the overview.</div></div>
             </div>
@@ -1639,6 +1736,7 @@
 
         wireButtonGroup('smoothingButtons', 'smoothingSelect');
         wireToggleButton('trendlineToggleBtn');
+        renderAllRegionsSummary();
 
         function switchTab(tabKey) {
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1743,6 +1841,70 @@
             return 'Two A/B periods through Mar 19, 2026, with the transition day removed.';
         }
 
+        function buildSegmentStructureLabel(segment) {
+            if (segment.periodModel === 'three_periods_production') return '2 A/B periods + single price';
+            if (segment.periodModel === 'three_periods') return '3 A/B periods';
+            if (segment.mode === 'production') return 'A/B test + single price';
+            return '2 A/B periods';
+        }
+
+        function formatConfidenceLabel(value) {
+            const normalized = (value || 'Medium').toLowerCase();
+            if (normalized === 'high') return 'High confidence';
+            if (normalized === 'medium-high') return 'Medium-high confidence';
+            if (normalized === 'medium') return 'Medium confidence';
+            if (normalized === 'low') return 'Low confidence';
+            return value || 'Medium confidence';
+        }
+
+        function renderAllRegionsSummary() {
+            const grid = document.getElementById('allRegionsGrid');
+            if (!grid) return;
+            const groups = [
+                {title: 'iOS', keys: ['poor', 'mid_ios', 'dev_ios', 'rich']},
+                {title: 'Android', keys: ['android_poor', 'mid_android', 'dev_android', 'android_rich']}
+            ];
+
+            const renderCard = key => {
+                const segment = segmentConfigs[key];
+                const selected = currentSegment?.key === segment.key ? 'active' : '';
+                return `
+                    <div class="region-summary-card ${selected}" data-segment-card="${segment.key}">
+                        <div class="region-summary-top">
+                            <div>
+                                <div class="region-summary-name">${segment.shortName}</div>
+                                <div class="region-summary-structure">${buildSegmentStructureLabel(segment)}</div>
+                            </div>
+                            <span class="info-chip">${formatConfidenceLabel(segment.decisionConfidence)}</span>
+                        </div>
+                        <div class="region-summary-call">${segment.recommendation}</div>
+                        <div class="region-summary-meta">
+                            <div class="fact-row"><span>Why</span><strong>${segment.recommendationHeadline || 'Recommendation'}</strong></div>
+                            <div class="fact-row"><span>Support</span><strong class="region-summary-support">${segment.summaryTakeaway || segment.overview}</strong></div>
+                        </div>
+                    </div>
+                `;
+            };
+
+            grid.innerHTML = groups.map(group => `
+                <div class="all-regions-section">
+                    <div class="all-regions-section-title">${group.title}</div>
+                    <div class="all-regions-grid">
+                        ${group.keys.map(renderCard).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            grid.querySelectorAll('[data-segment-card]').forEach(card => {
+                card.addEventListener('click', () => {
+                    const key = card.dataset.segmentCard;
+                    document.getElementById('segmentSelect').value = key;
+                    selectSegment(key);
+                    switchTab('overview');
+                });
+            });
+        }
+
         function selectSegment(segmentKey) {
             currentSegment = segmentConfigs[segmentKey];
             const totalUsersText = currentSegment.mode === 'production'
@@ -1761,6 +1923,7 @@
             document.getElementById('overviewTitle').textContent = 'Decision';
             document.getElementById('overviewCopy').textContent = '';
             document.getElementById('recommendationText').innerHTML = buildDecisionMarkup(currentSegment);
+            renderAllRegionsSummary();
             loadSegmentData(currentSegment.dataFile, currentSegment.cvrFile);
         }
 
