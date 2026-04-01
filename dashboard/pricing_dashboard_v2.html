@@ -682,6 +682,19 @@
             gap: 16px;
         }
 
+        .pricing-period-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .pricing-period-card {
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
         .period-comparison-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -709,7 +722,7 @@
 
         .period-metric-row {
             display: grid;
-            grid-template-columns: 120px 1fr 1fr;
+            grid-template-columns: 120px 1fr 1fr 1fr;
             gap: 10px;
             padding: 9px 0;
             border-bottom: 1px solid rgba(255,255,255,0.06);
@@ -730,6 +743,14 @@
             font-weight: 600;
         }
 
+        .period-metric-head {
+            color: #9eb0b9;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
         .period-callout {
             margin-bottom: 16px;
             padding: 15px 16px;
@@ -739,6 +760,15 @@
             color: #f9e0a8;
             font-size: 13px;
             line-height: 1.5;
+        }
+
+        .period-shift-note {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            color: #9eb0b9;
+            font-size: 12px;
+            line-height: 1.45;
         }
 
         .period-title {
@@ -1075,7 +1105,7 @@
                 <div class="panel-card" id="periodComparison" style="display:none;">
                     <h3>Period comparison</h3>
                     <div class="period-callout">
-                        Period 1 ran for 18 days, Jan 30 is removed as a mixed transition day, and Period 2 ran for 48 days, so the clean way to compare revenue velocity is Revenue/User/Day rather than raw totals.
+                        Compare A vs B inside each period. For cross-period comparisons, treat Revenue/User/Day as the normalized metric because the windows have different lengths. CVR and Revenue/User are shown as context only.
                     </div>
                     <div id="periodComparisonBody">
                         <div class="period-grid">
@@ -1083,7 +1113,7 @@
                                 <div class="period-title">Period 1: Jan 12 to Jan 29</div>
                                 <table class="pvalue-table">
                                     <thead>
-                                        <tr><th>Metric</th><th>Group A</th><th>Group B</th></tr>
+                                        <tr><th>Metric</th><th>Group A</th><th>Group B</th><th>Delta</th></tr>
                                     </thead>
                                     <tbody id="period1Stats"></tbody>
                                 </table>
@@ -1092,7 +1122,7 @@
                                 <div class="period-title">Period 2: Jan 31 to Mar 19</div>
                                 <table class="pvalue-table">
                                     <thead>
-                                        <tr><th>Metric</th><th>Group A</th><th>Group B</th></tr>
+                                        <tr><th>Metric</th><th>Group A</th><th>Group B</th><th>Delta</th></tr>
                                     </thead>
                                     <tbody id="period2Stats"></tbody>
                                 </table>
@@ -1187,26 +1217,28 @@
                 period2Label: 'Jan 31 to Mar 19',
                 period1Days: 42,
                 period2Days: 48,
-                totalUsers: {A: 4454, B: 4467},
-                uniqueConverters: {A: 1033, B: 1109},
+                totalUsers: {A: 4569, B: 4522},
+                uniqueConverters: {A: 1084, B: 1136},
                 note: 'Correct P-values only. Period 1 runs Dec 19, 2025 to Jan 29, 2026, Jan 30 is excluded as a mixed transition day, and Period 2 runs Jan 31 to Mar 19, 2026.',
+                recommendationHeadline: 'Ship the Period 2 B price',
                 recommendation: 'Use the Period 2 B price as the single shipped price for iOS Rich.',
-                recommendationFollowup: 'In other words, move to the lower tested price. This is a clean ship call because B wins conversion and keeps monetization close enough in the later period.',
-                overview: 'Rich Region is now a fuller two-period A/B read from Dec 19 onward. The lower ladder still wins, and the December extension reinforces that the richer market remained price-elastic across both periods.',
+                recommendationFollowup: 'In other words, move to the lower tested price. Period 1 is basically mixed, but Period 2 is the decisive read and B wins there on both conversion and revenue/day.',
+                summaryTakeaway: 'Period 1 is close enough to treat as mixed, while Period 2 is the clear decision period and supports shipping B.',
+                overview: 'iOS Rich is a two-period A/B test. Period 1 is mixed, but Period 2 gives the clearest read and should drive the final pricing decision.',
                 decisionAction: 'Ship',
                 decisionUse: 'Move to the Period 2 Group B price.',
-                decisionWhy: 'The lower price wins conversion cleanly and keeps revenue/day close enough across both periods.',
+                decisionWhy: 'Period 2 Group B wins both conversion and revenue/day, which makes it the strongest final price to ship.',
                 decisionConfidence: 'High',
                 decisionNext: 'Implement as the single price and monitor live revenue/day.',
                 reportFile: '../reports/test_report_male_ios_rich_mar19.md',
                 periodMetrics: {
                     A: {
-                        period1: {users: 2893, converters: 609, cvr: 21.0508, revenue: 14894.30, revPerUser: 5.1484, revPerUserDay: 0.1226},
-                        period2: {users: 3435, converters: 580, cvr: 16.8850, revenue: 14938.11, revPerUser: 4.3488, revPerUserDay: 0.0906}
+                        period1: {users: 3402, converters: 681, cvr: 20.0176, revenue: 17466.61, revPerUser: 5.1342, revPerUserDay: 0.1222},
+                        period2: {users: 3420, converters: 576, cvr: 16.8421, revenue: 14836.15, revPerUser: 4.3381, revPerUserDay: 0.0904}
                     },
                     B: {
-                        period1: {users: 2902, converters: 605, cvr: 20.8477, revenue: 15316.12, revPerUser: 5.2778, revPerUserDay: 0.1257},
-                        period2: {users: 3386, converters: 672, cvr: 19.8464, revenue: 14862.28, revPerUser: 4.3893, revPerUserDay: 0.0914}
+                        period1: {users: 3273, converters: 645, cvr: 19.7067, revenue: 17011.98, revPerUser: 5.1977, revPerUserDay: 0.1238},
+                        period2: {users: 3360, converters: 666, cvr: 19.8214, revenue: 14731.42, revPerUser: 4.3844, revPerUserDay: 0.0913}
                     }
                 },
                 pvalues: {
@@ -1245,13 +1277,15 @@
                 productionConverters: 252,
                 note: 'Mid uses Period 1 A/B from Dec 19, 2025 to Jan 29, 2026 with abchosen = 2, Jan 30 is excluded, and Period 2 uses one production ladder from Jan 31 to Mar 19 with abchosen = 1.',
                 recommendation: 'Keep the current single price for iOS Mid.',
-                recommendationFollowup: 'In other words, do not reopen pricing right now. The earlier A/B was too close to justify a change, and the live single price looks good enough.',
-                overview: 'Mid is a longer production-rollout story now. Period 1 runs from Dec 19 through Jan 29 as the A/B read, then Period 2 shows how the adopted ladder performed live.',
+                recommendationFollowup: 'In other words, the winning A/B price was rolled out, and the live single-price phase stayed viable even though it came in weaker than the winning test-period result. Do not reopen pricing right now.',
+                overview: 'iOS Mid starts with one A/B test and then moves to one live price. The key question is whether the live single price held up after the winner was implemented.',
                 decisionAction: 'Keep current single price',
                 decisionUse: 'Keep the current single price for now.',
-                decisionWhy: 'The A/B period was close, and the live single price looks viable but not fully proven as the best possible option.',
+                decisionWhy: 'The A/B period slightly favored the lower price, and the live single price remains viable even though the rollout is weaker than the winning A/B result.',
                 decisionConfidence: 'Medium',
                 decisionNext: 'Retest later only if Mid becomes a larger revenue lever.',
+                recommendationHeadline: 'Winner implemented, rollout softer',
+                summaryTakeaway: 'The lower price edged out the A/B test and was rolled out. The live single-price period is weaker than the winning B result, but not weak enough to justify reopening the test now.',
                 reportFile: '../docs/MID_SEGMENT_SETUP.md',
                 periodMetrics: {
                     A: { period1: {users: 1206, converters: 173, cvr: 14.3449, revenue: 2814.38, revPerUser: 2.3336, revPerUserDay: 0.0556} },
@@ -1294,13 +1328,15 @@
                 productionConverters: 1874,
                 note: 'Dev Period 1 uses A/B from Dec 19, 2025 to Jan 29, 2026 with abchosen = 2, Jan 30 is excluded, and Period 2 uses one production ladder from Jan 31 to Mar 19 with abchosen = 1.',
                 recommendation: 'Keep the current single price for iOS Dev.',
-                recommendationFollowup: 'In other words, stay where the product is now. The lower price won the A/B test, and the live single price held up after rollout.',
-                overview: 'Dev is now the full Dec 19 rollout story. Period 1 is the extended A/B read, while Period 2 is the adopted production ladder from Jan 31 onward.',
+                recommendationFollowup: 'In other words, Group B clearly won the A/B test and was rolled out to everyone. The live single-price phase is weaker than that winning B result, but it still looks good enough to keep. Do not raise price back toward A based on this alone.',
+                overview: 'iOS Dev starts with one A/B test and then moves to one live price. The important read is whether the rolled-out winner stayed strong after it went to the full population.',
                 decisionAction: 'Keep current single price',
                 decisionUse: 'Keep the current single price.',
-                decisionWhy: 'The A/B test favored the lower price, and the live single price held up after rollout.',
+                decisionWhy: 'Group B won the test clearly, and the rollout stayed viable even though it did not reproduce the same strength seen in the winning B test period.',
                 decisionConfidence: 'Medium-high',
                 decisionNext: 'Only retest if you want to challenge the current live price with a higher alternative.',
+                recommendationHeadline: 'B won, rollout held but softened',
+                summaryTakeaway: 'Group B was the right winner to implement. After rollout, the live single price stayed viable but underperformed the original winning B test result on both conversion and revenue/day.',
                 reportFile: '../docs/DEV_SEGMENT_SETUP.md',
                 periodMetrics: {
                     A: { period1: {users: 6610, converters: 1148, cvr: 17.3676, revenue: 25842.77, revPerUser: 3.9096, revPerUserDay: 0.0931} },
@@ -1396,13 +1432,15 @@
                 productionConverters: 93,
                 note: 'Android Mid now follows the full history: Period 1 A/B from Dec 19 to Jan 12, Period 2 A/B from Jan 14 to Jan 29, and Period 3 production from Jan 31 onward. Jan 13 and Jan 30 are excluded as transition days.',
                 recommendation: 'Keep the current single price for Android Mid.',
-                recommendationFollowup: 'In other words, do not reopen this test now. Both A/B periods leaned lower, and the live single price continues to look strong enough.',
-                overview: 'Android Mid is a three-step pricing history: an initial A/B, a lower A/B retest, and then a production rollout of the lower ladder from Jan 31 onward.',
+                recommendationFollowup: 'In other words, the lower price kept winning through the A/B phases and was rolled out to everyone. The live single-price phase is softer than the best A/B read, but still strong enough that I would not reopen the test now.',
+                overview: 'Android Mid has two A/B periods followed by one live price. The right read is whether the lower-price winner kept working once it was rolled out to the full population.',
                 decisionAction: 'Keep current single price',
                 decisionUse: 'Keep the current single price.',
-                decisionWhy: 'Both A/B periods leaned lower, and the live single price continued to perform well.',
+                decisionWhy: 'Both A/B periods leaned lower, and the live single price remains viable even though the rollout is weaker than the strongest test-period result.',
                 decisionConfidence: 'Medium-high',
                 decisionNext: 'No immediate retest needed unless business goals change.',
+                recommendationHeadline: 'Lower price still the right call',
+                summaryTakeaway: 'The lower price kept winning across the A/B phases. Once rolled out, the live single price softened versus the strongest test read, but not enough to justify changing course now.',
                 reportFile: '../docs/MID_SEGMENT_SETUP.md',
                 periodMetrics: {
                     A: {
@@ -1507,13 +1545,15 @@
                 productionConverters: 407,
                 note: 'Android Dev now follows the full history: Period 1 A/B from Dec 19 to Jan 12, Period 2 A/B from Jan 14 to Jan 29, and Period 3 production from Jan 31 onward. Jan 13 and Jan 30 are excluded as transition days.',
                 recommendation: 'Keep the current single price for Android Dev.',
-                recommendationFollowup: 'In other words, stay where the product is now. The later A/B favored the lower price, and the live single price has continued to convert well.',
-                overview: 'Android Dev is a three-step pricing history: an initial A/B, a lower A/B retest, and then a production rollout of the lower ladder from Jan 31 onward.',
+                recommendationFollowup: 'In other words, the later A/B test pointed to the lower price and that winner was rolled out. The live single-price phase is softer than the winning A/B result, but it is still good enough that I would keep it in place.',
+                overview: 'Android Dev has two A/B periods followed by one live price. The key question is whether the lower-price winner still holds up after rollout.',
                 decisionAction: 'Keep current single price',
                 decisionUse: 'Keep the current single price.',
-                decisionWhy: 'The lower price won the later A/B read, and the live single price continued to convert well.',
+                decisionWhy: 'The lower price won the later A/B read, and the live single price stayed viable after rollout even though it softened versus the winning test period.',
                 decisionConfidence: 'Medium-high',
                 decisionNext: 'Retest only if you want to see whether a slightly higher single price can recover more revenue/day.',
+                recommendationHeadline: 'Later winner still worth keeping',
+                summaryTakeaway: 'The later A/B test supports the lower price. After rollout, the live single price is weaker than that winning test result, but there is not enough evidence here to justify changing it now.',
                 reportFile: '../docs/DEV_SEGMENT_SETUP.md',
                 periodMetrics: {
                     A: {
@@ -1884,14 +1924,38 @@
             return;
         }
 
-        function buildPeriodMetricRow(label, valueA, valueB) {
+        function buildPeriodMetricHeader(col1, col2, col3) {
+            return `
+                <div class="period-metric-row">
+                    <div class="period-metric-label"></div>
+                    <div class="period-metric-head">${col1}</div>
+                    <div class="period-metric-head">${col2}</div>
+                    <div class="period-metric-head">${col3}</div>
+                </div>
+            `;
+        }
+
+        function buildPeriodMetricRow(label, valueA, valueB, valueC) {
             return `
                 <div class="period-metric-row">
                     <div class="period-metric-label">${label}</div>
                     <div class="period-metric-value">${valueA}</div>
                     <div class="period-metric-value">${valueB}</div>
+                    <div class="period-metric-value">${valueC}</div>
                 </div>
             `;
+        }
+
+        function formatSignedPct(value) {
+            const sign = value > 0 ? '+' : '';
+            return `${sign}${value.toFixed(1)}%`;
+        }
+
+        function formatRelativePct(currentValue, baseValue) {
+            if (!Number.isFinite(baseValue) || Math.abs(baseValue) < 0.000001) {
+                return '—';
+            }
+            return formatSignedPct(((currentValue - baseValue) / baseValue) * 100);
         }
 
         function buildThreePeriodCard(title, dateLabel, metricsA, metricsB) {
@@ -1899,30 +1963,23 @@
                 <div class="period-summary-card">
                     <h4>${title}</h4>
                     <div class="period-date">${dateLabel}</div>
-                    ${buildPeriodMetricRow('CVR', `${metricsA.cvr.toFixed(2)}%`, `${metricsB.cvr.toFixed(2)}%`)}
-                    ${buildPeriodMetricRow('Revenue/User', `€${metricsA.revPerUser.toFixed(2)}`, `€${metricsB.revPerUser.toFixed(2)}`)}
-                    ${buildPeriodMetricRow('Revenue/User/Day', `€${metricsA.revPerUserDay.toFixed(4)}`, `€${metricsB.revPerUserDay.toFixed(4)}`)}
+                    ${buildPeriodMetricHeader('A', 'B', 'Delta')}
+                    ${buildPeriodMetricRow('CVR (context)', `${metricsA.cvr.toFixed(2)}%`, `${metricsB.cvr.toFixed(2)}%`, formatRelativePct(metricsB.cvr, metricsA.cvr))}
+                    ${buildPeriodMetricRow('Revenue/User (context)', `€${metricsA.revPerUser.toFixed(2)}`, `€${metricsB.revPerUser.toFixed(2)}`, formatRelativePct(metricsB.revPerUser, metricsA.revPerUser))}
+                    ${buildPeriodMetricRow('Revenue/User/Day', `€${metricsA.revPerUserDay.toFixed(4)}`, `€${metricsB.revPerUserDay.toFixed(4)}`, formatRelativePct(metricsB.revPerUserDay, metricsA.revPerUserDay))}
                 </div>
             `;
         }
 
-        function buildThreePeriodProductionCard(title, dateLabel, metricsP) {
+        function buildThreePeriodProductionCard(title, dateLabel, metricsP, previousA = null, previousB = null) {
             return `
                 <div class="period-summary-card">
                     <h4>${title}</h4>
                     <div class="period-date">${dateLabel}</div>
-                    <div class="period-metric-row">
-                        <div class="period-metric-label">CVR</div>
-                        <div class="period-metric-value" style="grid-column: span 2;">${metricsP.cvr.toFixed(2)}%</div>
-                    </div>
-                    <div class="period-metric-row">
-                        <div class="period-metric-label">Revenue/User</div>
-                        <div class="period-metric-value" style="grid-column: span 2;">€${metricsP.revPerUser.toFixed(2)}</div>
-                    </div>
-                    <div class="period-metric-row">
-                        <div class="period-metric-label">Revenue/User/Day</div>
-                        <div class="period-metric-value" style="grid-column: span 2;">€${metricsP.revPerUserDay.toFixed(4)}</div>
-                    </div>
+                    ${buildPeriodMetricHeader('Single', '', '')}
+                    ${buildPeriodMetricRow('CVR (context)', `${metricsP.cvr.toFixed(2)}%`, '—', '—')}
+                    ${buildPeriodMetricRow('Revenue/User (context)', `€${metricsP.revPerUser.toFixed(2)}`, '—', '—')}
+                    ${buildPeriodMetricRow('Revenue/User/Day', `€${metricsP.revPerUserDay.toFixed(4)}`, '—', '—')}
                 </div>
             `;
         }
@@ -2681,12 +2738,12 @@
                 const p2B = getSummaryMetric('B', 'period2', duration);
                 const p3P = getSummaryMetric('P', 'period3', duration);
                 periodComparison.querySelector('h3').textContent = 'Three-period comparison';
-                periodComparison.querySelector('.period-callout').textContent = 'Read the three windows separately: Dec 19-Jan 12, Jan 14-Jan 29, and Jan 31-Mar 19. Jan 13 and Jan 30 are excluded as transition days, and Period 3 is a production rollout rather than an A/B test.';
+                periodComparison.querySelector('.period-callout').textContent = 'Read the three windows separately. Compare A vs B inside each period. For cross-period comparisons, use Revenue/User/Day because the windows have different lengths; CVR and Revenue/User are context only. Period 3 is a single-price rollout, not an A/B test.';
                 document.getElementById('periodComparisonBody').innerHTML = `
                     <div class="period-comparison-grid">
                         ${buildThreePeriodCard('Period 1', 'Dec 19 to Jan 12', p1A, p1B)}
                         ${buildThreePeriodCard('Period 2', 'Jan 14 to Jan 29', p2A, p2B)}
-                        ${buildThreePeriodProductionCard('Period 3', 'Jan 31 to Mar 19', p3P)}
+                        ${buildThreePeriodProductionCard('Period 3', 'Jan 31 to Mar 19', p3P, p2A, p2B)}
                     </div>
                 `;
                 return;
@@ -2699,7 +2756,7 @@
                 const p3A = getSummaryMetric('A', 'period3', duration);
                 const p3B = getSummaryMetric('B', 'period3', duration);
                 periodComparison.querySelector('h3').textContent = 'Three-period comparison';
-                periodComparison.querySelector('.period-callout').textContent = 'Read the three windows separately: Dec 19-Jan 11, Jan 13-Jan 29, and Jan 31-Mar 19. Jan 12 and Jan 30 are excluded as mixed days, and Revenue/User/Day stays the cleanest monetization comparison across unequal windows.';
+                periodComparison.querySelector('.period-callout').textContent = 'Read the three windows separately. Compare A vs B inside each period. For cross-period comparisons, use Revenue/User/Day because the windows have different lengths; CVR and Revenue/User are context only.';
                 document.getElementById('periodComparisonBody').innerHTML = `
                     <div class="period-comparison-grid">
                         ${buildThreePeriodCard('Period 1', 'Dec 19 to Jan 11', p1A, p1B)}
@@ -2715,7 +2772,7 @@
                         <div class="period-title">Period 1: ${currentSegment.period1Label || 'Jan 12 to Jan 29'}</div>
                         <table class="pvalue-table">
                             <thead>
-                                <tr><th>Metric</th><th>Group A</th><th>Group B</th></tr>
+                                <tr><th>Metric</th><th>Group A</th><th>Group B</th><th>Delta</th></tr>
                             </thead>
                             <tbody id="period1Stats"></tbody>
                         </table>
@@ -2724,7 +2781,7 @@
                         <div class="period-title">Period 2: ${currentSegment.period2Label || 'Jan 31 to Mar 19'}</div>
                         <table class="pvalue-table">
                             <thead>
-                                <tr><th>Metric</th><th>Group A</th><th>Group B</th></tr>
+                                <tr><th>Metric</th><th>Group A</th><th>Group B</th><th>Delta</th></tr>
                             </thead>
                             <tbody id="period2Stats"></tbody>
                         </table>
@@ -2732,7 +2789,7 @@
                 </div>
             `;
             periodComparison.querySelector('h3').textContent = 'Period comparison';
-            periodComparison.querySelector('.period-callout').textContent = `Period 1 ran for ${currentSegment.period1Days || 18} days, Jan 30 is removed as a mixed transition day, and Period 2 ran for ${currentSegment.period2Days || 48} days, so the clean way to compare revenue velocity is Revenue/User/Day rather than raw totals.`;
+            periodComparison.querySelector('.period-callout').textContent = `Compare A vs B inside each period. For cross-period comparisons, use Revenue/User/Day because Period 1 ran for ${currentSegment.period1Days || 18} days and Period 2 ran for ${currentSegment.period2Days || 48} days. CVR and Revenue/User are shown as context only.`;
 
             if (currentSegment.mode === 'production') {
                 const p1MetricsA = getSummaryMetric('A', 'period1', duration);
@@ -2740,15 +2797,15 @@
                 const p2MetricsP = getSummaryMetric('P', 'period2', duration);
 
                 document.getElementById('period1Stats').innerHTML = `
-                    <tr><td>CVR</td><td>${p1MetricsA.cvr.toFixed(2)}%</td><td>${p1MetricsB.cvr.toFixed(2)}%</td></tr>
-                    <tr><td>Revenue/User</td><td>€${p1MetricsA.revPerUser.toFixed(2)}</td><td>€${p1MetricsB.revPerUser.toFixed(2)}</td></tr>
-                    <tr><td class="winner-cell">Revenue/User/Day</td><td class="winner-cell">€${p1MetricsA.revPerUserDay.toFixed(4)}</td><td class="winner-cell">€${p1MetricsB.revPerUserDay.toFixed(4)}</td></tr>
+                    <tr><td>CVR (context)</td><td>${p1MetricsA.cvr.toFixed(2)}%</td><td>${p1MetricsB.cvr.toFixed(2)}%</td><td>${formatRelativePct(p1MetricsB.cvr, p1MetricsA.cvr)}</td></tr>
+                    <tr><td>Revenue/User (context)</td><td>€${p1MetricsA.revPerUser.toFixed(2)}</td><td>€${p1MetricsB.revPerUser.toFixed(2)}</td><td>${formatRelativePct(p1MetricsB.revPerUser, p1MetricsA.revPerUser)}</td></tr>
+                    <tr><td class="winner-cell">Revenue/User/Day</td><td class="winner-cell">€${p1MetricsA.revPerUserDay.toFixed(4)}</td><td class="winner-cell">€${p1MetricsB.revPerUserDay.toFixed(4)}</td><td class="winner-cell">${formatRelativePct(p1MetricsB.revPerUserDay, p1MetricsA.revPerUserDay)}</td></tr>
                 `;
                 document.getElementById('period2Stats').innerHTML = `
-                    <tr><td>Production CVR</td><td colspan="2">${p2MetricsP.cvr.toFixed(2)}%</td></tr>
-                    <tr><td>Production Revenue/User</td><td colspan="2">€${p2MetricsP.revPerUser.toFixed(2)}</td></tr>
-                    <tr><td class="winner-cell">Production Revenue/User/Day</td><td colspan="2" class="winner-cell">€${p2MetricsP.revPerUserDay.toFixed(4)}</td></tr>
-                    <tr><td>Production Users</td><td colspan="2">${p2MetricsP.users.toLocaleString()}</td></tr>
+                    <tr><td>Single-price CVR (context)</td><td>${p2MetricsP.cvr.toFixed(2)}%</td><td>—</td><td>—</td></tr>
+                    <tr><td>Single-price Revenue/User (context)</td><td>€${p2MetricsP.revPerUser.toFixed(2)}</td><td>—</td><td>—</td></tr>
+                    <tr><td class="winner-cell">Single-price Revenue/User/Day</td><td class="winner-cell">€${p2MetricsP.revPerUserDay.toFixed(4)}</td><td>—</td><td>—</td></tr>
+                    <tr><td>Single-price Users</td><td>${p2MetricsP.users.toLocaleString()}</td><td>—</td><td>—</td></tr>
                 `;
                 return;
             }
@@ -2759,27 +2816,14 @@
             const p2MetricsB = getSummaryMetric('B', 'period2', duration);
 
             document.getElementById('period1Stats').innerHTML = `
-                <tr><td>CVR</td><td>${p1MetricsA.cvr.toFixed(2)}%</td><td>${p1MetricsB.cvr.toFixed(2)}%</td></tr>
-                <tr><td>Revenue/User</td><td>€${p1MetricsA.revPerUser.toFixed(2)}</td><td>€${p1MetricsB.revPerUser.toFixed(2)}</td></tr>
-                <tr><td class="winner-cell">Revenue/User/Day</td><td class="winner-cell">€${p1MetricsA.revPerUserDay.toFixed(4)}</td><td class="winner-cell">€${p1MetricsB.revPerUserDay.toFixed(4)}</td></tr>
+                <tr><td>CVR (context)</td><td>${p1MetricsA.cvr.toFixed(2)}%</td><td>${p1MetricsB.cvr.toFixed(2)}%</td><td>${formatRelativePct(p1MetricsB.cvr, p1MetricsA.cvr)}</td></tr>
+                <tr><td>Revenue/User (context)</td><td>€${p1MetricsA.revPerUser.toFixed(2)}</td><td>€${p1MetricsB.revPerUser.toFixed(2)}</td><td>${formatRelativePct(p1MetricsB.revPerUser, p1MetricsA.revPerUser)}</td></tr>
+                <tr><td class="winner-cell">Revenue/User/Day</td><td class="winner-cell">€${p1MetricsA.revPerUserDay.toFixed(4)}</td><td class="winner-cell">€${p1MetricsB.revPerUserDay.toFixed(4)}</td><td class="winner-cell">${formatRelativePct(p1MetricsB.revPerUserDay, p1MetricsA.revPerUserDay)}</td></tr>
             `;
-
-            const changeA = p1MetricsA.revPerUserDay > 0
-                ? ((p2MetricsA.revPerUserDay - p1MetricsA.revPerUserDay) / p1MetricsA.revPerUserDay) * 100
-                : 0;
-            const changeB = p1MetricsB.revPerUserDay > 0
-                ? ((p2MetricsB.revPerUserDay - p1MetricsB.revPerUserDay) / p1MetricsB.revPerUserDay) * 100
-                : 0;
-
             document.getElementById('period2Stats').innerHTML = `
-                <tr><td>CVR</td><td>${p2MetricsA.cvr.toFixed(2)}%</td><td>${p2MetricsB.cvr.toFixed(2)}%</td></tr>
-                <tr><td>Revenue/User</td><td>€${p2MetricsA.revPerUser.toFixed(2)}</td><td>€${p2MetricsB.revPerUser.toFixed(2)}</td></tr>
-                <tr><td class="winner-cell">Revenue/User/Day</td><td class="winner-cell">€${p2MetricsA.revPerUserDay.toFixed(4)}</td><td class="winner-cell">€${p2MetricsB.revPerUserDay.toFixed(4)}</td></tr>
-                <tr>
-                    <td>vs Period 1</td>
-                    <td class="${changeA >= 0 ? 'winner-cell' : ''}">${changeA >= 0 ? '+' : ''}${changeA.toFixed(1)}%</td>
-                    <td class="${changeB >= 0 ? 'winner-cell' : ''}">${changeB >= 0 ? '+' : ''}${changeB.toFixed(1)}%</td>
-                </tr>
+                <tr><td>CVR (context)</td><td>${p2MetricsA.cvr.toFixed(2)}%</td><td>${p2MetricsB.cvr.toFixed(2)}%</td><td>${formatRelativePct(p2MetricsB.cvr, p2MetricsA.cvr)}</td></tr>
+                <tr><td>Revenue/User (context)</td><td>€${p2MetricsA.revPerUser.toFixed(2)}</td><td>€${p2MetricsB.revPerUser.toFixed(2)}</td><td>${formatRelativePct(p2MetricsB.revPerUser, p2MetricsA.revPerUser)}</td></tr>
+                <tr><td class="winner-cell">Revenue/User/Day</td><td class="winner-cell">€${p2MetricsA.revPerUserDay.toFixed(4)}</td><td class="winner-cell">€${p2MetricsB.revPerUserDay.toFixed(4)}</td><td class="winner-cell">${formatRelativePct(p2MetricsB.revPerUserDay, p2MetricsA.revPerUserDay)}</td></tr>
             `;
         }
 
@@ -2801,10 +2845,10 @@
                     return row ? `<tr><td>${age}</td><td>${row.P}</td></tr>` : '';
                 };
                 document.getElementById('pvalueDisplay').innerHTML = `
-                    <div class="period-grid">
-                        <div><div class="period-title">Period 1: Dec 19-Jan 12</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead><tbody>${renderABRows(pValueMap.period1)}</tbody></table></div>
-                        <div><div class="period-title">Period 2: Jan 14-Jan 29</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead><tbody>${renderABRows(pValueMap.period2)}</tbody></table></div>
-                        <div><div class="period-title">Period 3: Jan 31-Mar 19</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Production</th></tr></thead><tbody>${renderPRows(pValueMap.production)}</tbody></table></div>
+                    <div class="pricing-period-grid">
+                        <div class="pricing-period-card"><div class="period-title">Period 1: Dec 19-Jan 12</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead><tbody>${renderABRows(pValueMap.period1)}</tbody></table></div>
+                        <div class="pricing-period-card"><div class="period-title">Period 2: Jan 14-Jan 29</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead><tbody>${renderABRows(pValueMap.period2)}</tbody></table></div>
+                        <div class="pricing-period-card"><div class="period-title">Period 3: Jan 31-Mar 19</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Production</th></tr></thead><tbody>${renderPRows(pValueMap.production)}</tbody></table></div>
                     </div>
                 `;
                 return;
@@ -2818,10 +2862,10 @@
                     return row ? `<tr><td>${age}</td><td>${row.A}</td><td>${row.B}</td></tr>` : '';
                 };
                 document.getElementById('pvalueDisplay').innerHTML = `
-                    <div class="period-grid">
-                        <div><div class="period-title">Period 1: Dec 19-Jan 11</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead><tbody>${renderRows(pValueMap.period1)}</tbody></table></div>
-                        <div><div class="period-title">Period 2: Jan 13-Jan 29</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead><tbody>${renderRows(pValueMap.period2)}</tbody></table></div>
-                        <div><div class="period-title">Period 3: Jan 31-Mar 19</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead><tbody>${renderRows(pValueMap.period3)}</tbody></table></div>
+                    <div class="pricing-period-grid">
+                        <div class="pricing-period-card"><div class="period-title">Period 1: Dec 19-Jan 11</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead><tbody>${renderRows(pValueMap.period1)}</tbody></table></div>
+                        <div class="pricing-period-card"><div class="period-title">Period 2: Jan 13-Jan 29</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead><tbody>${renderRows(pValueMap.period2)}</tbody></table></div>
+                        <div class="pricing-period-card"><div class="period-title">Period 3: Jan 31-Mar 19</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead><tbody>${renderRows(pValueMap.period3)}</tbody></table></div>
                     </div>
                 `;
                 return;
@@ -2858,21 +2902,22 @@
                     document.getElementById('pvalueDisplay').innerHTML = `
                         <h3>Dev ladders by period</h3>
                         <p class="panel-copy" style="margin-bottom:16px;">Period 1 is a true A/B test. Period 2 is one production ladder, so it is shown separately instead of forcing an A/B comparison.</p>
-                        <div class="period-grid">
-                            <div>
+                        <div class="pricing-period-grid">
+                            <div class="pricing-period-card">
                                 <div class="period-title">Period 1 A/B ladder</div>
                                 <table class="pvalue-table">
                                     <thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead>
                                     <tbody>${p1Rows}</tbody>
                                 </table>
                             </div>
-                            <div>
+                            <div class="pricing-period-card">
                                 <div class="period-title">Period 2 production ladder</div>
                                 <table class="pvalue-table">
                                     <thead><tr><th>Age</th><th>Production</th></tr></thead>
                                     <tbody>${prodRows}</tbody>
                                 </table>
                             </div>
+                            <div></div>
                         </div>
                     `;
                     return;
@@ -2883,8 +2928,8 @@
                 document.getElementById('pvalueDisplay').innerHTML = `
                     <h3>Dev ladders for Age ${age}</h3>
                     <p class="panel-copy" style="margin-bottom:16px;">Period 1 shows the A/B ladder. Period 2 shows the single production ladder.</p>
-                    <div class="period-grid">
-                        <div>
+                    <div class="pricing-period-grid">
+                        <div class="pricing-period-card">
                             <div class="period-title">Period 1</div>
                             <table class="pvalue-table">
                                 <thead><tr><th>Group</th><th>Price</th></tr></thead>
@@ -2894,7 +2939,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div>
+                        <div class="pricing-period-card">
                             <div class="period-title">Period 2 production</div>
                             <table class="pvalue-table">
                                 <thead><tr><th>Mode</th><th>Price</th></tr></thead>
@@ -2903,6 +2948,7 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div></div>
                     </div>
                 `;
                 return;
@@ -2938,21 +2984,22 @@
                 document.getElementById('pvalueDisplay').innerHTML = `
                     <h3>Price ladders by period</h3>
                     <p class="panel-copy" style="margin-bottom:16px;">Use this section when the conversation shifts from “who won?” to “what exact price structure won?” The winner column is highlighted for faster scanning.</p>
-                    <div class="period-grid">
-                        <div>
+                    <div class="pricing-period-grid">
+                        <div class="pricing-period-card">
                             <div class="period-title">Period 1 ladder</div>
                             <table class="pvalue-table">
                                 <thead><tr><th>Age</th><th>Reference</th><th>Group A</th><th>Group B</th></tr></thead>
                                 <tbody>${p1Rows}</tbody>
                             </table>
                         </div>
-                        <div>
+                        <div class="pricing-period-card">
                             <div class="period-title">Period 2 ladder</div>
                             <table class="pvalue-table">
                                 <thead><tr><th>Age</th><th>Reference</th><th>Group A</th><th>Group B</th></tr></thead>
                                 <tbody>${p2Rows}</tbody>
                             </table>
                         </div>
+                        <div></div>
                     </div>
                 `;
                 return;
@@ -2963,8 +3010,8 @@
             document.getElementById('pvalueDisplay').innerHTML = `
                 <h3>Price ladders for Age ${age}</h3>
                 <p class="panel-copy" style="margin-bottom:16px;">Age-specific mode helps you inspect the exact handoff between Period 1 and Period 2 for a single cohort.</p>
-                <div class="period-grid">
-                    <div>
+                <div class="pricing-period-grid">
+                    <div class="pricing-period-card">
                         <div class="period-title">Period 1</div>
                         <table class="pvalue-table">
                             <thead><tr><th>Group</th><th>Price</th></tr></thead>
@@ -2974,7 +3021,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div>
+                    <div class="pricing-period-card">
                         <div class="period-title">Period 2</div>
                         <table class="pvalue-table">
                             <thead><tr><th>Group</th><th>Price</th></tr></thead>
@@ -2984,6 +3031,7 @@
                             </tbody>
                         </table>
                     </div>
+                    <div></div>
                 </div>
             `;
         }
@@ -3863,7 +3911,7 @@
                 title: `${metricLabels[metric]} · ${smoothing === 1 ? 'Raw' : `${smoothing}-day smoothing`}`,
                 xaxis: buildXAxisConfig(dates),
                 yaxis: yAxisConfig,
-                hovermode: currentSegment.mode === 'production' ? 'closest' : 'x unified',
+                hovermode: 'closest',
                 showlegend: false,
                 margin: {l: 72, r: 150, t: 72, b: 90},
                 height: 720,
