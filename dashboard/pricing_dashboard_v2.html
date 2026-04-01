@@ -2047,6 +2047,156 @@
             `;
         }
 
+        function classifyABPeriod(metricsA, metricsB) {
+            const cvrGap = metricsB.cvr - metricsA.cvr;
+            const revGap = metricsB.revPerUserDay - metricsA.revPerUserDay;
+            const cvrTie = Math.abs(cvrGap) < 0.35;
+            const revTie = Math.abs(revGap) < 0.0015;
+            const cvrWinner = cvrTie ? 'mixed' : (cvrGap > 0 ? 'B' : 'A');
+            const revWinner = revTie ? 'mixed' : (revGap > 0 ? 'B' : 'A');
+
+            if (cvrWinner !== 'mixed' && cvrWinner === revWinner) {
+                return {
+                    winner: cvrWinner,
+                    strength: Math.abs(cvrGap) >= 1 || Math.abs(revGap) >= 0.003 ? 'clear' : 'lean'
+                };
+            }
+            if (cvrWinner !== 'mixed' && revWinner === 'mixed') {
+                return {winner: cvrWinner, strength: 'lean'};
+            }
+            if (revWinner !== 'mixed' && cvrWinner === 'mixed') {
+                return {winner: revWinner, strength: 'lean'};
+            }
+            return {winner: 'mixed', strength: 'mixed'};
+        }
+
+        function buildABSupportSummary(metricsA, metricsB) {
+            const cvrGap = metricsB.cvr - metricsA.cvr;
+            const revGap = metricsB.revPerUserDay - metricsA.revPerUserDay;
+            const cvrTie = Math.abs(cvrGap) < 0.35;
+            const revTie = Math.abs(revGap) < 0.0015;
+            const cvrWinner = cvrTie ? 'mixed' : (cvrGap > 0 ? 'B' : 'A');
+            const revWinner = revTie ? 'mixed' : (revGap > 0 ? 'B' : 'A');
+            return {cvrWinner, revWinner, cvrGap, revGap, cvrTie, revTie};
+        }
+
+        function buildAgeLevelChartRecommendation(dataA, dataB, dataP, age, duration) {
+            if (age === 'all') return null;
+
+            const period1End = currentSegment.periodModel === 'three_periods' || currentSegment.periodModel === 'three_periods_production'
+                ? '2026-01-12'
+                : '2026-01-29';
+            const period2Start = (currentSegment.periodModel === 'three_periods' || currentSegment.periodModel === 'three_periods_production')
+                ? '2026-01-14'
+                : (currentSegment.period2Start || '2026-01-31');
+            const period2End = (currentSegment.periodModel === 'three_periods' || currentSegment.periodModel === 'three_periods_production')
+                ? '2026-01-29'
+                : null;
+            const period3Start = '2026-01-31';
+
+            const p1RowsA = dataA.filter(d => d.date <= period1End);
+            const p1RowsB = dataB.filter(d => d.date <= period1End);
+            const p1A = {
+                cvr: calculateSelectedMetricForPeriod(p1RowsA, 'user_cvr', age, 'A', 'period1', duration),
+                revPerUserDay: calculateSelectedMetricForPeriod(p1RowsA, 'revenue_per_user_day', age, 'A', 'period1', duration)
+            };
+            const p1B = {
+                cvr: calculateSelectedMetricForPeriod(p1RowsB, 'user_cvr', age, 'B', 'period1', duration),
+                revPerUserDay: calculateSelectedMetricForPeriod(p1RowsB, 'revenue_per_user_day', age, 'B', 'period1', duration)
+            };
+            const p1Signal = classifyABPeriod(p1A, p1B);
+            const p1Support = buildABSupportSummary(p1A, p1B);
+
+            if (currentSegment.mode === 'production') {
+                const abPeriodKey = currentSegment.periodModel === 'three_periods_production' ? 'period2' : 'period1';
+                const abRowsA = currentSegment.periodModel === 'three_periods_production'
+                    ? dataA.filter(d => d.date >= period2Start && d.date <= period2End)
+                    : p1RowsA;
+                const abRowsB = currentSegment.periodModel === 'three_periods_production'
+                    ? dataB.filter(d => d.date >= period2Start && d.date <= period2End)
+                    : p1RowsB;
+                const abA = {
+                    cvr: calculateSelectedMetricForPeriod(abRowsA, 'user_cvr', age, 'A', abPeriodKey, duration),
+                    revPerUserDay: calculateSelectedMetricForPeriod(abRowsA, 'revenue_per_user_day', age, 'A', abPeriodKey, duration)
+                };
+                const abB = {
+                    cvr: calculateSelectedMetricForPeriod(abRowsB, 'user_cvr', age, 'B', abPeriodKey, duration),
+                    revPerUserDay: calculateSelectedMetricForPeriod(abRowsB, 'revenue_per_user_day', age, 'B', abPeriodKey, duration)
+                };
+                const abSignal = classifyABPeriod(abA, abB);
+                const abSupport = buildABSupportSummary(abA, abB);
+                const prodPeriodKey = currentSegment.periodModel === 'three_periods_production' ? 'period3' : 'period2';
+                const prodRows = dataP.filter(d => d.date >= period3Start || d.date >= (currentSegment.period2Start || period3Start));
+                const prodMetrics = {
+                    cvr: calculateSelectedMetricForPeriod(prodRows, 'user_cvr', age, 'P', prodPeriodKey, duration),
+                    revPerUserDay: calculateSelectedMetricForPeriod(prodRows, 'revenue_per_user_day', age, 'P', prodPeriodKey, duration)
+                };
+                const winnerMetrics = abSignal.winner === 'A' ? abA : abSignal.winner === 'B' ? abB : null;
+                if (!winnerMetrics || abSignal.winner === 'mixed' || (abSupport.cvrWinner !== 'mixed' && abSupport.revWinner !== 'mixed' && abSupport.cvrWinner !== abSupport.revWinner)) {
+                    return {
+                        title: `Age ${age} is mixed`,
+                        copy: `This age does not give a clean enough A/B read before rollout because conversion and monetization do not point the same way. Use the region recommendation as the main decision, and treat this age view as supporting detail only.`
+                    };
+                }
+                const cvrHeld = winnerMetrics.cvr <= 0 ? true : prodMetrics.cvr >= winnerMetrics.cvr * 0.78;
+                const revHeld = winnerMetrics.revPerUserDay <= 0 ? true : prodMetrics.revPerUserDay >= winnerMetrics.revPerUserDay * 0.78;
+                if (cvrHeld && revHeld) {
+                    return {
+                        title: `Age ${age} supports keeping the current single price`,
+                        copy: `The winning ${abSignal.winner} result was rolled out, and this age still looks viable in the single-price period even though live performance is softer than the winning test read. Region recommendation stays higher priority than any single age.`
+                    };
+                }
+                return {
+                    title: `Age ${age} is softer after rollout`,
+                    copy: `This age weakened after rollout versus the winning ${abSignal.winner} test result. Keep the region recommendation as the main call unless this age becomes important enough to investigate separately.`
+                };
+            }
+
+            const latestPeriodKey = currentSegment.periodModel === 'three_periods' ? 'period3' : 'period2';
+            const latestRowsA = currentSegment.periodModel === 'three_periods'
+                ? dataA.filter(d => d.date >= period3Start)
+                : dataA.filter(d => d.date >= period2Start);
+            const latestRowsB = currentSegment.periodModel === 'three_periods'
+                ? dataB.filter(d => d.date >= period3Start)
+                : dataB.filter(d => d.date >= period2Start);
+            const latestA = {
+                cvr: calculateSelectedMetricForPeriod(latestRowsA, 'user_cvr', age, 'A', latestPeriodKey, duration),
+                revPerUserDay: calculateSelectedMetricForPeriod(latestRowsA, 'revenue_per_user_day', age, 'A', latestPeriodKey, duration)
+            };
+            const latestB = {
+                cvr: calculateSelectedMetricForPeriod(latestRowsB, 'user_cvr', age, 'B', latestPeriodKey, duration),
+                revPerUserDay: calculateSelectedMetricForPeriod(latestRowsB, 'revenue_per_user_day', age, 'B', latestPeriodKey, duration)
+            };
+            const latestSignal = classifyABPeriod(latestA, latestB);
+            const latestSupport = buildABSupportSummary(latestA, latestB);
+
+            if (latestSignal.winner === 'mixed' || (latestSupport.cvrWinner !== 'mixed' && latestSupport.revWinner !== 'mixed' && latestSupport.cvrWinner !== latestSupport.revWinner)) {
+                return {
+                    title: `Age ${age} is mixed`,
+                    copy: latestSupport.cvrWinner !== 'mixed' && latestSupport.revWinner !== 'mixed' && latestSupport.cvrWinner !== latestSupport.revWinner
+                        ? `The latest period splits the signal for this age: Group ${latestSupport.cvrWinner} wins CVR, while Group ${latestSupport.revWinner} holds revenue/day better. Use the region recommendation as the main call, and treat this age view as supporting context only.`
+                        : `The latest A/B period does not produce a clean winner for this age. Use the region recommendation as the main call, and treat this age view as supporting context only.`
+                };
+            }
+
+            const latestIsOneMetricOnly = (latestSupport.cvrWinner !== 'mixed' && latestSupport.revWinner === 'mixed')
+                || (latestSupport.revWinner !== 'mixed' && latestSupport.cvrWinner === 'mixed');
+            if (latestIsOneMetricOnly && p1Signal.winner !== 'mixed' && p1Signal.winner !== latestSignal.winner) {
+                return {
+                    title: `Age ${age} is mixed`,
+                    copy: `The latest period leans to Group ${latestSignal.winner}, but the earlier period leaned to Group ${p1Signal.winner} and the monetization signal is not strong enough to make this a clean age-level call. Keep the region recommendation as the higher-priority decision.`
+                };
+            }
+
+            const consistent = p1Signal.winner === latestSignal.winner || p1Signal.winner === 'mixed';
+            return {
+                title: `Age ${age} leans to Group ${latestSignal.winner}`,
+                copy: consistent
+                    ? `The latest period still favors Group ${latestSignal.winner} for this age, and the earlier read does not meaningfully conflict with it. Keep the region recommendation as the primary decision.`
+                    : `The latest period favors Group ${latestSignal.winner} for this age, but earlier periods were less consistent. Use this as supporting detail and keep the region recommendation as the higher-priority call.`
+            };
+        }
+
         function calculatePeriodMetrics(data, totalUsers) {
             const period1End = '2026-01-29';
             const p1 = data.filter(d => d.date <= period1End);
@@ -2158,8 +2308,13 @@
                 const p2AvgB = averageOf(p2ValuesB);
                 const p3AvgP = averageOf(p3ValuesP);
                 const viewLabel = age === 'all' ? 'All ages' : `Age ${age}`;
-                document.getElementById('chartReadTitle').textContent = `${currentSegment.shortName} separates two A/B windows from one production rollout`;
-                document.getElementById('chartReadCopy').textContent = age === 'all'
+                const ageRecommendation = buildAgeLevelChartRecommendation(dataA, dataB, dataP, age, duration);
+                document.getElementById('chartReadTitle').textContent = ageRecommendation
+                    ? ageRecommendation.title
+                    : `${currentSegment.shortName} separates two A/B windows from one production rollout`;
+                document.getElementById('chartReadCopy').textContent = ageRecommendation
+                    ? ageRecommendation.copy
+                    : age === 'all'
                     ? `This chart follows the actual ${currentSegment.shortName} chronology: Dec 19-Jan 12, Jan 14-Jan 29, and Jan 31-Mar 19.`
                     : 'This filtered cohort view stays directional, but the chart still separates the two A/B windows from the production rollout and removes the two transition days.';
                 document.getElementById('chartStatGrid').innerHTML = `
@@ -2284,8 +2439,13 @@
                 const p2AvgB = averageOf(p2SeriesB.values);
                 const p3AvgP = averageOf(p3SeriesP.values);
                 const viewLabel = age === 'all' ? 'All ages' : `Age ${age}`;
-                document.getElementById('chartReadTitle').textContent = `${currentSegment.shortName} separates two A/B windows from one production rollout`;
-                document.getElementById('chartReadCopy').textContent = age === 'all'
+                const ageRecommendation = buildAgeLevelChartRecommendation(dataA, dataB, dataP, age, duration);
+                document.getElementById('chartReadTitle').textContent = ageRecommendation
+                    ? ageRecommendation.title
+                    : `${currentSegment.shortName} separates two A/B windows from one production rollout`;
+                document.getElementById('chartReadCopy').textContent = ageRecommendation
+                    ? ageRecommendation.copy
+                    : age === 'all'
                     ? `This chart follows the actual ${currentSegment.shortName} chronology: Dec 19-Jan 12, Jan 14-Jan 29, and Jan 31-Mar 19.`
                     : 'This filtered cohort view stays directional, but the chart still separates the two A/B windows from the production rollout and removes the two transition days.';
                 document.getElementById('chartStatGrid').innerHTML = `
@@ -2395,8 +2555,13 @@
                 const p2AvgB = averageOf(p2SeriesB.values);
                 const p3AvgP = averageOf(p3SeriesP.values);
                 const viewLabel = age === 'all' ? 'All ages' : `Age ${age}`;
-                document.getElementById('chartReadTitle').textContent = `${currentSegment.shortName} separates two A/B windows from one production rollout`;
-                document.getElementById('chartReadCopy').textContent = age === 'all'
+                const ageRecommendation = buildAgeLevelChartRecommendation(dataA, dataB, dataP, age, duration);
+                document.getElementById('chartReadTitle').textContent = ageRecommendation
+                    ? ageRecommendation.title
+                    : `${currentSegment.shortName} separates two A/B windows from one production rollout`;
+                document.getElementById('chartReadCopy').textContent = ageRecommendation
+                    ? ageRecommendation.copy
+                    : age === 'all'
                     ? `This chart follows the actual ${currentSegment.shortName} chronology: Dec 19-Jan 12, Jan 14-Jan 29, and Jan 31-Mar 19.`
                     : 'This filtered cohort view stays directional, but the chart still separates the two A/B windows from the production rollout and removes the two transition days.';
                 document.getElementById('chartStatGrid').innerHTML = `
@@ -2766,28 +2931,6 @@
                 `;
                 return;
             }
-            document.getElementById('periodComparisonBody').innerHTML = `
-                <div class="period-grid">
-                    <div>
-                        <div class="period-title">Period 1: ${currentSegment.period1Label || 'Jan 12 to Jan 29'}</div>
-                        <table class="pvalue-table">
-                            <thead>
-                                <tr><th>Metric</th><th>Group A</th><th>Group B</th><th>Delta</th></tr>
-                            </thead>
-                            <tbody id="period1Stats"></tbody>
-                        </table>
-                    </div>
-                    <div>
-                        <div class="period-title">Period 2: ${currentSegment.period2Label || 'Jan 31 to Mar 19'}</div>
-                        <table class="pvalue-table">
-                            <thead>
-                                <tr><th>Metric</th><th>Group A</th><th>Group B</th><th>Delta</th></tr>
-                            </thead>
-                            <tbody id="period2Stats"></tbody>
-                        </table>
-                    </div>
-                </div>
-            `;
             periodComparison.querySelector('h3').textContent = 'Period comparison';
             periodComparison.querySelector('.period-callout').textContent = `Compare A vs B inside each period. For cross-period comparisons, use Revenue/User/Day because Period 1 ran for ${currentSegment.period1Days || 18} days and Period 2 ran for ${currentSegment.period2Days || 48} days. CVR and Revenue/User are shown as context only.`;
 
@@ -2795,17 +2938,12 @@
                 const p1MetricsA = getSummaryMetric('A', 'period1', duration);
                 const p1MetricsB = getSummaryMetric('B', 'period1', duration);
                 const p2MetricsP = getSummaryMetric('P', 'period2', duration);
-
-                document.getElementById('period1Stats').innerHTML = `
-                    <tr><td>CVR (context)</td><td>${p1MetricsA.cvr.toFixed(2)}%</td><td>${p1MetricsB.cvr.toFixed(2)}%</td><td>${formatRelativePct(p1MetricsB.cvr, p1MetricsA.cvr)}</td></tr>
-                    <tr><td>Revenue/User (context)</td><td>€${p1MetricsA.revPerUser.toFixed(2)}</td><td>€${p1MetricsB.revPerUser.toFixed(2)}</td><td>${formatRelativePct(p1MetricsB.revPerUser, p1MetricsA.revPerUser)}</td></tr>
-                    <tr><td class="winner-cell">Revenue/User/Day</td><td class="winner-cell">€${p1MetricsA.revPerUserDay.toFixed(4)}</td><td class="winner-cell">€${p1MetricsB.revPerUserDay.toFixed(4)}</td><td class="winner-cell">${formatRelativePct(p1MetricsB.revPerUserDay, p1MetricsA.revPerUserDay)}</td></tr>
-                `;
-                document.getElementById('period2Stats').innerHTML = `
-                    <tr><td>Single-price CVR (context)</td><td>${p2MetricsP.cvr.toFixed(2)}%</td><td>—</td><td>—</td></tr>
-                    <tr><td>Single-price Revenue/User (context)</td><td>€${p2MetricsP.revPerUser.toFixed(2)}</td><td>—</td><td>—</td></tr>
-                    <tr><td class="winner-cell">Single-price Revenue/User/Day</td><td class="winner-cell">€${p2MetricsP.revPerUserDay.toFixed(4)}</td><td>—</td><td>—</td></tr>
-                    <tr><td>Single-price Users</td><td>${p2MetricsP.users.toLocaleString()}</td><td>—</td><td>—</td></tr>
+                document.getElementById('periodComparisonBody').innerHTML = `
+                    <div class="period-comparison-grid">
+                        ${buildThreePeriodCard('Period 1', currentSegment.period1Label || 'Jan 12 to Jan 29', p1MetricsA, p1MetricsB)}
+                        ${buildThreePeriodProductionCard('Period 2', currentSegment.period2Label || 'Jan 31 to Mar 19', p2MetricsP)}
+                        <div></div>
+                    </div>
                 `;
                 return;
             }
@@ -2815,15 +2953,12 @@
             const p1MetricsB = getSummaryMetric('B', 'period1', duration);
             const p2MetricsB = getSummaryMetric('B', 'period2', duration);
 
-            document.getElementById('period1Stats').innerHTML = `
-                <tr><td>CVR (context)</td><td>${p1MetricsA.cvr.toFixed(2)}%</td><td>${p1MetricsB.cvr.toFixed(2)}%</td><td>${formatRelativePct(p1MetricsB.cvr, p1MetricsA.cvr)}</td></tr>
-                <tr><td>Revenue/User (context)</td><td>€${p1MetricsA.revPerUser.toFixed(2)}</td><td>€${p1MetricsB.revPerUser.toFixed(2)}</td><td>${formatRelativePct(p1MetricsB.revPerUser, p1MetricsA.revPerUser)}</td></tr>
-                <tr><td class="winner-cell">Revenue/User/Day</td><td class="winner-cell">€${p1MetricsA.revPerUserDay.toFixed(4)}</td><td class="winner-cell">€${p1MetricsB.revPerUserDay.toFixed(4)}</td><td class="winner-cell">${formatRelativePct(p1MetricsB.revPerUserDay, p1MetricsA.revPerUserDay)}</td></tr>
-            `;
-            document.getElementById('period2Stats').innerHTML = `
-                <tr><td>CVR (context)</td><td>${p2MetricsA.cvr.toFixed(2)}%</td><td>${p2MetricsB.cvr.toFixed(2)}%</td><td>${formatRelativePct(p2MetricsB.cvr, p2MetricsA.cvr)}</td></tr>
-                <tr><td>Revenue/User (context)</td><td>€${p2MetricsA.revPerUser.toFixed(2)}</td><td>€${p2MetricsB.revPerUser.toFixed(2)}</td><td>${formatRelativePct(p2MetricsB.revPerUser, p2MetricsA.revPerUser)}</td></tr>
-                <tr><td class="winner-cell">Revenue/User/Day</td><td class="winner-cell">€${p2MetricsA.revPerUserDay.toFixed(4)}</td><td class="winner-cell">€${p2MetricsB.revPerUserDay.toFixed(4)}</td><td class="winner-cell">${formatRelativePct(p2MetricsB.revPerUserDay, p2MetricsA.revPerUserDay)}</td></tr>
+            document.getElementById('periodComparisonBody').innerHTML = `
+                <div class="period-comparison-grid">
+                    ${buildThreePeriodCard('Period 1', currentSegment.period1Label || 'Jan 12 to Jan 29', p1MetricsA, p1MetricsB)}
+                    ${buildThreePeriodCard('Period 2', currentSegment.period2Label || 'Jan 31 to Mar 19', p2MetricsA, p2MetricsB)}
+                    <div></div>
+                </div>
             `;
         }
 
@@ -2848,7 +2983,7 @@
                     <div class="pricing-period-grid">
                         <div class="pricing-period-card"><div class="period-title">Period 1: Dec 19-Jan 12</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead><tbody>${renderABRows(pValueMap.period1)}</tbody></table></div>
                         <div class="pricing-period-card"><div class="period-title">Period 2: Jan 14-Jan 29</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead><tbody>${renderABRows(pValueMap.period2)}</tbody></table></div>
-                        <div class="pricing-period-card"><div class="period-title">Period 3: Jan 31-Mar 19</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Production</th></tr></thead><tbody>${renderPRows(pValueMap.production)}</tbody></table></div>
+                        <div class="pricing-period-card"><div class="period-title">Period 3: Jan 31-Mar 19</div><table class="pvalue-table"><thead><tr><th>Age</th><th>Single price</th></tr></thead><tbody>${renderPRows(pValueMap.production)}</tbody></table></div>
                     </div>
                 `;
                 return;
@@ -2876,45 +3011,37 @@
             }
 
             if (currentSegment.mode === 'production') {
-                const ageRanges = [
-                    {range:'18-21', ages:[18,19,20,21]},
-                    {range:'22-24', ages:[22,23,24]},
-                    {range:'25-29', ages:[25,26,27,28,29]},
-                    {range:'30-34', ages:[30,31,32,33,34]},
-                    {range:'35-40', ages:[35,36,37,38,39,40]}
-                ];
+                const renderABAgeRows = (source) => {
+                    if (age === 'all') {
+                        return Object.keys(source).map(k => `<tr><td>${k}</td><td>${source[k].A}</td><td>${source[k].B}</td></tr>`).join('');
+                    }
+                    const row = source[age];
+                    return row ? `<tr><td>${age}</td><td>${row.A}</td><td>${row.B}</td></tr>` : '';
+                };
+                const renderProductionAgeRows = (source) => {
+                    if (age === 'all') {
+                        return Object.keys(source).map(k => `<tr><td>${k}</td><td>${source[k].P}</td></tr>`).join('');
+                    }
+                    const row = source[age];
+                    return row ? `<tr><td>${age}</td><td>${row.P}</td></tr>` : '';
+                };
 
                 if (age === 'all') {
-                    const p1Rows = ageRanges.map(range => {
-                        const first = pValueMap.period1[range.ages[0]];
-                        const last = pValueMap.period1[range.ages[range.ages.length - 1]];
-                        const aValue = first.A === last.A ? first.A : `${first.A}-${last.A}`;
-                        const bValue = first.B === last.B ? first.B : `${first.B}-${last.B}`;
-                        return `<tr><td>${range.range}</td><td>${aValue}</td><td>${bValue}</td></tr>`;
-                    }).join('');
-                    const prodRows = ageRanges.map(range => {
-                        const first = pValueMap.production[range.ages[0]];
-                        const last = pValueMap.production[range.ages[range.ages.length - 1]];
-                        const pValue = first.P === last.P ? first.P : `${first.P}-${last.P}`;
-                        return `<tr><td>${range.range}</td><td>${pValue}</td></tr>`;
-                    }).join('');
-
                     document.getElementById('pvalueDisplay').innerHTML = `
-                        <h3>Dev ladders by period</h3>
-                        <p class="panel-copy" style="margin-bottom:16px;">Period 1 is a true A/B test. Period 2 is one production ladder, so it is shown separately instead of forcing an A/B comparison.</p>
+                        <h3>Price ladders by period</h3>
                         <div class="pricing-period-grid">
                             <div class="pricing-period-card">
-                                <div class="period-title">Period 1 A/B ladder</div>
+                                <div class="period-title">Period 1: ${currentSegment.period1Label || 'Dec 19 to Jan 29'}</div>
                                 <table class="pvalue-table">
                                     <thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead>
-                                    <tbody>${p1Rows}</tbody>
+                                    <tbody>${renderABAgeRows(pValueMap.period1)}</tbody>
                                 </table>
                             </div>
                             <div class="pricing-period-card">
-                                <div class="period-title">Period 2 production ladder</div>
+                                <div class="period-title">Period 2: ${currentSegment.period2Label || 'Jan 31 to Mar 19'}</div>
                                 <table class="pvalue-table">
-                                    <thead><tr><th>Age</th><th>Production</th></tr></thead>
-                                    <tbody>${prodRows}</tbody>
+                                    <thead><tr><th>Age</th><th>Single price</th></tr></thead>
+                                    <tbody>${renderProductionAgeRows(pValueMap.production)}</tbody>
                                 </table>
                             </div>
                             <div></div>
@@ -2926,25 +3053,23 @@
                 const p1 = pValueMap.period1[age] || {A:'N/A',B:'N/A'};
                 const p2 = pValueMap.production[age] || {P:'N/A'};
                 document.getElementById('pvalueDisplay').innerHTML = `
-                    <h3>Dev ladders for Age ${age}</h3>
-                    <p class="panel-copy" style="margin-bottom:16px;">Period 1 shows the A/B ladder. Period 2 shows the single production ladder.</p>
+                    <h3>Price ladders for Age ${age}</h3>
                     <div class="pricing-period-grid">
                         <div class="pricing-period-card">
                             <div class="period-title">Period 1</div>
                             <table class="pvalue-table">
-                                <thead><tr><th>Group</th><th>Price</th></tr></thead>
+                                <thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead>
                                 <tbody>
-                                    <tr><td>Group A</td><td>${p1.A}</td></tr>
-                                    <tr><td>Group B</td><td>${p1.B}</td></tr>
+                                    <tr><td>${age}</td><td>${p1.A}</td><td>${p1.B}</td></tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="pricing-period-card">
-                            <div class="period-title">Period 2 production</div>
+                            <div class="period-title">Period 2</div>
                             <table class="pvalue-table">
-                                <thead><tr><th>Mode</th><th>Price</th></tr></thead>
+                                <thead><tr><th>Age</th><th>Single price</th></tr></thead>
                                 <tbody>
-                                    <tr><td>Production</td><td>${p2.P}</td></tr>
+                                    <tr><td>${age}</td><td>${p2.P}</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -2954,49 +3079,24 @@
                 return;
             }
 
-            const winnerBySegment = currentSegment.key.includes('rich') ? 'B' : 'B';
-
             if (age === 'all') {
-                const ageRanges = [
-                    {range:'18-21', ages:[18,19,20,21]},
-                    {range:'22-24', ages:[22,23,24]},
-                    {range:'25-29', ages:[25,26,27,28,29]},
-                    {range:'30-34', ages:[30,31,32,33,34]},
-                    {range:'35-40', ages:[35,36,37,38,39,40]}
-                ];
-
-                const p1Rows = ageRanges.map(range => {
-                    const first = pValueMap.period1[range.ages[0]];
-                    const last = pValueMap.period1[range.ages[range.ages.length - 1]];
-                    const aValue = first.A === last.A ? first.A : `${first.A}-${last.A}`;
-                    const bValue = first.B === last.B ? first.B : `${first.B}-${last.B}`;
-                    return `<tr><td>${range.range}</td><td>${aValue}</td><td class="${winnerBySegment === 'A' ? 'winner-cell' : ''}">${aValue}</td><td class="${winnerBySegment === 'B' ? 'winner-cell' : ''}">${bValue}</td></tr>`;
-                }).join('');
-
-                const p2Rows = ageRanges.map(range => {
-                    const first = pValueMap.period2[range.ages[0]];
-                    const last = pValueMap.period2[range.ages[range.ages.length - 1]];
-                    const aValue = first.A === last.A ? first.A : `${first.A}-${last.A}`;
-                    const bValue = first.B === last.B ? first.B : `${first.B}-${last.B}`;
-                    return `<tr><td>${range.range}</td><td>${aValue}</td><td class="${winnerBySegment === 'A' ? 'winner-cell' : ''}">${aValue}</td><td class="${winnerBySegment === 'B' ? 'winner-cell' : ''}">${bValue}${first.aa ? ' <span class="aa-control">(AA)</span>' : ''}</td></tr>`;
-                }).join('');
+                const renderRows = (source) => Object.keys(source).map(k => `<tr><td>${k}</td><td>${source[k].A}</td><td>${source[k].B}${source[k].aa ? ' <span class="aa-control">(AA)</span>' : ''}</td></tr>`).join('');
 
                 document.getElementById('pvalueDisplay').innerHTML = `
                     <h3>Price ladders by period</h3>
-                    <p class="panel-copy" style="margin-bottom:16px;">Use this section when the conversation shifts from “who won?” to “what exact price structure won?” The winner column is highlighted for faster scanning.</p>
                     <div class="pricing-period-grid">
                         <div class="pricing-period-card">
-                            <div class="period-title">Period 1 ladder</div>
+                            <div class="period-title">Period 1: ${currentSegment.period1Label || 'Dec 19 to Jan 29'}</div>
                             <table class="pvalue-table">
-                                <thead><tr><th>Age</th><th>Reference</th><th>Group A</th><th>Group B</th></tr></thead>
-                                <tbody>${p1Rows}</tbody>
+                                <thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead>
+                                <tbody>${renderRows(pValueMap.period1)}</tbody>
                             </table>
                         </div>
                         <div class="pricing-period-card">
-                            <div class="period-title">Period 2 ladder</div>
+                            <div class="period-title">Period 2: ${currentSegment.period2Label || 'Jan 31 to Mar 19'}</div>
                             <table class="pvalue-table">
-                                <thead><tr><th>Age</th><th>Reference</th><th>Group A</th><th>Group B</th></tr></thead>
-                                <tbody>${p2Rows}</tbody>
+                                <thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead>
+                                <tbody>${renderRows(pValueMap.period2)}</tbody>
                             </table>
                         </div>
                         <div></div>
@@ -3009,25 +3109,22 @@
             const p2 = pValueMap.period2[age] || {A:'N/A',B:'N/A'};
             document.getElementById('pvalueDisplay').innerHTML = `
                 <h3>Price ladders for Age ${age}</h3>
-                <p class="panel-copy" style="margin-bottom:16px;">Age-specific mode helps you inspect the exact handoff between Period 1 and Period 2 for a single cohort.</p>
                 <div class="pricing-period-grid">
                     <div class="pricing-period-card">
                         <div class="period-title">Period 1</div>
                         <table class="pvalue-table">
-                            <thead><tr><th>Group</th><th>Price</th></tr></thead>
+                            <thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead>
                             <tbody>
-                                <tr><td>Group A</td><td>${p1.A}</td></tr>
-                                <tr><td>Group B</td><td class="winner-cell">${p1.B}</td></tr>
+                                <tr><td>${age}</td><td>${p1.A}</td><td>${p1.B}</td></tr>
                             </tbody>
                         </table>
                     </div>
                     <div class="pricing-period-card">
                         <div class="period-title">Period 2</div>
                         <table class="pvalue-table">
-                            <thead><tr><th>Group</th><th>Price</th></tr></thead>
+                            <thead><tr><th>Age</th><th>Group A</th><th>Group B</th></tr></thead>
                             <tbody>
-                                <tr><td>Group A</td><td>${p2.A}</td></tr>
-                                <tr><td>Group B</td><td class="winner-cell">${p2.B}${p2.aa ? ' <span class="aa-control">(AA)</span>' : ''}</td></tr>
+                                <tr><td>${age}</td><td>${p2.A}</td><td>${p2.B}${p2.aa ? ' <span class="aa-control">(AA)</span>' : ''}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -3438,8 +3535,13 @@
                 const p3AvgA = averageOf(p3ValuesA);
                 const p3AvgB = averageOf(p3ValuesB);
                 const viewLabel = age === 'all' ? 'All ages' : `Age ${age}`;
-                document.getElementById('chartReadTitle').textContent = `${currentSegment.shortName} now separates Period 1, Period 2, and Period 3`;
-                document.getElementById('chartReadCopy').textContent = age === 'all'
+                const ageRecommendation = buildAgeLevelChartRecommendation(dataA, dataB, dataP, age, duration);
+                document.getElementById('chartReadTitle').textContent = ageRecommendation
+                    ? ageRecommendation.title
+                    : `${currentSegment.shortName} now separates Period 1, Period 2, and Period 3`;
+                document.getElementById('chartReadCopy').textContent = ageRecommendation
+                    ? ageRecommendation.copy
+                    : age === 'all'
                     ? `This chart follows the actual ${currentSegment.shortName} chronology: Dec 19-Jan 11, Jan 13-Jan 29, and Jan 31-Mar 19.`
                     : 'This filtered cohort view stays directional, but the chart still separates the three actual pricing periods and removes the two mixed transition days.';
                 document.getElementById('chartStatGrid').innerHTML = `
@@ -3590,14 +3692,19 @@
                 ? 'Period-level revenue normalized by users and days'
                 : 'Period totals on the selected metric';
 
-            document.getElementById('chartReadTitle').textContent = currentSegment.mode === 'production'
-                ? 'This segment separates Period 1 A/B from Period 2 production'
+            const ageRecommendation = buildAgeLevelChartRecommendation(dataA, dataB, dataP, age, duration);
+            document.getElementById('chartReadTitle').textContent = ageRecommendation
+                ? ageRecommendation.title
+                : currentSegment.mode === 'production'
+                ? 'This segment separates the A/B test from the single-price period'
                 : `${leadingGroup} is leading, and the chart separates Period 1 from Period 2`;
-            document.getElementById('chartReadCopy').textContent = currentSegment.mode === 'production'
-                ? `Period 1 shows Group A and Group B. Period 2 shows one production stream, so the chart does not imply an A/B comparison after Jan 30.`
+            document.getElementById('chartReadCopy').textContent = ageRecommendation
+                ? ageRecommendation.copy
+                : currentSegment.mode === 'production'
+                ? `Period 1 shows Group A and Group B. The later period is a single price, so the chart should be read as test first, rollout second.`
                 : age === 'all'
-                ? `This chart keeps the two pricing periods separate. The side panel now shows Period 1 and Period 2 values for Group A and Group B on ${metricLabels[metric].toLowerCase()}, with January 30 removed as a mixed transition day.`
-                : `This filtered cohort view is directional because the denominator is estimated, but the chart still separates the two pricing periods and the side panel shows period-level values for the selected cohort.`;
+                ? `This chart keeps the pricing periods separate. The side panel shows period-level values for Group A and Group B on ${metricLabels[metric].toLowerCase()}, with the mixed transition day removed.`
+                : `This filtered cohort view is directional because the denominator is estimated, but the chart still separates the pricing periods and the side panel shows period-level values for the selected age.`;
 
             if (currentSegment.mode === 'production') {
                 const period2ValueP = calculateSelectedMetricForPeriod(dataP, metric, age, 'P', 'period2', duration);
