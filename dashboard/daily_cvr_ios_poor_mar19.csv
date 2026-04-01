@@ -223,7 +223,7 @@ date,group,duration,unique_users,unique_converters,conversion_events,daily_cvr
 2026-01-16,B,All,1199,14,14,1.1676
 2026-01-16,B,Monthly,1199,3,3,0.2502
 2026-01-16,B,Weekly,1199,10,10,0.834
-2026-01-17,A,3 Months,1277,0,0,0.0
+2026-01-17,A,3 Months,1277,1,1,0.0783
 2026-01-17,A,All,1277,12,12,0.9397
 2026-01-17,A,Monthly,1277,4,4,0.3132
 2026-01-17,A,Weekly,1277,7,7,0.5482

@@ -43,7 +43,7 @@ date,group,duration,unique_users,unique_converters,conversion_events,daily_cvr
 2025-12-24,A,All,290,4,4,1.3793
 2025-12-24,A,Monthly,290,0,0,0.0
 2025-12-24,A,Weekly,290,3,3,1.0345
-2025-12-24,B,3 Months,293,0,0,0.0
+2025-12-24,B,3 Months,293,1,1,0.3413
 2025-12-24,B,All,293,7,7,2.3891
 2025-12-24,B,Monthly,293,0,0,0.0
 2025-12-24,B,Weekly,293,6,6,2.0478
