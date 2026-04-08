@@ -19,7 +19,7 @@
       --bad: #ef4444;
       --conf-high: rgba(49,196,141,0.85);
       --conf-mod: rgba(245,158,11,0.85);
-      --conf-low: rgba(239,68,68,0.70);
+      --conf-low: rgba(120,140,155,0.55);
       --conf-none: rgba(120,140,155,0.45);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -159,8 +159,7 @@
     <div class="eyebrow">dua.com · Male Pricing A/B Test</div>
     <h1>Price Recommendations</h1>
     <p class="hero-copy">
-      Recommended price per age, segment and OS — combining direct A/B evidence with empirical cross-segment signals.
-      Cell colour shows confidence tier (see legend below). Click any cell for the full evidence breakdown and next A/B test proposal.
+      Analytically derived optimal price per age per segment. Green = direct A/B winner. Amber = blended signal. Gray = cross-segment model. For production segments (iOS Mid, iOS Dev, Android Mid, Android Dev) only: <code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:4px;font-size:13px;">live:Px</code> shows the current running price when it differs from the recommendation — that gap is what the next A/B test closes.
     </p>
     <div class="hero-actions">
       <a class="btn primary" href="./age_anchor_analysis.html">Age Anchor Analysis</a>
@@ -175,29 +174,30 @@
     <!-- Legend row -->
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:4px;">
       <div class="legend">
-        <div class="legend-item"><div class="legend-dot" style="background:var(--conf-high)"></div> High (direct)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--conf-mod)"></div> Moderate (blended)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--conf-low)"></div> Low (cross-seg)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--conf-none)"></div> Insufficient</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--conf-high)"></div> Green (High) — Direct A/B winner</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--conf-mod)"></div> Amber (Mod) — Blended A/B + model</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--conf-low)"></div> Gray (Low) — Cross-segment model only</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--conf-none)"></div> Insufficient — No usable signal</div>
+        <div class="legend-item" style="margin-left:10px;padding-left:14px;border-left:1px solid var(--line);font-size:11px;color:var(--muted);"><code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:3px;">live:Px</code> = current production price for single-price segments</div>
       </div>
     </div>
     <!-- Confidence explanation -->
     <div class="conf-explain">
       <div class="conf-explain-item">
-        <strong style="color:var(--good)">● High — direct A/B</strong>
-        Strong sample on the winning side. Act on it.
+        <strong style="color:var(--good)">● Green — Direct A/B winner</strong>
+        Winning price confirmed by A/B test with sufficient sample. Act on it.
       </div>
       <div class="conf-explain-item">
-        <strong style="color:var(--warn)">● Moderate — blended</strong>
-        Thin direct data or combined with cross-segment signal. Use with caution.
+        <strong style="color:var(--warn)">● Amber — Blended A/B + model</strong>
+        Direct data present but thin — combined with cross-segment signal.
       </div>
       <div class="conf-explain-item">
-        <strong style="color:var(--bad)">● Low — cross-segment</strong>
-        Little or no local data. Cross-segment prediction dominates. Treat as a hypothesis, not a proven optimum.
+        <strong style="color:var(--muted)">● Gray — Cross-segment model only</strong>
+        No local A/B data for this age. Derived from iOS Dev anchor × WTP ratio. Treat as a starting hypothesis.
       </div>
       <div class="conf-explain-item">
         <strong style="color:var(--muted)">● Insufficient</strong>
-        No usable local data. Run a proper A/B before acting on this.
+        No usable signal. Run a proper A/B before acting on this.
       </div>
     </div>
     <!-- WTP ratio strip -->
@@ -258,9 +258,32 @@
 </div>
 
 <script>
-  let data = null;
+  let data    = null;
   let ltvData = null;
+  let aaData  = null;   // age_anchor_analysis.json — for B prices + live prices
   let activeCell = null;
+
+  const AB_SEGS   = new Set(['poor','rich','android_poor','android_rich']);
+  const PROD_SEGS = new Set(['mid_ios','dev_ios','mid_android','dev_android']);
+
+  // Build lookup: aaLookup[age][segKey] = { bPrice, livePrice }
+  function buildAALookup(aa) {
+    const out = {};
+    for (const [age, ageObj] of Object.entries(aa.age_analysis || {})) {
+      out[age] = {};
+      for (const entry of (ageObj.cohort_performance || [])) {
+        const sk = entry.segment_key;
+        const gd = entry.group_data || {};
+        if (AB_SEGS.has(sk)) {
+          const pa = gd.A?.p_value, pb = gd.B?.p_value;
+          out[age][sk] = { bPrice: pb || pa || null };
+        } else if (PROD_SEGS.has(sk)) {
+          out[age][sk] = { livePrice: gd.P?.p_value || null };
+        }
+      }
+    }
+    return out;
+  }
 
   const CONF_COLOR = {
     'High':         'var(--conf-high)',
@@ -304,12 +327,12 @@
       `Empirical WTP ratio · iOS Dev = 1.000× baseline (derived from observed conversion prices, not GDP)`;
   }
 
-  function renderMatrix() {
+  function renderMatrix(aaLookup) {
     const ages = data.ages;
     const segs = data.segments;
     const recs = data.recommendations;
 
-    // Header row — use querySelector as fallback if IDs were browser-stripped
+    // Header row
     const table = document.getElementById('recMatrix');
     const hdr = document.getElementById('matrixHeader')
       || table.querySelector('thead tr')
@@ -324,20 +347,44 @@
     tbody.innerHTML = segs.map(seg => {
       const isAndroid = seg.startsWith('android') || seg.includes('android');
       const rowClass  = isAndroid ? 'seg-section-android' : 'seg-section-ios';
+      const isABSeg   = AB_SEGS.has(seg);
+      const isProdSeg = PROD_SEGS.has(seg);
+
       const cells = ages.map(age => {
         const rec = recs[age]?.[seg];
         const bg  = cellColor(rec);
         const method = rec?.method || '';
         const dotClass = method === 'ppp_scaled' ? 'ppp' : method === 'blended' ? 'blended' : '';
+
         if (!rec) {
           return `<td><div class="rec-cell empty"></div></td>`;
         }
+
+        // Price to display: for A/B segs use B's actual price; for prod use recommended_price
+        let displayPrice = rec.recommended_price;
+        if (isABSeg && aaLookup?.[age]?.[seg]?.bPrice) {
+          displayPrice = aaLookup[age][seg].bPrice;
+        }
+
+        // live:Px subscript for production segments only
+        let liveSub = '';
+        if (isProdSeg) {
+          const liveP = aaLookup?.[age]?.[seg]?.livePrice;
+          if (liveP && liveP !== rec.recommended_price) {
+            const ri = parseInt(rec.recommended_price.replace('P',''));
+            const li = parseInt(liveP.replace('P',''));
+            const arrow = ri > li ? '↑' : '↓';
+            liveSub = `<span style="color:rgba(158,176,185,0.7);font-size:9px;line-height:1.1;display:block;margin-top:1px;">${arrow}${liveP}</span>`;
+          }
+        }
+
         return `<td>
-          <div class="rec-cell" style="background:${bg}"
+          <div class="rec-cell" style="background:${bg};height:${liveSub ? '58px' : '48px'}"
                data-age="${age}" data-seg="${seg}"
                onclick="showDetail('${age}','${seg}')">
-            <span class="price">${rec.recommended_price}</span>
+            <span class="price">${displayPrice}</span>
             <span class="method-dot ${dotClass}"></span>
+            ${liveSub}
           </div>
         </td>`;
       }).join('');
@@ -692,12 +739,15 @@
   window.addEventListener('DOMContentLoaded', () => {
     Promise.all([
       fetch('./price_recommendations.json').then(r => r.json()),
-      fetch('./ltv_ab_signals.json').then(r => r.json()).catch(() => null)
-    ]).then(([rec, ltv]) => {
-      data = rec;
+      fetch('./ltv_ab_signals.json').then(r => r.json()).catch(() => null),
+      fetch('./age_anchor_analysis.json').then(r => r.json()).catch(() => null),
+    ]).then(([rec, ltv, aa]) => {
+      data    = rec;
       ltvData = ltv;
+      aaData  = aa;
+      const aaLookup = aa ? buildAALookup(aa) : {};
       renderPppStrip(rec.empirical_ratios, rec.reference_segment);
-      renderMatrix();
+      renderMatrix(aaLookup);
     }).catch(err => {
       const wrap = document.querySelector('.matrix-panel');
       if (wrap) wrap.insertAdjacentHTML('afterbegin',
