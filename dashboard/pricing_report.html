@@ -855,31 +855,7 @@
   </table>
   <p>The anchor formula is <strong>CVR% × √(conversion events)</strong>. It rewards high conversion rate but scales it by evidence mass. Example at age 25: P25 had 20.7% CVR but only 34 converters (score 107). P26 had 14.5% CVR with 136 converters (score 182). <strong>P26 is the anchor</strong> — the lower rate is more than compensated by the evidence behind it.</p>
 
-  <h3>2. iOS Dev — reference anchor</h3>
-  <p>iOS Dev has the most conversion data (1,879 converters in the latest period). Its per-age anchor prices are the reference the cross-segment model uses to derive prices for all other segments. Prices rise by 1 tier per year — a clean linear relationship the data produces without assuming it.</p>
-  <table style="font-size:12px;margin:12px 0 20px;">
-    <thead><tr><th>Age</th><th>18</th><th>19</th><th>20</th><th>21</th><th>22</th><th>23</th><th>24</th><th>25</th><th>26</th><th>27</th><th>28</th><th>29</th><th>30</th><th>31</th><th>32</th><th>33</th><th>34</th><th>35</th><th>36</th><th>37</th><th>38</th><th>39</th><th>40</th></tr></thead>
-    <tbody>
-      <tr><td class="td-bold">Anchor</td><td>P19</td><td>P20</td><td>P21</td><td>P22</td><td>P23</td><td>P24</td><td>P25</td><td>P26</td><td>P27</td><td>P28</td><td>P29</td><td>P30</td><td>P31</td><td>P32</td><td>P33</td><td>P34</td><td>P35</td><td>P36</td><td>P37</td><td>P38</td><td>P39</td><td>P40</td><td>P41</td></tr>
-    </tbody>
-  </table>
-
-  <h3>3. Cross-regional anchoring — how prices translate across segments</h3>
-  <p>Each segment's best-observed price at a given age is compared to iOS Dev's anchor at that age. The ratio is the empirical WTP ratio — stable across ages, observed from the test data. At age 25 (iOS Dev anchor = P26):</p>
-  <table style="margin:12px 0 12px;">
-    <thead><tr><th>Segment</th><th>Best observed</th><th>Users</th><th>CVR</th><th>Anchor score</th><th>WTP ratio</th></tr></thead>
-    <tbody>
-      <tr><td class="td-bold">iOS Dev</td><td class="td-green">P26</td><td>931</td><td>14.50%</td><td>181.7</td><td>1.000 (reference)</td></tr>
-      <tr><td class="td-bold">iOS Rich</td><td>P25</td><td>164</td><td>20.73%</td><td>129.5</td><td>0.972</td></tr>
-      <tr><td class="td-bold">iOS Mid</td><td>P24</td><td>177</td><td>9.60%</td><td>41.9</td><td>0.934</td></tr>
-      <tr><td class="td-bold">iOS Poor</td><td>P12</td><td>461</td><td>8.24%</td><td>53.4</td><td>0.435 × age factor</td></tr>
-      <tr><td class="td-bold">Android Dev</td><td>P16</td><td>77</td><td>18.18%</td><td>72.7</td><td>0.688</td></tr>
-      <tr><td class="td-bold">Android Rich</td><td>P16</td><td>17</td><td>17.65%</td><td>30.6</td><td>0.730</td></tr>
-      <tr><td class="td-bold">Android Mid</td><td>P16</td><td>36</td><td>5.56%</td><td>9.6</td><td>0.688</td></tr>
-      <tr><td class="td-bold">Android Poor</td><td>P14</td><td>40</td><td>10.00%</td><td>20.0</td><td>0.467 × age factor</td></tr>
-    </tbody>
-  </table>
-  <p style="font-size:12px;color:var(--muted);">For iOS Poor and Android Poor, an age-income factor is applied for ages 18–27 — younger Kosovo/Albania users have proportionally lower income relative to their German-cohort peers. The factor reaches 1.0 at age 28. <strong>When direct A/B data exists (green/amber cells in Section 6), it always overrides the model.</strong> The ratios only drive the gray cells.</p>
+  <p style="margin-top:16px;">Full per-age anchor tables, iOS Dev reference prices, and cross-segment WTP ratio breakdowns are in the <a href="./age_anchor_analysis.html" style="color:var(--accent);text-decoration:none;font-weight:600;">Age Anchor Analysis dashboard →</a></p>
 
 </div>
 
