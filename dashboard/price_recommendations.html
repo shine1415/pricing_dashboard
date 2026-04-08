@@ -258,13 +258,27 @@
 </div>
 
 <script>
-  let data    = null;
-  let ltvData = null;
-  let aaData  = null;   // age_anchor_analysis.json — for B prices + live prices
+  let data      = null;
+  let ltvData   = null;
+  let aaData    = null;   // age_anchor_analysis.json — for B prices + live prices
+  let aaLookup  = {};     // built from aaData
+  let eurMap    = {};     // Px → {wk, mo, 3mo} — built from all recommended_eur values
   let activeCell = null;
 
   const AB_SEGS   = new Set(['poor','rich','android_poor','android_rich']);
   const PROD_SEGS = new Set(['mid_ios','dev_ios','mid_android','dev_android']);
+
+  // Build Px → EUR map from all recommended_eur values in price_recommendations.json
+  function buildEurMap(rec) {
+    const map = {};
+    for (const segs of Object.values(rec.recommendations || {})) {
+      for (const entry of Object.values(segs)) {
+        if (entry.recommended_price && entry.recommended_eur)
+          map[entry.recommended_price] = entry.recommended_eur;
+      }
+    }
+    return map;
+  }
 
   // Build lookup: aaLookup[age][segKey] = { bPrice, livePrice }
   function buildAALookup(aa) {
@@ -371,10 +385,7 @@
         if (isProdSeg) {
           const liveP = aaLookup?.[age]?.[seg]?.livePrice;
           if (liveP && liveP !== rec.recommended_price) {
-            const ri = parseInt(rec.recommended_price.replace('P',''));
-            const li = parseInt(liveP.replace('P',''));
-            const arrow = ri > li ? '↑' : '↓';
-            liveSub = `<span style="color:rgba(158,176,185,0.7);font-size:9px;line-height:1.1;display:block;margin-top:1px;">${arrow}${liveP}</span>`;
+            liveSub = `<span style="color:rgba(158,176,185,0.7);font-size:9px;line-height:1.1;display:block;margin-top:1px;">live:${liveP}</span>`;
           }
         }
 
@@ -520,6 +531,32 @@
     const cross = rec.cross_signal;
     const color = CONF_COLOR[rec.confidence_label];
     const e     = rec.recommended_eur;
+
+    // For production segments: if live price ≠ recommended_price, the next test
+    // should close that gap (live → rec), not test beyond rec.
+    // The JSON next_test was built assuming current = rec, which is wrong in this case.
+    let ntOverride = null;
+    if (PROD_SEGS.has(seg)) {
+      const liveP = aaLookup[age]?.[seg]?.livePrice;
+      if (liveP && liveP !== rec.recommended_price) {
+        const li = parseInt(liveP.replace('P',''));
+        const ri = parseInt(rec.recommended_price.replace('P',''));
+        const breakeven = ri > li
+          ? parseFloat(((1 - li/ri) * 100).toFixed(1))
+          : null;
+        ntOverride = {
+          type: ri > li ? 'explore_higher' : 'explore_lower',
+          current_price: liveP,
+          current_eur: eurMap[liveP] || null,
+          test_price: rec.recommended_price,
+          test_eur: rec.recommended_eur,
+          breakeven_lift: breakeven,
+          risk: breakeven != null ? (breakeven < 4 ? 'Low' : breakeven < 8 ? 'Moderate' : 'High') : null,
+          rationale: `Current live price is ${liveP}. The model recommends ${rec.recommended_price} — test this gap first. ` +
+            (rec.next_test?.rationale || ''),
+        };
+      }
+    }
 
     // --- Recommended price card ---
     const recCard = `
@@ -731,7 +768,7 @@
       ${buildChain(age, seg, rec, ev, cross, color)}
       <div class="reasoning-box">${rec.reasoning}</div>
       ${ltvSignalBox(seg)}
-      ${nextTestBox(rec.next_test)}
+      ${nextTestBox(ntOverride || rec.next_test)}
     `;
     panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
@@ -742,10 +779,11 @@
       fetch('./ltv_ab_signals.json').then(r => r.json()).catch(() => null),
       fetch('./age_anchor_analysis.json').then(r => r.json()).catch(() => null),
     ]).then(([rec, ltv, aa]) => {
-      data    = rec;
-      ltvData = ltv;
-      aaData  = aa;
-      const aaLookup = aa ? buildAALookup(aa) : {};
+      data      = rec;
+      ltvData   = ltv;
+      aaData    = aa;
+      aaLookup  = aa ? buildAALookup(aa) : {};
+      eurMap    = buildEurMap(rec);
       renderPppStrip(rec.empirical_ratios, rec.reference_segment);
       renderMatrix(aaLookup);
     }).catch(err => {
