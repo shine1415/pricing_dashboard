@@ -1,122 +1,69 @@
 #!/usr/bin/env python3
 """
 Export: unique users, conversions, CVR per os x region x age x group
-Period: Jan 31 - Mar 19 2026 (latest for all segments)
-Exclusions: Jan 30 (transition), Mar 20-24 (Ramadan promo)
-
-Method: find dominant price per (os, region, age, group), then aggregate
-only users with that price — filters out carryover from earlier periods.
-Production segments (mid, dev): A+B combined into group P.
+Uses identical filtering logic as build_age_anchor_analysis.py:
+  - Male users only
+  - Country-based region lookup (not raw region column)
+  - apval/bpval expected-price matching
+  - is_converted = product_id OR did_subscription_started == 1
+  - Latest period per segment (Jan 31 - Mar 19 for all)
 """
 
-import csv
-from collections import defaultdict, Counter
-from datetime import date, datetime
+import csv, sys
+from collections import defaultdict
 from pathlib import Path
 
-RAW_CSV     = Path("/Users/ardittrikshiqi/Desktop/pricing-test-results/pricing_matrix_inc_store_country.csv")
-OUT_CSV     = Path("/Users/ardittrikshiqi/Desktop/pricing-v2/dashboard/segment_age_summary.csv")
+SCRIPTS_DIR = Path("/Users/ardittrikshiqi/Desktop/pricing-v2/scripts")
+sys.path.insert(0, str(SCRIPTS_DIR))
 
-PERIOD_START = date(2026, 1, 31)
-PERIOD_END   = date(2026, 3, 19)
-EXCLUDED     = {date(2026, 1, 30)} | {date(2026, 3, d) for d in range(20, 25)}
+from build_age_anchor_analysis import (
+    resolve_latest_assignment,
+    SEGMENTS,
+    LATEST_PERIOD,
+    country_region,
+)
+from rebuild_canonical_metrics import RAW_CSV, is_converted, normalize_pvalue
 
-# Production segments — A/B labels irrelevant, all go into group P
-PROD_SEGMENTS = {('ios','mid'), ('ios','dev'), ('android','mid'), ('android','dev')}
+OUT_CSV = Path("/Users/ardittrikshiqi/Desktop/pricing-v2/dashboard/segment_age_summary.csv")
 
-def parse_date(s):
-    return datetime.strptime(s.strip(), "%d.%m.%Y").date()
+REGION_ORDER = ['poor', 'mid', 'dev', 'rich']
 
-# Pass 1: find dominant price per key
-price_counts = defaultdict(Counter)   # key -> Counter{price: user_count}
-user_prices  = {}                      # (uid, key) -> price seen (for consistency check)
+SEG_TO_OS_REGION = {
+    'poor':          ('ios',     'poor'),
+    'mid_ios':       ('ios',     'mid'),
+    'dev_ios':       ('ios',     'dev'),
+    'rich':          ('ios',     'rich'),
+    'android_poor':  ('android', 'poor'),
+    'mid_android':   ('android', 'mid'),
+    'dev_android':   ('android', 'dev'),
+    'android_rich':  ('android', 'rich'),
+}
 
-print("Pass 1: counting prices per segment/age/group...")
-with open(RAW_CSV, newline='', encoding='utf-8-sig') as f:
-    reader = csv.DictReader(f)
-    for row in reader:
-        try:
-            d = parse_date(row['date'])
-        except Exception:
-            continue
-        if not (PERIOD_START <= d <= PERIOD_END) or d in EXCLUDED:
-            continue
-
-        os_    = (row['os'] or '').strip().lower()
-        region = (row['region'] or '').strip().lower()
-        if not os_ or region in ('', 'other'):
-            continue
-
-        try:
-            age = int(float(row.get('final_age') or row.get('age') or ''))
-        except Exception:
-            continue
-        if not (18 <= age <= 40):
-            continue
-
-        uid   = (row['cognito_user_id'] or '').strip()
-        ab    = (row['ab_type'] or '').strip().upper()
-        try:
-            price = f"P{int(float(row['ct_p_value']))}"
-        except Exception:
-            continue
-
-        group = 'P' if (os_, region) in PROD_SEGMENTS else (ab if ab in ('A','B') else 'P')
-        key   = (os_, region, age, group)
-        price_counts[key][price] += 1
-
-# Dominant price per key
-dominant = {k: c.most_common(1)[0][0] for k, c in price_counts.items()}
-
-# Pass 2: aggregate users/conversions using only dominant price
 users_set = defaultdict(set)
 conv_set  = defaultdict(set)
 
-print("Pass 2: aggregating users/conversions...")
-with open(RAW_CSV, newline='', encoding='utf-8-sig') as f:
+print("Reading raw CSV...")
+with RAW_CSV.open(newline='', encoding='utf-8') as f:
     reader = csv.DictReader(f)
     for row in reader:
-        try:
-            d = parse_date(row['date'])
-        except Exception:
-            continue
-        if not (PERIOD_START <= d <= PERIOD_END) or d in EXCLUDED:
+        user_id = (row.get('cognito_user_id') or '').strip()
+        if not user_id:
             continue
 
-        os_    = (row['os'] or '').strip().lower()
-        region = (row['region'] or '').strip().lower()
-        if not os_ or region in ('', 'other'):
-            continue
+        converted = is_converted(row)
 
-        try:
-            age = int(float(row.get('final_age') or row.get('age') or ''))
-        except Exception:
-            continue
-        if not (18 <= age <= 40):
-            continue
+        for seg_key in SEGMENTS:
+            result = resolve_latest_assignment(seg_key, row)
+            if not result:
+                continue
+            _period, group, _date, age, p_value, _src = result
+            os_, region = SEG_TO_OS_REGION[seg_key]
+            key = (os_, region, age, group, p_value)
+            users_set[key].add(user_id)
+            if converted:
+                conv_set[key].add(user_id)
 
-        uid   = (row['cognito_user_id'] or '').strip()
-        ab    = (row['ab_type'] or '').strip().upper()
-        try:
-            price = f"P{int(float(row['ct_p_value']))}"
-        except Exception:
-            continue
-
-        converted = str(row.get('did_subscription_started', '0')).strip() == '1'
-        group = 'P' if (os_, region) in PROD_SEGMENTS else (ab if ab in ('A','B') else 'P')
-        key   = (os_, region, age, group)
-
-        if price != dominant.get(key):
-            continue   # skip carryover from other periods
-
-        users_set[key].add(uid)
-        if converted:
-            conv_set[key].add(uid)
-
-# Write output
-print(f"Writing {OUT_CSV}...")
-REGION_ORDER = ['poor', 'mid', 'dev', 'rich']
-
+print(f"Writing {OUT_CSV.name}...")
 with open(OUT_CSV, 'w', newline='', encoding='utf-8') as f:
     writer = csv.writer(f)
     writer.writerow(['os', 'region', 'age', 'group', 'price',
@@ -125,11 +72,10 @@ with open(OUT_CSV, 'w', newline='', encoding='utf-8') as f:
                       key=lambda k: (k[0],
                                      REGION_ORDER.index(k[1]) if k[1] in REGION_ORDER else 99,
                                      k[2], k[3])):
-        os_, region, age, group = key
-        price = dominant[key]
+        os_, region, age, group, p_value = key
         u = len(users_set[key])
         c = len(conv_set[key])
         cvr = round(c / u * 100, 2) if u else 0.0
-        writer.writerow([os_, region, age, group, price, u, c, f"{cvr}%"])
+        writer.writerow([os_, region, age, group, p_value, u, c, f"{cvr}%"])
 
 print("Done.")
