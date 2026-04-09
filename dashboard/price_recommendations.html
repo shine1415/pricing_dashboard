@@ -366,10 +366,11 @@
           return `<td><div class="rec-cell empty"></div></td>`;
         }
 
-        // Price to display: for A/B segs use B's actual price; for prod use recommended_price
+        // Price to display: for A/B segs use the winner's price (A or B, whichever won);
+        // for prod segments use recommended_price
         let displayPrice = rec.recommended_price;
-        if (isABSeg && aaLookup?.[age]?.[seg]?.bPrice) {
-          displayPrice = aaLookup[age][seg].bPrice;
+        if (isABSeg) {
+          displayPrice = rec.direct_evidence?.winner_price || rec.recommended_price;
         }
 
         // live:Px subscript for production segments only
