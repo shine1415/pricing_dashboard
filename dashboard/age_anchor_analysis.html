@@ -1,0 +1,1232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Age Anchor Analysis</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0d1418;
+      --paper: #121d23;
+      --paper-2: #18262e;
+      --line: rgba(255,255,255,0.08);
+      --text: #f5f7f8;
+      --muted: #9eb0b9;
+      --accent: #4d9dff;
+      --accent-soft: rgba(77,157,255,0.14);
+      --good: #31c48d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(77,157,255,0.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(49,196,141,0.08), transparent 24%),
+        linear-gradient(180deg, #0a1115 0%, #0d1418 100%);
+      min-height: 100vh;
+    }
+    .page {
+      width: min(1440px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+    .hero,
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+      backdrop-filter: blur(6px);
+    }
+    .hero {
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+    .eyebrow {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(34px, 5vw, 54px);
+      line-height: 0.95;
+    }
+    .hero-copy {
+      margin: 0;
+      max-width: 80ch;
+      color: #d7e1e6;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .btn, select {
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #0c1418;
+      color: var(--text);
+      font: inherit;
+      padding: 11px 15px;
+      text-decoration: none;
+    }
+    .btn.primary {
+      background: linear-gradient(135deg, rgba(77,157,255,0.24), rgba(77,157,255,0.10));
+      color: white;
+      border-color: rgba(77,157,255,0.34);
+    }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .toolbar-left {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .toolbar-note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      text-align: right;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+.summary-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+    }
+    .summary-card .title {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+    .summary-card .value {
+      font-size: 28px;
+      line-height: 1.04;
+      margin-bottom: 8px;
+      color: var(--accent);
+    }
+    .summary-card .sub {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #d2dde2;
+    }
+    .section {
+      margin-top: 18px;
+    }
+    .section .panel {
+      padding: 20px;
+    }
+    .section h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+    .section-copy {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(29, 41, 34, 0.08);
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+    .leader {
+      color: var(--good);
+      font-weight: 700;
+    }
+    .region-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .region-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .region-card h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+      color: var(--accent);
+    }
+    .region-meta {
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .pill {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      margin-bottom: 10px;
+      border: 1px solid rgba(28,90,73,0.12);
+    }
+    .validation-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 14px;
+    }
+    .validation-box {
+      background: var(--paper-2);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .validation-box h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      color: var(--accent);
+    }
+    .validation-box ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .validation-box li {
+      margin: 6px 0;
+      line-height: 1.45;
+    }
+    .empty {
+      color: var(--muted);
+      padding: 20px 0;
+    }
+    @media (max-width: 1200px) {
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .region-grid, .validation-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 800px) {
+      .page { width: min(100vw - 20px, 1440px); }
+      .toolbar { flex-direction: column; align-items: flex-start; }
+      .toolbar-note { text-align: left; }
+      .summary-grid { grid-template-columns: 1fr; }
+    }
+    .prices-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+    .price-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--paper-2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+    .price-chip .chip-seg {
+      color: var(--muted);
+      white-space: nowrap;
+      font-size: 11px;
+    }
+    .chip-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .chip-tag.g-a { background: rgba(77,157,255,0.12); color: var(--accent); }
+    .chip-tag.g-b { background: rgba(49,196,141,0.12); color: var(--good); }
+    .chip-tag.g-p { background: rgba(255,255,255,0.06); color: #b0c4ce; }
+    /* Metric toggle */
+    .metric-toggle { display: flex; gap: 6px; margin-left: 14px; }
+    .metric-btn {
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .metric-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: rgba(77,157,255,0.34);
+    }
+    /* Chart */
+    .chart-wrap { position: relative; height: 300px; margin-bottom: 20px; }
+    /* Candidate cards */
+    .candidate-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .candidate-card {
+      background: var(--paper-2);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .candidate-card.winner {
+      border-color: rgba(49,196,141,0.4);
+      background: rgba(49,196,141,0.05);
+    }
+    .candidate-card .c-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .candidate-card .c-p {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .candidate-card.winner .c-p { color: var(--good); }
+    .candidate-card .c-meta { font-size: 13px; color: #d2dde2; line-height: 1.5; }
+    /* Score bars */
+    .score-breakdown { display: grid; gap: 10px; margin-top: 14px; }
+    .score-row { display: grid; grid-template-columns: 160px 1fr 55px; align-items: center; gap: 10px; }
+    .score-row-label { font-size: 13px; color: var(--muted); }
+    .score-bar-track { height: 8px; background: rgba(255,255,255,0.07); border-radius: 999px; overflow: hidden; }
+    .score-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--good)); }
+    .score-row-val { font-size: 13px; color: var(--text); text-align: right; }
+    .group-header-a { background: rgba(77,157,255,0.08); color: var(--accent); }
+    .group-header-b { background: rgba(49,196,141,0.08); color: var(--good); }
+    .group-header-p { background: rgba(245,158,11,0.08); color: #f59e0b; }
+    .cell-a { color: var(--accent); font-weight: 600; }
+    .cell-b { color: var(--good); font-weight: 600; }
+    .cell-p { color: #f59e0b; font-weight: 600; }
+    .cell-winner { background: rgba(49,196,141,0.07); }
+    .single-price-row td { color: var(--muted); font-style: italic; }
+    @media (max-width: 1000px) { .candidate-row { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 680px)  { .candidate-row { grid-template-columns: 1fr; } .metric-toggle { flex-wrap: wrap; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="hero">
+      <div class="eyebrow">Age Anchor Analysis</div>
+      <h1>Age anchor analysis</h1>
+      <p class="hero-copy">Latest-period CVR and converter data per age. The anchor is the price that wins on CVR, volume, and evidence — not just the highest rate.</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="./price_recommendations.html">Price Recommendations</a>
+        <a class="btn" href="./pricing_dashboard_v2.html">Pricing Monitor</a>
+<a class="btn" href="./index.html">Home</a>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <label for="ageSelect">Age</label>
+        <select id="ageSelect"></select>
+        <div class="metric-toggle">
+          <button class="metric-btn active" data-metric="cvr">CVR</button>
+          <button class="metric-btn" data-metric="converters">Converters</button>
+          <button class="metric-btn" data-metric="users">Users</button>
+        </div>
+      </div>
+      <div class="toolbar-note" id="generatedAt">Loading analysis…</div>
+    </div>
+
+    <div id="currentPrices"></div>
+    <div class="summary-grid" id="summaryCards"></div>
+
+    <div class="section">
+      <div class="panel">
+        <h2>1. Age cohort performance</h2>
+        <p class="section-copy">CVR by age across all regions. One line per region — use this to see where the selected age is strong or weak before picking an anchor.</p>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div class="metric-toggle" id="viewToggle">
+            <button class="metric-btn active" data-view="combined">Combined</button>
+            <button class="metric-btn" data-view="A">Group A</button>
+            <button class="metric-btn" data-view="B">Group B</button>
+          </div>
+          <button class="metric-btn active" id="chartAllBtn" onclick="showAllSeries()">All regions</button>
+        </div>
+        <div class="chart-wrap"><canvas id="cohortChart"></canvas></div>
+        <div id="cohortPerformance"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="panel">
+        <h2>2. Converter analysis</h2>
+        <p class="section-copy">Three signals — best CVR, most converters, best balanced. These are not always the same price. The anchor should win on balance, not on a single metric.</p>
+        <div id="converterCards"></div>
+        <div id="converterAnalysis"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="panel">
+        <h2>3. Cross-regional anchoring</h2>
+        <p class="section-copy">Each segment's best-observed price for this age, split by platform.</p>
+        <div id="crossRegionalAnchor"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="panel">
+        <h2>4. Anchor validation</h2>
+        <p class="section-copy">The anchor score = <strong>CVR% × √(conversion events)</strong> — quality scaled by evidence mass. A price with 30% CVR from 2 converters scores less than one with 14% CVR from 90. The bars below are a visual guide to the four signals; they don't represent separate additive weights.</p>
+        <div id="anchorValidation"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="panel">
+        <h2>5. A/B prices vs anchor recommendation</h2>
+        <p class="section-copy">For the selected age: current test prices (Group A / Group B, or single production price) alongside the anchor-derived recommendation for each segment.</p>
+        <div id="abVsAnchorRoot" style="overflow-x:auto;margin-top:14px;"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="panel">
+        <h2>6. Full anchor price matrix</h2>
+        <p class="section-copy">Best-observed anchor price for every age × segment combination. Score = <strong>CVR% × √conversions</strong>. Segments as rows, ages as columns. <em>(thin)</em> = fewer than 25 total users in that cell — treat as directional only.</p>
+        <div id="anchorMatrix" style="overflow-x:auto;margin-top:14px;"></div>
+        <p style="font-size:11px;color:var(--muted);margin-top:10px;">
+          Color intensity reflects price tier — darker = higher price. Cells with no data are blank.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let analysis = null;
+    let recData  = null;
+    let chartInstance = null;
+
+    // Anchor matrix data — populated by renderAnchorMatrix, used by renderAbVsAnchor
+    let anchorLookup      = {};
+    let matIosAnchorSeg   = {};
+    let matAndAnchorSeg   = {};
+
+    // Age-income adjustment factors for Poor segments only.
+    // Derived from observed per-age iOS Poor / iOS Dev price ratios vs the global 0.435 ratio.
+    // Kosovo/Albania users aged 18–21 are largely students with near-zero disposable income;
+    // German users (iOS Dev baseline) at the same age earn apprenticeship wages (~€800–1,200/mo).
+    // The gap narrows through the mid-20s and disappears by age 28.
+    // Factor = observed_ratio(age) / global_ratio, smoothed. All other segments = 1.0.
+    const SEG_AGE_INCOME_FACTORS = {
+      'poor':         { 18:0.60, 19:0.62, 20:0.65, 21:0.68, 22:0.76, 23:0.83, 24:0.90, 25:0.94, 26:0.97, 27:0.99, 28:1.00 },
+      'android_poor': { 18:0.60, 19:0.62, 20:0.65, 21:0.68, 22:0.76, 23:0.83, 24:0.90, 25:0.94, 26:0.97, 27:0.99, 28:1.00 },
+    };
+    function getAgeFactor(segKey, age) {
+      const f = SEG_AGE_INCOME_FACTORS[segKey];
+      return f ? (f[Number(age)] ?? 1.00) : 1.00;
+    }
+    let currentMetric = 'cvr';
+    let currentView = 'combined'; // 'combined' | 'A' | 'B'
+
+    function fmtPct(value) {
+      return `${Number(value || 0).toFixed(2)}%`;
+    }
+
+    function fmtInt(value) {
+      return Number(value || 0).toLocaleString();
+    }
+
+    function summaryCard(title, primary, secondary) {
+      return `
+        <div class="summary-card">
+          <div class="title">${title}</div>
+          <div class="value">${primary}</div>
+          <div class="sub">${secondary}</div>
+        </div>
+      `;
+    }
+
+
+    function renderCurrentPrices(age) {
+      const root = document.getElementById('currentPrices');
+      if (!root) return;
+      const ageData = analysis?.age_analysis?.[String(age)];
+      if (!ageData || !ageData.observations) { root.innerHTML = ''; return; }
+
+      const order = ['rich','dev_ios','mid_ios','poor','android_rich','dev_android','mid_android','android_poor'];
+      const labels = {
+        rich:'iOS Rich', dev_ios:'iOS Dev', mid_ios:'iOS Mid', poor:'iOS Poor',
+        android_rich:'Droid Rich', dev_android:'Droid Dev', mid_android:'Droid Mid', android_poor:'Droid Poor'
+      };
+
+      const chips = order.map(segKey => {
+        const rows = ageData.observations.filter(r => r.segment_key === segKey);
+        if (!rows.length) return null;
+        const groups = {};
+        rows.forEach(r => {
+          if (!groups[r.group]) groups[r.group] = new Set();
+          groups[r.group].add(r.p_value);
+        });
+        const sortP = set => [...set].sort((a,b) => Number(a.replace('P','')) - Number(b.replace('P',''))).join(', ');
+        let tags = '';
+        if (groups['A']) tags += `<span class="chip-tag g-a">A: ${sortP(groups['A'])}</span>`;
+        if (groups['B']) tags += `<span class="chip-tag g-b">B: ${sortP(groups['B'])}</span>`;
+        if (groups['P']) tags += `<span class="chip-tag g-p">${sortP(groups['P'])}</span>`;
+        return `<div class="price-chip"><span class="chip-seg">${labels[segKey]}</span>${tags}</div>`;
+      }).filter(Boolean);
+
+      root.innerHTML = `<div class="prices-strip">${chips.join('')}</div>`;
+    }
+
+    function showAllSeries() {
+      if (!chartInstance) return;
+      chartInstance.data.datasets.forEach((_, i) => { chartInstance.getDatasetMeta(i).hidden = false; });
+      chartInstance.update();
+    }
+
+    function buildChartDatasets(metric) {
+      const ages = analysis.ages.map(Number);
+      const segOrder = ['rich','dev_ios','mid_ios','poor','android_rich','dev_android','mid_android','android_poor'];
+      const segLabels = {
+        rich:'iOS Rich', dev_ios:'iOS Dev', mid_ios:'iOS Mid', poor:'iOS Poor',
+        android_rich:'Android Rich', dev_android:'Android Dev', mid_android:'Android Mid', android_poor:'Android Poor'
+      };
+      const colors = ['#4d9dff','#31c48d','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#a3e635'];
+      return {
+        labels: ages,
+        datasets: segOrder.map((segKey, i) => ({
+          label: segLabels[segKey],
+          data: ages.map(a => {
+            const entry = analysis.age_analysis[String(a)];
+            if (!entry) return null;
+            const seg = entry.cohort_performance.find(s => s.segment_key === segKey);
+            if (!seg) return null;
+            if (currentView !== 'combined') {
+              const gd = seg.group_data?.[currentView];
+              if (!gd) return null;
+              if (metric === 'converters') return gd.converters;
+              if (metric === 'users') return gd.users;
+              return +gd.cvr.toFixed(2);
+            }
+            if (metric === 'converters') return seg.converters;
+            if (metric === 'users') return seg.users;
+            return +seg.aggregate_cvr.toFixed(2);
+          }),
+          borderColor: colors[i],
+          backgroundColor: colors[i] + '18',
+          borderWidth: 2,
+          tension: 0.35,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          spanGaps: true,
+        }))
+      };
+    }
+
+    function renderChart(age) {
+      const canvas = document.getElementById('cohortChart');
+      if (!canvas || typeof Chart === 'undefined') return;
+      const viewSuffix = currentView === 'A' ? ' (Group A)' : currentView === 'B' ? ' (Group B)' : '';
+      const yLabel = (currentMetric === 'cvr' ? 'CVR (%)' : currentMetric === 'converters' ? 'Converters' : 'Users') + viewSuffix;
+      // Preserve which datasets are hidden before rebuilding
+      const hiddenState = chartInstance
+        ? chartInstance.data.datasets.map((_, i) => chartInstance.getDatasetMeta(i).hidden)
+        : null;
+      if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+      chartInstance = new Chart(canvas, {
+        type: 'line',
+        data: buildChartDatasets(currentMetric),
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              labels: { color: '#9eb0b9', font: { size: 11 }, boxWidth: 12, padding: 12 },
+              onClick(e, legendItem, legend) {
+                const chart = legend.chart;
+                const idx = legendItem.datasetIndex;
+                const meta = chart.getDatasetMeta(idx);
+                meta.hidden = !meta.hidden;
+                chart.update();
+              }
+            },
+            tooltip: {
+              backgroundColor: '#18262e',
+              borderColor: 'rgba(255,255,255,0.1)',
+              borderWidth: 1,
+              titleColor: '#f5f7f8',
+              bodyColor: '#d2dde2',
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: { color: '#9eb0b9' },
+              title: { display: true, text: 'Age', color: '#9eb0b9' }
+            },
+            y: {
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: { color: '#9eb0b9' },
+              title: { display: true, text: yLabel, color: '#9eb0b9' }
+            }
+          }
+        }
+      });
+      // Restore hidden state across metric/view switches
+      if (hiddenState) {
+        hiddenState.forEach((hidden, i) => { chartInstance.getDatasetMeta(i).hidden = hidden; });
+        chartInstance.update();
+      }
+    }
+
+    function candidateCard(label, d, winner) {
+      if (!d) return `<div class="candidate-card"><div class="c-label">${label}</div><div class="c-meta">No data</div></div>`;
+      return `
+        <div class="candidate-card${winner ? ' winner' : ''}">
+          <div class="c-label">${label}</div>
+          <div class="c-p">${d.p_value}</div>
+          <div class="c-meta">
+            ${fmtPct(d.cvr)} CVR &nbsp;·&nbsp; ${fmtInt(d.converters)} converters<br>
+            ${fmtInt(d.users)} users &nbsp;·&nbsp; ${fmtInt(d.conversion_events)} units<br>
+            Score: ${Number(d.anchor_score || 0).toFixed(2)}
+          </div>
+        </div>`;
+    }
+
+    function scoreBar(label, weight, value, max) {
+      const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
+      const disp = Number.isInteger(value) ? value : value.toFixed(2);
+      return `
+        <div class="score-row">
+          <div class="score-row-label">${label} <span style="opacity:.6;font-size:11px;">(${weight}%)</span></div>
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:${pct.toFixed(1)}%"></div></div>
+          <div class="score-row-val">${disp}</div>
+        </div>`;
+    }
+
+    function renderAge(age) {
+      renderCurrentPrices(age);
+      renderChart(age);
+
+      const ageData        = analysis?.age_analysis?.[String(age)];
+      const summaryRoot    = document.getElementById('summaryCards');
+      const cohortRoot     = document.getElementById('cohortPerformance');
+      const cCardsRoot     = document.getElementById('converterCards');
+      const converterRoot  = document.getElementById('converterAnalysis');
+      const anchorRoot     = document.getElementById('crossRegionalAnchor');
+      const validationRoot = document.getElementById('anchorValidation');
+      if (!ageData) {
+        const empty = '<div class="empty">No data for this age.</div>';
+        [summaryRoot, cohortRoot, cCardsRoot, converterRoot, anchorRoot, validationRoot]
+          .forEach(el => { if (el) el.innerHTML = empty; });
+        return;
+      }
+
+      const bestBalanced   = ageData.converter_analysis?.best_balanced;
+      const bestCvr        = ageData.converter_analysis?.best_cvr;
+      const mostConverters = ageData.converter_analysis?.most_converters;
+      const globalAnchor   = ageData.cross_regional_anchor?.global_anchor;
+
+      // Summary cards
+      if (summaryRoot) summaryRoot.innerHTML = [
+        summaryCard('Anchor', bestBalanced ? bestBalanced.p_value : '—',
+          bestBalanced ? `${fmtPct(bestBalanced.cvr)} CVR · ${fmtInt(bestBalanced.converters)} converters · ${fmtInt(bestBalanced.users)} users` : 'No anchor'),
+        summaryCard('Anchor score', bestBalanced ? Number(bestBalanced.anchor_score||0).toFixed(1) : '—',
+          'Weighted: CVR + volume + evidence'),
+        summaryCard('Best CVR price', bestCvr ? bestCvr.p_value : '—',
+          bestCvr ? `${fmtPct(bestCvr.cvr)} CVR · ${fmtInt(bestCvr.users)} users` : 'No data'),
+        summaryCard('Most converters', mostConverters ? mostConverters.p_value : '—',
+          mostConverters ? `${fmtInt(mostConverters.converters)} converters · ${fmtInt(mostConverters.conversion_events)} units` : 'No data'),
+      ].join('');
+
+      // Step 1: cohort table (below chart)
+      if (cohortRoot) cohortRoot.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th rowspan="2">Segment</th>
+              <th rowspan="2">Period</th>
+              <th colspan="4" class="group-header-a">Group A</th>
+              <th colspan="4" class="group-header-b">Group B</th>
+            </tr>
+            <tr>
+              <th>Price</th><th>Users</th><th>Conv</th><th>CVR</th>
+              <th>Price</th><th>Users</th><th>Conv</th><th>CVR</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${((() => {
+              const ORDER = ['poor','mid_ios','dev_ios','rich','android_poor','mid_android','dev_android','android_rich'];
+              const CLEAN = {
+                'poor':'iOS Poor','mid_ios':'iOS Mid','dev_ios':'iOS Dev','rich':'iOS Rich',
+                'android_poor':'Android Poor','mid_android':'Android Mid','dev_android':'Android Dev','android_rich':'Android Rich'
+              };
+              const sorted = [...ageData.cohort_performance].sort((a,b) =>
+                ORDER.indexOf(a.segment_key) - ORDER.indexOf(b.segment_key));
+              return sorted.map(r => {
+                const name = CLEAN[r.segment_key] || r.segment_name.replace(' Region','');
+                const a = r.group_data?.A;
+                const b = r.group_data?.B;
+                const p = r.group_data?.P;
+                if (p && !a && !b) {
+                  return `<tr class="single-price-row">
+                    <td>${name}</td>
+                    <td>${r.period_label}</td>
+                    <td class="cell-p">${p.p_value}</td>
+                    <td>${fmtInt(p.users)}</td>
+                    <td>${fmtInt(p.converters)}</td>
+                    <td>${fmtPct(p.cvr)}</td>
+                    <td colspan="4" style="color:var(--muted);text-align:center;">No A/B test</td>
+                  </tr>`;
+                }
+                const aWins = a && b && a.cvr > b.cvr;
+                const bWins = a && b && b.cvr > a.cvr;
+                return `<tr>
+                  <td>${name}</td>
+                  <td>${r.period_label}</td>
+                  <td class="cell-a">${a ? a.p_value : '—'}</td>
+                  <td>${a ? fmtInt(a.users) : '—'}</td>
+                  <td>${a ? fmtInt(a.converters) : '—'}</td>
+                  <td class="${aWins ? 'cell-winner' : ''}">${a ? fmtPct(a.cvr) : '—'}</td>
+                  <td class="cell-b">${b ? b.p_value : '—'}</td>
+                  <td>${b ? fmtInt(b.users) : '—'}</td>
+                  <td>${b ? fmtInt(b.converters) : '—'}</td>
+                  <td class="${bWins ? 'cell-winner' : ''}">${b ? fmtPct(b.cvr) : '—'}</td>
+                </tr>`;
+              }).join('');
+            })())}
+          </tbody>
+        </table>`;
+
+      // Step 2: candidate cards
+      const allSame = bestCvr && mostConverters && bestBalanced &&
+        bestCvr.p_value === mostConverters.p_value && mostConverters.p_value === bestBalanced.p_value;
+      if (cCardsRoot) cCardsRoot.innerHTML =
+        `<div class="candidate-row">
+          ${candidateCard('Best CVR', bestCvr, false)}
+          ${candidateCard('Most converters', mostConverters, false)}
+          ${candidateCard('Best balanced · anchor', bestBalanced, true)}
+        </div>
+        ${allSame ? '<p class="section-copy" style="margin:0 0 14px;color:var(--good);">All three signals agree — strong consensus.</p>' : ''}`;
+
+      // Step 2: leaderboard
+      if (converterRoot) converterRoot.innerHTML = `
+        <table>
+          <thead><tr>
+            <th>P-value</th><th>Users</th><th>Converters</th><th>Units</th><th>CVR</th><th>Score</th><th>Best context</th>
+          </tr></thead>
+          <tbody>
+            ${ageData.converter_analysis.leaderboard.map((r, i) => `
+              <tr>
+                <td class="${i === 0 ? 'leader' : ''}">${r.p_value}</td>
+                <td>${fmtInt(r.users)}</td>
+                <td>${fmtInt(r.converters)}</td>
+                <td>${fmtInt(r.conversion_events)}</td>
+                <td>${fmtPct(r.cvr)}</td>
+                <td>${Number(r.anchor_score||0).toFixed(2)}</td>
+                <td>${r.contexts[0] ? `${r.contexts[0].platform} ${r.contexts[0].region} · ${r.contexts[0].group}` : '—'}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+
+      // Step 3: cross-regional
+      if (anchorRoot) {
+        const equivs = ageData.cross_regional_anchor?.regional_equivalents || [];
+
+        const iosEquivs = equivs.filter(r => r.platform === 'iOS');
+        const andEquivs = equivs.filter(r => r.platform === 'Android');
+
+        function renderEquivRows(rows) {
+          return rows.map(r => {
+            const thinNote = r.users < 25
+              ? ` <span style="color:#f59e0b;font-size:10px;">(thin)</span>` : '';
+            return `
+            <tr>
+              <td>${r.region}${globalAnchor && r.platform === (globalAnchor.contexts?.[0]?.platform||'') && r.region === (globalAnchor.contexts?.[0]?.region||'') ? ' <span style="color:var(--accent);font-size:11px;">(anchor)</span>' : ''}${thinNote}</td>
+              <td class="${globalAnchor && r.best_p_value === globalAnchor.p_value ? 'leader' : ''}">${r.best_p_value || '—'}</td>
+              <td>${fmtInt(r.users)}</td>
+              <td>${fmtInt(r.converters)}</td>
+              <td>${fmtPct(r.cvr)}</td>
+              <td>${r.gap_to_anchor_cvr == null ? '—' : `${r.gap_to_anchor_cvr > 0 ? '+' : ''}${Number(r.gap_to_anchor_cvr).toFixed(2)} pp`}</td>
+            </tr>`;
+          }).join('');
+        }
+
+        function platformTable(label, rows) {
+          if (!rows.length) return '';
+          return `
+            <p style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:16px 0 6px;">${label}</p>
+            <table>
+              <thead><tr>
+                <th>Region</th>
+                <th>Best observed</th>
+                <th>Users</th><th>Conv</th><th>CVR</th>
+                <th>Gap vs anchor</th>
+              </tr></thead>
+              <tbody>${renderEquivRows(rows)}</tbody>
+            </table>`;
+        }
+
+        anchorRoot.innerHTML =
+          platformTable('iOS', iosEquivs) +
+          platformTable('Android', andEquivs) +
+          `<p class="section-copy" style="margin-top:8px;font-size:12px;"><em>(thin)</em> = fewer than 25 users — treat with caution.</p>`;
+      }
+
+      // Step 4: anchor validation with score bars
+      if (validationRoot) {
+        const v  = ageData.anchor_validation;
+        const lb = ageData.converter_analysis.leaderboard;
+        const maxCvr   = Math.max(...lb.map(r => r.cvr));
+        const maxConv  = Math.max(...lb.map(r => r.converters));
+        const maxUsers = Math.max(...lb.map(r => r.users));
+        const maxUnits = Math.max(...lb.map(r => r.conversion_events));
+        const a = bestBalanced;
+        validationRoot.innerHTML = `
+          <div class="validation-grid">
+            <div class="validation-box">
+              <h3>Anchor: ${v?.anchor_p_value || '—'}</h3>
+              <p style="color:var(--muted);font-size:13px;margin:0 0 10px;">${v?.definition || ''}</p>
+              <ul>${(v?.why || []).filter(Boolean).map(w => `<li>${w}</li>`).join('')}</ul>
+            </div>
+            <div class="validation-box">
+              <h3>Score breakdown &nbsp;<span style="font-weight:400;font-size:13px;color:var(--muted);">total: ${Number(v?.score||0).toFixed(2)}</span></h3>
+              <div class="score-breakdown">
+                ${scoreBar('CVR strength',     40, a ? +a.cvr.toFixed(2) : 0,           maxCvr)}
+                ${scoreBar('Converter volume', 30, a ? a.converters : 0,                 maxConv)}
+                ${scoreBar('User confidence',  20, a ? a.users : 0,                      maxUsers)}
+                ${scoreBar('Revenue units',    10, a ? a.conversion_events : 0,          maxUnits)}
+              </div>
+            </div>
+          </div>`;
+      }
+
+    }
+
+    // ── Section 5: iOS A/B prices vs anchor — full matrix (all ages) ─────────
+    function renderAbVsAnchor(data) {
+      const root = document.getElementById('abVsAnchorRoot');
+      if (!root) return;
+      if (Object.keys(anchorLookup).length === 0) {
+        root.innerHTML = '<div class="empty">No anchor data yet.</div>';
+        return;
+      }
+
+      const ages = data.ages;
+      const ageAnalysis = data.age_analysis;
+
+      // iOS segments: A/B test segments have A+B groups; production have P only
+      const IOS_SEGS = [
+        { key: 'poor',    label: 'iOS Poor', prod: false },
+        { key: 'mid_ios', label: 'iOS Mid',  prod: true  },
+        { key: 'dev_ios', label: 'iOS Dev',  prod: true  },
+        { key: 'rich',    label: 'iOS Rich', prod: false },
+      ];
+
+      // Build raw group data: { age → { segKey → group_data } }
+      const rawLookup = {};
+      ages.forEach(age => {
+        rawLookup[age] = {};
+        const cohort = ageAnalysis[String(age)]?.cohort_performance || [];
+        cohort.forEach(c => {
+          if (c.segment_key) rawLookup[age][c.segment_key] = c.group_data || {};
+        });
+      });
+
+      // Header row — age numbers
+      const headerCells = ages.map(a =>
+        `<th style="min-width:36px;padding:4px 2px;text-align:center;font-size:11px;color:var(--muted);font-weight:500;">${a}</th>`
+      ).join('');
+
+      // Build the three sub-rows per segment
+      function subRow(subLabel, subColor, cells) {
+        return `<tr>
+          <td style="padding:1px 8px 1px 4px;font-size:9px;color:${subColor};white-space:nowrap;text-align:right;">${subLabel}</td>
+          ${cells}
+        </tr>`;
+      }
+
+      const bodyRows = IOS_SEGS.map(({ key, label, prod }) => {
+        const isAnchorAnywhere = ages.some(age => matIosAnchorSeg[age] === key);
+
+        // Row A (or P for production)
+        const rowA = ages.map(age => {
+          const gd = rawLookup[age]?.[key] || {};
+          const g  = prod ? gd.P : gd.A;
+          if (!g?.p_value) return `<td style="text-align:center;font-size:10px;color:var(--muted);padding:1px 2px;">—</td>`;
+          const aWins = !prod && gd.A && gd.B && gd.A.cvr >= gd.B.cvr;
+          const win = aWins ? 'font-weight:700;color:var(--good);' : '';
+          return `<td style="text-align:center;font-size:10px;padding:1px 2px;${win}" title="${g.p_value} · ${fmtInt(g.users)}u · ${fmtPct(g.cvr)}">${g.p_value}</td>`;
+        }).join('');
+
+        // Row B (blank for production)
+        const rowB = prod ? null : ages.map(age => {
+          const gd = rawLookup[age]?.[key] || {};
+          const g  = gd.B;
+          if (!g?.p_value) return `<td style="text-align:center;font-size:10px;color:var(--muted);padding:1px 2px;">—</td>`;
+          const bWins = gd.A && gd.B && gd.B.cvr > gd.A.cvr;
+          const win = bWins ? 'font-weight:700;color:var(--good);' : '';
+          return `<td style="text-align:center;font-size:10px;padding:1px 2px;${win}" title="${g.p_value} · ${fmtInt(g.users)}u · ${fmtPct(g.cvr)}">${g.p_value}</td>`;
+        }).join('');
+
+        // Row Rec
+        const rowRec = ages.map(age => {
+          const d = anchorLookup[age]?.[key];
+          if (!d?.price) return `<td style="text-align:center;font-size:10px;color:var(--muted);padding:1px 2px;">—</td>`;
+          const isAnc = matIosAnchorSeg[age] === key;
+          const style = isAnc
+            ? 'font-weight:700;color:var(--accent);font-size:11px;'
+            : d.derived
+              ? 'font-style:italic;color:rgba(219,231,235,0.5);font-size:10px;'
+              : 'font-weight:600;font-size:10px;';
+          const tip = isAnc
+            ? `Anchor segment · score ${Number(d.score).toFixed(1)}`
+            : d.derived
+              ? `Derived from ${d.sourceKey} via WTP ratio`
+              : `Observed · score ${Number(d.score).toFixed(1)}`;
+          return `<td style="text-align:center;padding:1px 2px;${style}" title="${tip}">${d.price}</td>`;
+        }).join('');
+
+        const segLabelStyle = isAnchorAnywhere
+          ? 'font-weight:600;color:#dbe7eb;'
+          : 'color:#9eb0b9;';
+
+        return `
+          <tr style="border-top:1px solid var(--line);">
+            <td rowspan="${prod ? 2 : 3}" style="padding:4px 6px 4px 4px;white-space:nowrap;font-size:12px;${segLabelStyle}vertical-align:middle;">${label}</td>
+            <td style="padding:1px 8px 1px 4px;font-size:9px;color:var(--muted);white-space:nowrap;text-align:right;">${prod ? 'P' : 'A'}</td>
+            ${rowA}
+          </tr>
+          ${prod ? '' : subRow('B', 'var(--muted)', rowB)}
+          ${subRow('Rec', 'var(--accent)', rowRec)}`;
+      }).join('');
+
+      root.innerHTML = `
+        <div style="overflow-x:auto;">
+          <table style="border-collapse:collapse;width:100%;font-family:inherit;">
+            <thead><tr>
+              <th style="padding:4px 6px 4px 4px;text-align:left;font-size:11px;color:var(--muted);font-weight:500;white-space:nowrap;">Segment</th>
+              <th style="padding:4px 6px;font-size:9px;color:var(--muted);font-weight:400;"></th>
+              ${headerCells}
+            </tr></thead>
+            <tbody>${bodyRows}</tbody>
+          </table>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:8px;">
+          <strong style="color:var(--accent);">Rec</strong> = anchor recommendation (bold blue = this segment IS the anchor for that age · italic = derived via WTP ratio).
+          <strong style="color:var(--good);">Green</strong> = winning group (higher CVR). P = single production price.
+        </p>`;
+    }
+
+    function bootstrapPage(data) {
+      analysis = data;
+      const select = document.getElementById('ageSelect');
+      select.innerHTML = data.ages.map(age => `<option value="${age}">Age ${age}</option>`).join('');
+      document.getElementById('generatedAt').textContent =
+        `Generated ${data.generated_at.slice(0, 10)} · Latest periods only`;
+      select.addEventListener('change', () => renderAge(select.value));
+      document.querySelectorAll('[data-metric]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-metric]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentMetric = btn.dataset.metric;
+          renderChart(select.value);
+        });
+      });
+      document.querySelectorAll('[data-view]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-view]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentView = btn.dataset.view;
+          renderChart(select.value);
+        });
+      });
+      select.value = '18';
+      renderAnchorMatrix(data);   // must run first — populates anchorLookup
+      renderAbVsAnchor(data);     // static all-ages matrix, rendered once
+      renderAge(18);
+    }
+
+    // ── Section 5: Full anchor price matrix ──────────────────────────────────
+    function renderAnchorMatrix(data) {
+      const container = document.getElementById('anchorMatrix');
+      if (!container) return;
+
+      const ages = data.ages;          // [18, 19, … 40]
+      const ageAnalysis = data.age_analysis;
+
+      // Ordered segment rows + display labels
+      const SEGS = [
+        { key: 'poor',         label: 'iOS Poor'     },
+        { key: 'mid_ios',      label: 'iOS Mid'      },
+        { key: 'dev_ios',      label: 'iOS Dev'      },
+        { key: 'rich',         label: 'iOS Rich'     },
+        { key: 'android_poor', label: 'And. Poor'    },
+        { key: 'mid_android',  label: 'And. Mid'     },
+        { key: 'dev_android',  label: 'And. Dev'     },
+        { key: 'android_rich', label: 'And. Rich'    },
+      ];
+
+      // Build lookup: { age → { segKey → { price, thin, score } } }
+      // Written to module-level anchorLookup so renderAbVsAnchor can use it
+      anchorLookup = {};
+      const lookup = anchorLookup;
+      ages.forEach(age => {
+        lookup[age] = {};
+        const cohort = ageAnalysis[String(age)]?.cohort_performance || [];
+        cohort.forEach(c => {
+          const sk = c.segment_key;
+          if (!sk) return;
+          const gd = c.group_data || {};
+          const totalUsers = Object.values(gd).reduce((s, g) => s + (g.users || 0), 0);
+          const thin = totalUsers < 25;
+
+          // Compute anchor score for each group
+          const scored = Object.values(gd).map(g => {
+            const conv  = g.converters || 0;
+            const cvr   = g.cvr || 0;
+            const score = conv > 0 ? cvr * Math.sqrt(conv) : 0;
+            return { price: g.p_value, score };
+          }).filter(x => x.price);
+
+          // Sort by anchor score descending — highest score wins, no tiebreaker
+          scored.sort((a, b) => b.score - a.score);
+          let bestPrice = scored[0]?.price || null;
+          let bestScore = scored[0]?.score || -1;
+
+          // fallback: if no converters anywhere, pick price with most users
+          if (!bestPrice) {
+            let maxU = -1;
+            Object.values(gd).forEach(g => {
+              if ((g.users || 0) > maxU) { maxU = g.users; bestPrice = g.p_value; }
+            });
+          }
+
+          lookup[age][sk] = { price: bestPrice, thin, score: bestScore };
+        });
+      });
+
+      // WTP ratios (empirical, all vs iOS Dev baseline)
+      const WTP_RATIOS = {
+        poor: 0.435, mid_ios: 0.934, dev_ios: 1.000, rich: 0.972,
+        android_poor: 0.467, mid_android: 0.688, dev_android: 0.688, android_rich: 0.730,
+      };
+      const IOS_SEGS = ['poor', 'mid_ios', 'dev_ios', 'rich'];
+      const AND_SEGS = ['android_poor', 'mid_android', 'dev_android', 'android_rich'];
+
+      // ── iOS: find best-scoring observed segment per age, derive all other iOS rows from it ──
+      matIosAnchorSeg = {};
+      const iosAnchorSeg = matIosAnchorSeg;
+      ages.forEach(age => {
+        let bestSeg = null, bestSc = -1;
+        IOS_SEGS.forEach(key => {
+          const d = lookup[age]?.[key];
+          if (d && (d.score || 0) > bestSc) { bestSc = d.score; bestSeg = key; }
+        });
+        iosAnchorSeg[age] = bestSeg;
+      });
+
+      // Override every non-anchor iOS cell with the WTP-derived price
+      IOS_SEGS.forEach(key => {
+        ages.forEach(age => {
+          const ancSeg = iosAnchorSeg[age];
+          if (!ancSeg || key === ancSeg) return;          // this cell IS the anchor — keep observed
+          const ancPrice = parseInt((lookup[age]?.[ancSeg]?.price || 'P0').replace('P', ''));
+          if (!ancPrice || !WTP_RATIOS[key] || !WTP_RATIOS[ancSeg]) return;
+          const derived = Math.round(ancPrice * WTP_RATIOS[key] / WTP_RATIOS[ancSeg]);
+          const origScore = lookup[age]?.[key]?.score || 0;
+          lookup[age][key] = { price: `P${derived}`, thin: false, score: origScore, derived: true, sourceKey: ancSeg };
+        });
+      });
+
+      // ── Android: same logic — find best-scoring Android segment per age, derive all others ──
+      matAndAnchorSeg = {};
+      const andAnchorSeg = matAndAnchorSeg;
+      ages.forEach(age => {
+        let bestSeg = null, bestSc = -1;
+        AND_SEGS.forEach(key => {
+          const d = lookup[age]?.[key];
+          if (d && (d.score || 0) > bestSc) { bestSc = d.score; bestSeg = key; }
+        });
+        andAnchorSeg[age] = bestSeg;
+      });
+
+      // Override every non-anchor Android cell with the WTP-derived price
+      AND_SEGS.forEach(key => {
+        ages.forEach(age => {
+          const ancSeg = andAnchorSeg[age];
+          if (!ancSeg || key === ancSeg) return;          // this cell IS the Android anchor — keep observed
+          const ancPrice = parseInt((lookup[age]?.[ancSeg]?.price || 'P0').replace('P', ''));
+          if (!ancPrice || !WTP_RATIOS[key] || !WTP_RATIOS[ancSeg]) return;
+          const derived = Math.round(ancPrice * WTP_RATIOS[key] / WTP_RATIOS[ancSeg]);
+          const origScore = lookup[age]?.[key]?.score || 0;
+          lookup[age][key] = { price: `P${derived}`, thin: false, score: origScore, derived: true, sourceKey: ancSeg };
+        });
+      });
+
+      // Anchor row uses iOS anchor per age
+      const globalAnchorSeg = {};
+      ages.forEach(age => { globalAnchorSeg[age] = iosAnchorSeg[age]; });
+
+      // Determine global price range for colour scaling
+      let minP = Infinity, maxP = -Infinity;
+      ages.forEach(age => {
+        SEGS.forEach(({ key }) => {
+          const d = lookup[age]?.[key];
+          if (d?.price) {
+            const n = parseInt(d.price.replace('P', ''));
+            if (n < minP) minP = n;
+            if (n > maxP) maxP = n;
+          }
+        });
+      });
+
+      function cellBg(priceStr, thin) {
+        if (!priceStr) return 'transparent';
+        const n = parseInt(priceStr.replace('P', ''));
+        const t = (n - minP) / Math.max(maxP - minP, 1); // 0→1
+        // Blue-teal gradient: low = dim blue, high = bright teal/green
+        const r = Math.round(20  + t * 10);
+        const g = Math.round(60  + t * 95);
+        const b = Math.round(90  + t * 65);
+        const a = thin ? 0.28 : 0.55 + t * 0.30;
+        return `rgba(${r},${g},${b},${a})`;
+      }
+
+      // ── Helpers ──────────────────────────────────────────────────────────────
+      const SEG_LABEL = { poor:'Poor', mid_ios:'Mid', dev_ios:'Dev', rich:'Rich',
+        android_poor:'Poor', mid_android:'Mid', dev_android:'Dev', android_rich:'Rich' };
+
+      const headerCells = ages.map(a =>
+        `<th style="min-width:34px;padding:4px 3px;text-align:center;font-size:11px;color:var(--muted);font-weight:500;">${a}</th>`
+      ).join('');
+
+      function buildCell(age, key, label, anchorMap) {
+        const d = lookup[age]?.[key];
+        if (!d?.price) return `<td style="padding:3px 2px;text-align:center;"></td>`;
+        const isDerived = !!d.derived;
+        const isAnchor  = !isDerived && anchorMap[age] === key;
+        const bg      = cellBg(d.price, isDerived);   // anchor always full-colour
+        const opacity = isAnchor ? '1' : isDerived ? '0.45' : d.thin ? '0.6' : '1';
+        const italic  = isDerived ? 'font-style:italic;' : '';
+        const marker  = (!isAnchor && d.thin) ? '†' : isDerived ? '*' : '';
+        const markerEl = marker ? `<span style="font-size:8px;vertical-align:super;color:var(--muted);">${marker}</span>` : '';
+        const titleStr = isDerived
+          ? `Age ${age} · ${label}: ${d.price} — derived from ${SEG_LABEL[d.sourceKey] || d.sourceKey} via WTP ratio`
+          : `Age ${age} · ${label}: ${d.price}${d.thin ? ' (thin)' : ''} · score ${Number(d.score).toFixed(1)}`;
+        return `<td style="padding:3px 2px;text-align:center;" title="${titleStr}">
+          <div style="background:${bg};border-radius:5px;padding:3px 0;${italic}font-size:11px;font-weight:600;color:rgba(219,231,235,${opacity});line-height:1.2;">
+            ${d.price}${markerEl}
+          </div>
+        </td>`;
+      }
+
+      function buildAnchorRow(anchorMap) {
+        return `<tr>
+          <td style="padding:4px 10px 4px 4px;font-size:11px;color:var(--muted);font-style:italic;white-space:nowrap;">anchor</td>
+          ${ages.map(age => {
+            const lbl = SEG_LABEL[anchorMap[age]] || '—';
+            return `<td style="padding:3px 2px;text-align:center;font-size:9px;color:var(--accent);font-weight:700;">${lbl}</td>`;
+          }).join('')}
+        </tr>`;
+      }
+
+      function buildSegRows(segList, anchorMap) {
+        return segList.map(({ key, label }) => `<tr>
+          <td style="padding:4px 10px 4px 4px;white-space:nowrap;font-size:12px;color:#9eb0b9;font-weight:500;">${label}</td>
+          ${ages.map(age => buildCell(age, key, label, anchorMap)).join('')}
+        </tr>`).join('');
+      }
+
+      function buildTable(title, segList, anchorMap) {
+        return `
+          <p style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:18px 0 6px;">${title}</p>
+          <table style="border-collapse:collapse;width:100%;font-family:inherit;margin-bottom:4px;">
+            <thead><tr>
+              <th style="padding:4px 10px 4px 4px;text-align:left;font-size:11px;color:var(--muted);font-weight:500;white-space:nowrap;">Segment</th>
+              ${headerCells}
+            </tr></thead>
+            <tbody>
+              ${buildAnchorRow(anchorMap)}
+              ${buildSegRows(segList, anchorMap)}
+            </tbody>
+          </table>`;
+      }
+
+      const IOS_SEG_LIST = [
+        { key: 'poor',    label: 'iOS Poor' },
+        { key: 'mid_ios', label: 'iOS Mid'  },
+        { key: 'dev_ios', label: 'iOS Dev'  },
+        { key: 'rich',    label: 'iOS Rich' },
+      ];
+      const AND_SEG_LIST = [
+        { key: 'android_poor', label: 'And. Poor' },
+        { key: 'mid_android',  label: 'And. Mid'  },
+        { key: 'dev_android',  label: 'And. Dev'  },
+        { key: 'android_rich', label: 'And. Rich' },
+      ];
+
+      container.innerHTML =
+        buildTable('iOS', IOS_SEG_LIST, iosAnchorSeg) +
+        buildTable('Android', AND_SEG_LIST, andAnchorSeg) +
+        `<p style="font-size:11px;color:var(--muted);margin-top:8px;">
+          * derived via WTP ratio from best observed segment (anchor row).
+          Score = CVR% × √converters — pure score, no revenue adjustment.
+        </p>`;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      Promise.all([
+        fetch('./age_anchor_analysis.json').then(r => r.json()),
+        fetch('./price_recommendations.json').then(r => r.json()).catch(() => null)
+      ])
+        .then(([anchorData, recJson]) => {
+          recData = recJson;
+          bootstrapPage(anchorData);
+        })
+        .catch(err => {
+          document.getElementById('summaryCards').innerHTML =
+            '<div class="empty">Failed to load age anchor data. Is the server running?</div>';
+          console.error(err);
+        });
+    });
+  </script>
+
+</body>
+</html>
