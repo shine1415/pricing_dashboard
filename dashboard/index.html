@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pricing Analysis Hub — dua.com</title>
+  <style>
+    :root {
+      --bg: #07141a;
+      --text: #f5f7f8;
+      --muted: #9eb0b9;
+      --line: rgba(255,255,255,0.08);
+      --accent: #f3b94e;
+      --good: #31c48d;
+      --blue: #4d9dff;
+      --purple: #a78bfa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(77,157,255,0.16), transparent 30%),
+        radial-gradient(circle at top right, rgba(243,185,78,0.12), transparent 26%),
+        linear-gradient(180deg, #09161c 0%, #07141a 100%);
+    }
+    .page {
+      width: min(1180px, calc(100vw - 40px));
+      margin: 0 auto;
+      padding: 56px 0 80px;
+    }
+    .eyebrow {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 14px;
+    }
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1.0;
+    }
+    .hero-copy {
+      max-width: 68ch;
+      color: #dbe7eb;
+      font-size: 16px;
+      line-height: 1.65;
+      margin: 0 0 36px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 26px;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      background: rgba(255,255,255,0.06);
+    }
+    .card.monitor:hover  { border-color: rgba(49,196,141,0.35); }
+    .card.anchor:hover   { border-color: rgba(77,157,255,0.35); }
+    .card.rec:hover      { border-color: rgba(243,185,78,0.35); }
+    .card.ltv:hover      { border-color: rgba(167,139,250,0.35); }
+    .card-tag {
+      display: inline-flex;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .card.monitor .card-tag { background: rgba(49,196,141,0.12); border: 1px solid rgba(49,196,141,0.22); color: #b8f0d8; }
+    .card.anchor  .card-tag { background: rgba(77,157,255,0.12); border: 1px solid rgba(77,157,255,0.22); color: #dbe8ff; }
+    .card.rec     .card-tag { background: rgba(243,185,78,0.12); border: 1px solid rgba(243,185,78,0.22); color: #fde8b0; }
+    .card.ltv     .card-tag { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.22); color: #ddd6fe; }
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .card p {
+      margin: 0 0 18px;
+      color: #c8d9e0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .bullet-list {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .bullet-list div::before {
+      content: "→ ";
+      color: var(--accent);
+    }
+    .arrow {
+      display: inline-block;
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="eyebrow">dua.com · Male Pricing · A/B Test Results</div>
+    <h1>Pricing Analysis Hub</h1>
+    <p class="hero-copy">Dec 19, 2025 – Mar 19, 2026 · 8 segments · iOS and Android. Pick the view you need.</p>
+
+    <div class="grid">
+
+      <a class="card monitor" href="./pricing_dashboard_v2.html">
+        <div class="card-tag">Experiment monitor</div>
+        <h2>Pricing Monitor</h2>
+        <p>Region-level A/B results, period comparisons, time series charts, and the LTV A/B analysis for the four A/B segments.</p>
+        <div class="bullet-list">
+          <div>All 8 segments in one executive view</div>
+          <div>Period 1 vs Period 2 CVR and revenue</div>
+          <div>LTV depth and renewal rates (Feb 1–7)</div>
+        </div>
+        <span class="arrow">Open monitor →</span>
+      </a>
+
+      <a class="card anchor" href="./age_anchor_analysis.html">
+        <div class="card-tag">Age intelligence</div>
+        <h2>Age Anchor Analysis</h2>
+        <p>Per-age deep dive across all regions. Identifies the best-converting price for each age cohort using a weighted CVR, volume, and evidence score.</p>
+        <div class="bullet-list">
+          <div>Cohort performance chart by age</div>
+          <div>Converter analysis and anchor scoring</div>
+          <div>Cross-regional price comparison per age</div>
+        </div>
+        <span class="arrow">Open analysis →</span>
+      </a>
+
+      <a class="card rec" href="./price_recommendations.html">
+        <div class="card-tag">Next actions</div>
+        <h2>Price Recommendations</h2>
+        <p>Per-age, per-segment recommendations with confidence levels, coherence chains, and next-test suggestions based on P1 A/B history.</p>
+        <div class="bullet-list">
+          <div>Recommended price per age × segment</div>
+          <div>Prior A/B winner/loser surfaced — no retesting</div>
+          <div>Break-even CVR lift for each proposed test</div>
+        </div>
+        <span class="arrow">Open recommendations →</span>
+      </a>
+
+      <a class="card ltv" href="./pricing_report.html">
+        <div class="card-tag">Strategy report</div>
+        <h2>Pricing Strategy Report</h2>
+        <p>Full written report: test verdicts, LTV validation, age intelligence, per-age recommendation matrix, and prioritized next tests. Print to PDF.</p>
+        <div class="bullet-list">
+          <div>All 4 segment verdicts with LTV data</div>
+          <div>Age anchor analysis and cross-segment translation</div>
+          <div>Prioritized next tests + data quality audit</div>
+        </div>
+        <span class="arrow">Open report →</span>
+      </a>
+
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing A/B Test Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1a1a; padding: 20px; color: #e0e0e0; }
+        .container { max-width: 1800px; margin: 0 auto; background: #2a2a2a; border-radius: 12px; padding: 30px; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+        h1 { font-size: 28px; margin-bottom: 5px; color: #ffffff; }
+        .subtitle { color: #a0a0a0; margin-bottom: 10px; font-size: 14px; }
+        .warning { background: #3d3416; border-left: 4px solid #f59e0b; padding: 12px 15px; margin-bottom: 20px; border-radius: 4px; font-size: 13px; color: #fbbf24; }
+        
+        .segment-selector { background: #1e3a5f; border-left: 4px solid #3b82f6; padding: 20px; margin-bottom: 20px; border-radius: 4px; }
+        .segment-selector h3 { margin-bottom: 10px; color: #60a5fa; font-size: 16px; }
+        .segment-selector select { padding: 10px; border: 2px solid #3b82f6; border-radius: 6px; background: #1a1a1a; cursor: pointer; font-size: 14px; color: #e0e0e0; min-width: 250px; }
+        
+        .controls { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; align-items: flex-end; }
+        .control-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-size: 13px; font-weight: 600; color: #a0a0a0; }
+        select { padding: 8px 12px; border: 1px solid #404040; border-radius: 6px; font-size: 14px; background: #1a1a1a; color: #e0e0e0; cursor: pointer; min-width: 150px; }
+        select:focus { outline: none; border-color: #3b82f6; }
+        
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .metric-card { color: white; padding: 20px; border-radius: 8px; background: #1a1a1a; border: 1px solid #404040; }
+        .metric-card.primary { border-left: 4px solid #3b82f6; }
+        .metric-card.success { border-left: 4px solid #10b981; }
+        .metric-card.warning { border-left: 4px solid #f59e0b; }
+        .metric-card.info { border-left: 4px solid #8b5cf6; }
+        .metric-label { font-size: 12px; color: #a0a0a0; margin-bottom: 5px; }
+        .metric-value { font-size: 28px; font-weight: 700; color: #ffffff; }
+        .metric-sub { font-size: 11px; color: #808080; margin-top: 5px; }
+        
+        .event-legend { background: #1a1a1a; border: 1px solid #404040; border-radius: 8px; padding: 15px; margin-bottom: 20px; display: none; }
+        .event-legend h4 { font-size: 13px; color: #a0a0a0; margin-bottom: 10px; }
+        .event-categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .event-category-title { font-size: 11px; font-weight: 600; color: #808080; margin-bottom: 5px; text-transform: uppercase; }
+        .event-item { font-size: 12px; padding: 4px 0; color: #e0e0e0; display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+        .event-item:hover { opacity: 0.8; }
+        .event-checkbox { width: 14px; height: 14px; cursor: pointer; }
+        .event-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .event-line { width: 2px; height: 12px; }
+        
+        #chart { margin-bottom: 30px; min-height: 600px; border: 1px solid #404040; border-radius: 8px; padding: 15px; background: #1a1a1a; }
+        
+        .pvalue-container { background: #2a2a2a; border: 1px solid #404040; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+        .pvalue-container h3 { margin-bottom: 15px; font-size: 16px; color: #60a5fa; }
+        .pvalue-table-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .pvalue-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .pvalue-table th { background: #1a1a1a; padding: 10px; text-align: left; border-bottom: 2px solid #404040; color: #60a5fa; font-weight: 600; }
+        .pvalue-table td { padding: 8px 10px; border-bottom: 1px solid #333; }
+        .pvalue-table tr:hover { background: #333; }
+        .period-title { font-size: 14px; font-weight: 600; color: #a0a0a0; margin-bottom: 10px; }
+        .aa-control { color: #fbbf24; font-size: 11px; margin-left: 5px; }
+        
+        .loading { text-align: center; padding: 40px; color: #a0a0a0; font-size: 16px; }
+        .success { color: #10b981; font-weight: 600; }
+        .error { color: #ef4444; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Pricing A/B Test Dashboard</h1>
+        <p class="subtitle" id="segmentSubtitle">Select a segment to begin</p>
+        
+        <div class="warning" id="warningBox" style="display: none;">
+            <strong>✅ Actual Unique Users:</strong> <span id="userCount"></span>
+        </div>
+        
+        <div class="segment-selector">
+            <h3>🎯 Select Test Segment</h3>
+            <select id="segmentSelect">
+                <option value="">-- Choose Segment --</option>
+                <option value="poor">Male | iOS | Poor Region</option>
+                <option value="rich">Male | iOS | Rich Region</option>
+                <option value="android_poor">Male | Android | Poor Region</option>
+                <option value="android_rich">Male | Android | Rich Region</option>
+            </select>
+        </div>
+        
+        <div class="controls" id="controls" style="display: none;">
+            <div class="control-group">
+                <label for="ageSelect">📅 Age:</label>
+                <select id="ageSelect"><option value="all">All Ages</option></select>
+            </div>
+            <div class="control-group">
+                <label for="purchaseTypeSelect">🔄 Type:</label>
+                <select id="purchaseTypeSelect">
+                    <option value="All">All</option>
+                    <option value="Subscription Started">Activation</option>
+                    <option value="Subscription Reactivated">Reactivation</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="metricSelect">📈 Metric:</label>
+                <select id="metricSelect">
+                    <option value="user_cvr">User CVR (%)</option>
+                    <option value="revenue_per_user">Revenue/User (€)</option>
+                    <option value="revenue">Revenue (€)</option>
+                    <option value="users">Users</option>
+                    <option value="converted_users">Converters</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="smoothingSelect">🔄 Smooth:</label>
+                <select id="smoothingSelect">
+                    <option value="1">None</option>
+                    <option value="7" selected>7-day</option>
+                    <option value="14">14-day</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="trendlineToggle">📉 Trend:</label>
+                <select id="trendlineToggle">
+                    <option value="yes" selected>Show</option>
+                    <option value="no">Hide</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="eventsToggle">🎯 Events:</label>
+                <select id="eventsToggle">
+                    <option value="yes" selected>Show</option>
+                    <option value="no">Hide</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="metrics" id="metrics"><div class="loading">Select a segment to view metrics</div></div>
+        
+        <div class="pvalue-container" id="periodComparison" style="display: none;">
+            <h3>📊 Period Comparison Analysis</h3>
+            <div style="background: #3d3416; border-left: 4px solid #f59e0b; padding: 12px 15px; margin-bottom: 15px; border-radius: 4px;">
+                <strong>⚠️ CRITICAL:</strong> Period 1 (19 days) vs Period 2 (48 days) — Period 2 is 2.5x longer!
+            </div>
+            <div class="pvalue-table-wrapper">
+                <div>
+                    <div class="period-title">Period 1 (Jan 12-30) — 19 days</div>
+                    <table class="pvalue-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Group A</th>
+                                <th>Group B</th>
+                            </tr>
+                        </thead>
+                        <tbody id="period1Stats"></tbody>
+                    </table>
+                </div>
+                <div>
+                    <div class="period-title">Period 2 (Jan 31-Mar 19) — 48 days</div>
+                    <table class="pvalue-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Group A</th>
+                                <th>Group B</th>
+                            </tr>
+                        </thead>
+                        <tbody id="period2Stats"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div style="margin-top: 15px; font-size: 13px; color: #a0a0a0;">
+                <strong>Key Insight:</strong> Revenue/User/Day normalizes for period length. Raw totals are misleading when periods have different durations.
+            </div>
+        </div>
+        
+        <div class="event-legend" id="eventLegend">
+            <h4>📅 Event Timeline (Click to toggle)</h4>
+            <div class="event-categories">
+                <div class="event-category">
+                    <div class="event-category-title">🔴 Negative (Suppressors)</div>
+                    <label class="event-item">
+                        <input type="checkbox" class="event-checkbox" data-event="female-ux" checked>
+                        <div class="event-dot" style="background:#ef4444"></div>
+                        <span>Female UX Issue (Jan 14-30)</span>
+                    </label>
+                    <label class="event-item">
+                        <input type="checkbox" class="event-checkbox" data-event="paywall-exp" checked>
+                        <div class="event-dot" style="background:#ef4444"></div>
+                        <span>Paywall Exp (Feb 4-15)</span>
+                    </label>
+                    <label class="event-item">
+                        <input type="checkbox" class="event-checkbox" data-event="promos" checked>
+                        <div class="event-dot" style="background:#ef4444"></div>
+                        <span>Promo Offers (Mar 20-22)</span>
+                    </label>
+                </div>
+                <div class="event-category">
+                    <div class="event-category-title">🟠 Mixed Impact</div>
+                    <label class="event-item">
+                        <input type="checkbox" class="event-checkbox" data-event="profile-builder" checked>
+                        <div class="event-dot" style="background:#f59e0b"></div>
+                        <span>Profile Builder (Jan 19+)</span>
+                    </label>
+                    <label class="event-item">
+                        <input type="checkbox" class="event-checkbox" data-event="free-female" checked>
+                        <div class="event-dot" style="background:#f59e0b"></div>
+                        <span>Free Female Premium (Feb 10-17)</span>
+                    </label>
+                </div>
+                <div class="event-category">
+                    <div class="event-category-title">🟣 Cultural</div>
+                    <label class="event-item">
+                        <input type="checkbox" class="event-checkbox" data-event="ramadan" checked>
+                        <div class="event-dot" style="background:#8b5cf6"></div>
+                        <span>Ramadan (Feb 17-Mar 20)</span>
+                    </label>
+                </div>
+                <div class="event-category">
+                    <div class="event-category-title">🟢 Positive</div>
+                    <label class="event-item">
+                        <input type="checkbox" class="event-checkbox" data-event="period2" checked>
+                        <div class="event-dot" style="background:#10b981"></div>
+                        <span>Period 2 Start (Jan 30)</span>
+                    </label>
+                </div>
+                <div class="event-category">
+                    <div class="event-category-title">🔵 iOS Releases</div>
+                    <label class="event-item">
+                        <input type="checkbox" class="event-checkbox" data-event="ios-releases" checked>
+                        <div class="event-line" style="background:#60a5fa"></div>
+                        <span>All 7 releases (Jan-Mar)</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div id="chart"><div class="loading">Select a segment to view chart</div></div>
+        
+        <div id="pvalueDisplay" style="display: none;"></div>
+    </div>
+
+    <script>
+        let rawData = [];
+        let dailyCVRData = [];
+        let currentSegment = null;
+        
+        const CUTOFF_DATE = '2026-03-19'; // Exclude Ramadan promotion period
+        
+        const segmentConfigs = {
+            poor: {
+                name: "Male | iOS | Poor Region",
+                dataFile: "dashboard_data_poor_region.csv",
+                cvrFile: "daily_cvr_ios_poor_mar19.csv",
+                totalUsers: {A: 7024, B: 6971},
+                uniqueConverters: {A: 737, B: 836},
+                revenueTotal: {A: 4957.14, B: 5684.81},
+                note: "Filtered for correct P-values only | Excludes Mar 20–24 (Ramadan promos)",
+                pvalues: {
+                    period1: {
+                        18:{A:'P14',B:'P5'}, 19:{A:'P15',B:'P5'}, 20:{A:'P16',B:'P5'}, 21:{A:'P17',B:'P5'},
+                        22:{A:'P18',B:'P10'}, 23:{A:'P19',B:'P10'}, 24:{A:'P20',B:'P10'},
+                        25:{A:'P21',B:'P14'}, 26:{A:'P22',B:'P14'}, 27:{A:'P23',B:'P14'}, 28:{A:'P24',B:'P14'}, 29:{A:'P25',B:'P14'},
+                        30:{A:'P26',B:'P20'}, 31:{A:'P27',B:'P20'}, 32:{A:'P28',B:'P20'}, 33:{A:'P29',B:'P20'}, 34:{A:'P30',B:'P20'},
+                        35:{A:'P31',B:'P28'}, 36:{A:'P32',B:'P28'}, 37:{A:'P33',B:'P28'}, 38:{A:'P34',B:'P28'}, 39:{A:'P35',B:'P28'}, 40:{A:'P36',B:'P28'}
+                    },
+                    period2: {
+                        18:{A:'P5',B:'P5',aa:1}, 19:{A:'P5',B:'P5',aa:1}, 20:{A:'P5',B:'P5',aa:1}, 21:{A:'P5',B:'P5',aa:1},
+                        22:{A:'P10',B:'P10',aa:1}, 23:{A:'P10',B:'P10',aa:1}, 24:{A:'P10',B:'P10',aa:1},
+                        25:{A:'P14',B:'P12'}, 26:{A:'P14',B:'P12'}, 27:{A:'P14',B:'P12'}, 28:{A:'P14',B:'P12'}, 29:{A:'P14',B:'P12'},
+                        30:{A:'P20',B:'P12'}, 31:{A:'P20',B:'P12'}, 32:{A:'P20',B:'P12'}, 33:{A:'P20',B:'P12'}, 34:{A:'P20',B:'P12'},
+                        35:{A:'P28',B:'P20'}, 36:{A:'P28',B:'P20'}, 37:{A:'P28',B:'P20'}, 38:{A:'P28',B:'P20'}, 39:{A:'P28',B:'P20'}, 40:{A:'P28',B:'P20'}
+                    }
+                }
+            },
+            rich: {
+                name: "Male | iOS | Rich Region",
+                dataFile: "dashboard_data_rich_region.csv",
+                cvrFile: "daily_cvr_ios_rich_mar19.csv",
+                totalUsers: {A: 3939, B: 3915},
+                uniqueConverters: {A: 784, B: 862},
+                revenueTotal: {A: 6031.43, B: 6557.53},
+                note: "Filtered for correct P-values only | Excludes Mar 20–24 (Ramadan promos)",
+                pvalues: {
+                    period1: {
+                        18:{A:'P24',B:'P25'}, 19:{A:'P25',B:'P26'}, 20:{A:'P26',B:'P27'}, 21:{A:'P27',B:'P28'},
+                        22:{A:'P28',B:'P29'}, 23:{A:'P29',B:'P30'}, 24:{A:'P30',B:'P31'},
+                        25:{A:'P31',B:'P32'}, 26:{A:'P32',B:'P33'}, 27:{A:'P33',B:'P34'}, 28:{A:'P34',B:'P35'}, 29:{A:'P35',B:'P36'},
+                        30:{A:'P36',B:'P37'}, 31:{A:'P37',B:'P38'}, 32:{A:'P38',B:'P39'}, 33:{A:'P39',B:'P40'}, 34:{A:'P40',B:'P41'},
+                        35:{A:'P41',B:'P42'}, 36:{A:'P42',B:'P43'}, 37:{A:'P43',B:'P44'}, 38:{A:'P44',B:'P45'}, 39:{A:'P45',B:'P46'}, 40:{A:'P46',B:'P47'}
+                    },
+                    period2: {
+                        18:{A:'P24',B:'P18'}, 19:{A:'P25',B:'P19'}, 20:{A:'P26',B:'P20'}, 21:{A:'P27',B:'P21'},
+                        22:{A:'P28',B:'P22'}, 23:{A:'P29',B:'P23'}, 24:{A:'P30',B:'P24'},
+                        25:{A:'P31',B:'P25'}, 26:{A:'P32',B:'P26'}, 27:{A:'P33',B:'P27'}, 28:{A:'P34',B:'P28'}, 29:{A:'P35',B:'P29'},
+                        30:{A:'P36',B:'P30'}, 31:{A:'P37',B:'P31'}, 32:{A:'P38',B:'P32'}, 33:{A:'P39',B:'P33'}, 34:{A:'P40',B:'P34'},
+                        35:{A:'P41',B:'P35'}, 36:{A:'P42',B:'P36'}, 37:{A:'P43',B:'P37'}, 38:{A:'P44',B:'P38'}, 39:{A:'P45',B:'P39'}, 40:{A:'P46',B:'P40'}
+                    }
+                }
+            },
+            android_poor: {
+                name: "Male | Android | Poor Region",
+                dataFile: "dashboard_data_poor_region_android.csv",
+                cvrFile: "daily_cvr_android_poor_mar19.csv",
+                totalUsers: {A: 2454, B: 2467},
+                uniqueConverters: {A: 167, B: 208},
+                revenueTotal: {A: 1250.04, B: 1784.14},
+                note: "Excludes Mar 20–24 (Ramadan promos)",
+                pvalues: null
+            },
+            android_rich: {
+                name: "Male | Android | Rich Region",
+                dataFile: "dashboard_data_rich_region_android.csv",
+                cvrFile: "daily_cvr_android_rich_mar19.csv",
+                totalUsers: {A: 906, B: 995},
+                uniqueConverters: {A: 148, B: 191},
+                revenueTotal: {A: 783.53, B: 737.43},
+                note: "Excludes Mar 20–24 (Ramadan promos)",
+                pvalues: null
+            }
+        };
+
+        const keyEvents = {
+            'female-ux': {start:'2026-01-14', end:'2026-01-30', label:'Female UX', color:'#ef4444', enabled:true},
+            'paywall-exp': {start:'2026-02-04', end:'2026-02-15', label:'Paywall Exp', color:'#ef4444', enabled:true},
+            'promos': {start:'2026-03-20', end:'2026-03-22', label:'Promos', color:'#ef4444', enabled:true},
+            'profile-builder': {start:'2026-01-19', end:'2026-03-24', label:'Profile Builder', color:'#f59e0b', enabled:true},
+            'free-female': {start:'2026-02-10', end:'2026-02-17', label:'Free Female', color:'#f59e0b', enabled:true},
+            'ramadan': {start:'2026-02-17', end:'2026-03-20', label:'Ramadan', color:'#8b5cf6', enabled:true},
+            'period2': {start:'2026-01-30', end:'2026-01-30', label:'Period 2', color:'#10b981', enabled:true},
+            'ios-releases': [
+                {start:'2026-01-19', end:'2026-01-19', label:'v5.0.0', color:'#60a5fa', enabled:true},
+                {start:'2026-01-26', end:'2026-01-26', label:'v5.0.1', color:'#60a5fa', enabled:true},
+                {start:'2026-02-01', end:'2026-02-01', label:'v5.0.2', color:'#60a5fa', enabled:true},
+                {start:'2026-02-16', end:'2026-02-16', label:'v5.0.3', color:'#60a5fa', enabled:true},
+                {start:'2026-02-20', end:'2026-02-20', label:'v5.0.4', color:'#60a5fa', enabled:true},
+                {start:'2026-02-26', end:'2026-02-26', label:'v5.0.5', color:'#60a5fa', enabled:true},
+                {start:'2026-03-13', end:'2026-03-13', label:'v5.1', color:'#60a5fa', enabled:true}
+            ]
+        };
+        
+        document.getElementById('segmentSelect').addEventListener('change', function() {
+            const segment = this.value;
+            if (!segment) return;
+            
+            currentSegment = segmentConfigs[segment];
+            document.getElementById('segmentSubtitle').textContent = `${currentSegment.name} | Jan 12 - Mar 19, 2026`;
+            document.getElementById('userCount').textContent = `${currentSegment.totalUsers.A + currentSegment.totalUsers.B} total (Group A: ${currentSegment.totalUsers.A} | Group B: ${currentSegment.totalUsers.B})`;
+            document.getElementById('warningBox').style.display = 'block';
+            
+            loadSegmentData(currentSegment.dataFile, currentSegment.cvrFile);
+        });
+        
+        function loadSegmentData(dataFilename, cvrFilename) {
+            Promise.all([
+                fetch(dataFilename).then(r => r.text()),
+                fetch(cvrFilename).then(r => r.text())
+            ])
+            .then(([dataCSV, cvrCSV]) => {
+                rawData = parseCSV(dataCSV);
+                dailyCVRData = parseCSV(cvrCSV);
+                initDashboard();
+            })
+            .catch(err => {
+                alert(`Could not load data files. Make sure they are in the same directory.`);
+                console.error(err);
+            });
+        }
+        
+        function parseCSV(text) {
+            const lines = text.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.trim());
+            const data = [];
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                const values = lines[i].split(',');
+                const row = {};
+                headers.forEach((header, idx) => {
+                    const value = values[idx]?.trim();
+                    if (['age','users','exposures','converted_users','events'].includes(header)) {
+                        row[header] = parseInt(value) || 0;
+                    } else if (['user_cvr','revenue','revenue_per_user'].includes(header)) {
+                        row[header] = parseFloat(value) || 0;
+                    } else {
+                        row[header] = value;
+                    }
+                });
+                data.push(row);
+            }
+            return data;
+        }
+        
+        function updatePValueDisplay(age) {
+            const pValueMap = currentSegment.pvalues;
+
+            if (!pValueMap) {
+                document.getElementById('pvalueDisplay').innerHTML = `
+                    <div class="pvalue-container">
+                        <h3>📋 Price Points</h3>
+                        <p style="color:#94a3b8;font-size:0.85rem;">Price point data not available for this segment.</p>
+                    </div>`;
+                return;
+            }
+
+            if (age === 'all') {
+                const ageRanges = [
+                    {range:'18-21', ages:[18,19,20,21]},
+                    {range:'22-24', ages:[22,23,24]},
+                    {range:'25-29', ages:[25,26,27,28,29]},
+                    {range:'30-34', ages:[30,31,32,33,34]},
+                    {range:'35-40', ages:[35,36,37,38,39,40]}
+                ];
+                
+                const p1Rows = ageRanges.map(r => {
+                    const firstAge = r.ages[0];
+                    const lastAge = r.ages[r.ages.length-1];
+                    const pFirst = pValueMap.period1[firstAge];
+                    const pLast = pValueMap.period1[lastAge];
+                    const aRange = pFirst.A === pLast.A ? pFirst.A : `${pFirst.A}-${pLast.A}`;
+                    const bValue = pFirst.B === pLast.B ? pFirst.B : `${pFirst.B}-${pLast.B}`;
+                    return `<tr><td>${r.range}</td><td>${aRange}</td><td>${bValue}</td></tr>`;
+                }).join('');
+                
+                const p2Rows = ageRanges.map(r => {
+                    const firstAge = r.ages[0];
+                    const lastAge = r.ages[r.ages.length-1];
+                    const pFirst = pValueMap.period2[firstAge];
+                    const pLast = pValueMap.period2[lastAge];
+                    const aValue = pFirst.A === pLast.A ? pFirst.A : `${pFirst.A}-${pLast.A}`;
+                    const bValue = pFirst.B === pLast.B ? pFirst.B : `${pFirst.B}-${pLast.B}`;
+                    return `<tr><td>${r.range}</td><td>${aValue}</td><td>${bValue}${pFirst.aa?' <span class="aa-control">(AA)</span>':''}</td></tr>`;
+                }).join('');
+                
+                document.getElementById('pvalueDisplay').innerHTML = `
+                    <div class="pvalue-container">
+                        <h3>📋 Price Points (All Ages)</h3>
+                        <div class="pvalue-table-wrapper">
+                            <div>
+                                <div class="period-title">Period 1 (Jan 12-30)</div>
+                                <table class="pvalue-table">
+                                    <thead><tr><th>Age</th><th>A</th><th>B</th></tr></thead>
+                                    <tbody>${p1Rows}</tbody>
+                                </table>
+                            </div>
+                            <div>
+                                <div class="period-title">Period 2 (Jan 31-Mar 24)</div>
+                                <table class="pvalue-table">
+                                    <thead><tr><th>Age</th><th>A</th><th>B</th></tr></thead>
+                                    <tbody>${p2Rows}</tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const p1 = pValueMap.period1[age] || {A:'N/A',B:'N/A'};
+                const p2 = pValueMap.period2[age] || {A:'N/A',B:'N/A'};
+                
+                document.getElementById('pvalueDisplay').innerHTML = `
+                    <div class="pvalue-container">
+                        <h3>📋 Price Points (Age ${age})</h3>
+                        <div class="pvalue-table-wrapper">
+                            <div>
+                                <div class="period-title">Period 1 (Jan 12-30)</div>
+                                <table class="pvalue-table">
+                                    <thead><tr><th>Group</th><th>Price</th></tr></thead>
+                                    <tbody>
+                                        <tr><td>A</td><td>${p1.A}</td></tr>
+                                        <tr><td>B</td><td>${p1.B}</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div>
+                                <div class="period-title">Period 2 (Jan 31-Mar 24)</div>
+                                <table class="pvalue-table">
+                                    <thead><tr><th>Group</th><th>Price</th></tr></thead>
+                                    <tbody>
+                                        <tr><td>A</td><td>${p2.A}</td></tr>
+                                        <tr><td>B</td><td>${p2.B}${p2.aa?' <span class="aa-control">(AA)</span>':''}</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        function initDashboard() {
+            const ages = [...new Set(rawData.map(d => d.age))].sort((a,b) => a-b);
+            const ageSelect = document.getElementById('ageSelect');
+            ageSelect.innerHTML = '<option value="all">All Ages</option>';
+            ages.forEach(age => {
+                const option = document.createElement('option');
+                option.value = age;
+                option.textContent = `Age ${age}`;
+                ageSelect.appendChild(option);
+            });
+            
+            ['ageSelect','purchaseTypeSelect','metricSelect','smoothingSelect','trendlineToggle','eventsToggle'].forEach(id => {
+                const elem = document.getElementById(id);
+                elem.removeEventListener('change', updateDashboard);
+                elem.addEventListener('change', updateDashboard);
+            });
+            
+            document.querySelectorAll('.event-checkbox').forEach(checkbox => {
+                checkbox.removeEventListener('change', handleEventToggle);
+                checkbox.addEventListener('change', handleEventToggle);
+            });
+            
+            document.getElementById('controls').style.display = 'flex';
+            document.getElementById('pvalueDisplay').style.display = 'block';
+            updateDashboard();
+        }
+        
+        function handleEventToggle() {
+            const eventId = this.getAttribute('data-event');
+            if (keyEvents[eventId]) {
+                if (Array.isArray(keyEvents[eventId])) {
+                    keyEvents[eventId].forEach(e => e.enabled = this.checked);
+                } else {
+                    keyEvents[eventId].enabled = this.checked;
+                }
+            }
+            updateDashboard();
+        }
+        
+        function movingAverage(values, window) {
+            if (window === 1) return values;
+            const result = [];
+            for (let i = 0; i < values.length; i++) {
+                const start = Math.max(0, i - Math.floor(window/2));
+                const end = Math.min(values.length, i + Math.ceil(window/2));
+                const sum = values.slice(start, end).reduce((a,b) => a+b, 0);
+                result.push(sum / (end-start));
+            }
+            return result;
+        }
+        
+        function linearRegression(xValues, yValues) {
+            const n = xValues.length;
+            const sumX = xValues.reduce((a,b) => a+b, 0);
+            const sumY = yValues.reduce((a,b) => a+b, 0);
+            const sumXY = xValues.reduce((sum,x,i) => sum + x*yValues[i], 0);
+            const sumXX = xValues.reduce((sum,x) => sum + x*x, 0);
+            const slope = (n*sumXY - sumX*sumY) / (n*sumXX - sumX*sumX);
+            const intercept = (sumY - slope*sumX) / n;
+            return {slope, intercept, predict: x => slope*x + intercept};
+        }
+        
+        function updateDashboard() {
+            if (!currentSegment) return;
+            
+            const selectedAge = document.getElementById('ageSelect').value;
+            const purchaseType = document.getElementById('purchaseTypeSelect').value;
+            const selectedMetric = document.getElementById('metricSelect').value;
+            const smoothing = parseInt(document.getElementById('smoothingSelect').value);
+            const showTrendlines = document.getElementById('trendlineToggle').value === 'yes';
+            const showEvents = document.getElementById('eventsToggle').value === 'yes';
+            
+            updatePValueDisplay(selectedAge);
+            document.getElementById('eventLegend').style.display = showEvents ? 'block' : 'none';
+            
+            let filteredData;
+            if (purchaseType === 'All') {
+                filteredData = rawData.filter(d => d.purchase_type === 'All');
+            } else {
+                filteredData = rawData.filter(d => d.purchase_type === purchaseType);
+            }
+            
+            // Apply date cutoff (exclude Ramadan promo period)
+            filteredData = filteredData.filter(d => d.date <= CUTOFF_DATE);
+            
+            if (selectedAge !== 'all') {
+                filteredData = filteredData.filter(d => d.age == selectedAge);
+            }
+            
+            const byDate = {};
+            filteredData.forEach(row => {
+                const key = `${row.date}_${row.group}`;
+                if (!byDate[key]) {
+                    byDate[key] = {date:row.date, group:row.group, users:0, converted_users:0, events:0, exposures:0, revenue:0};
+                }
+                byDate[key].users += row.users;
+                byDate[key].converted_users += row.converted_users;
+                byDate[key].events += row.events;
+                byDate[key].exposures += row.exposures;
+                byDate[key].revenue += row.revenue;
+            });
+            
+            Object.values(byDate).forEach(d => {
+                d.user_cvr = d.users > 0 ? (d.converted_users / d.users * 100) : 0;
+                d.revenue_per_user = d.users > 0 ? d.revenue / d.users : 0;
+            });
+            
+            const dataA = Object.values(byDate).filter(d => d.group==='A').sort((a,b) => a.date.localeCompare(b.date));
+            const dataB = Object.values(byDate).filter(d => d.group==='B').sort((a,b) => a.date.localeCompare(b.date));
+            
+            updateMetrics(dataA, dataB, selectedAge, purchaseType);
+            updatePeriodComparison(dataA, dataB, selectedAge, purchaseType);
+            updateChart(dataA, dataB, selectedMetric, smoothing, selectedAge, showTrendlines, showEvents);
+        }
+        
+        function updatePeriodComparison(dataA, dataB, age, ptype) {
+            const periodComparison = document.getElementById('periodComparison');
+            
+            // Only show for "All Ages" and "All" purchase type
+            if (age !== 'all' || ptype !== 'All') {
+                periodComparison.style.display = 'none';
+                return;
+            }
+            
+            periodComparison.style.display = 'block';
+            
+            const PERIOD_1_END = '2026-01-30';
+            const PERIOD_1_DAYS = 19;
+            const PERIOD_2_DAYS = 48; // Jan 31 - Mar 19 (was 53 with Mar 24)
+            
+            // Split data by period
+            const p1A = dataA.filter(d => d.date <= PERIOD_1_END);
+            const p2A = dataA.filter(d => d.date > PERIOD_1_END);
+            const p1B = dataB.filter(d => d.date <= PERIOD_1_END);
+            const p2B = dataB.filter(d => d.date > PERIOD_1_END);
+            
+            // Calculate metrics
+            function calcMetrics(data, days, totalUsers) {
+                const totalRevenue = data.reduce((sum,d) => sum+d.revenue, 0);
+                const totalConverters = data.reduce((sum,d) => sum+d.converted_users, 0);
+                const revPerUser = totalRevenue / totalUsers;
+                const revPerUserPerDay = revPerUser / days;
+                const cvr = (totalConverters / totalUsers * 100);
+                
+                return {
+                    totalRevenue: totalRevenue.toFixed(2),
+                    revPerUser: revPerUser.toFixed(2),
+                    revPerUserPerDay: revPerUserPerDay.toFixed(4),
+                    converters: totalConverters,
+                    cvr: cvr.toFixed(2)
+                };
+            }
+            
+            const usersA = currentSegment.totalUsers.A;
+            const usersB = currentSegment.totalUsers.B;
+            
+            const p1MetricsA = calcMetrics(p1A, PERIOD_1_DAYS, usersA);
+            const p2MetricsA = calcMetrics(p2A, PERIOD_2_DAYS, usersA);
+            const p1MetricsB = calcMetrics(p1B, PERIOD_1_DAYS, usersB);
+            const p2MetricsB = calcMetrics(p2B, PERIOD_2_DAYS, usersB);
+            
+            // Period 1 table
+            document.getElementById('period1Stats').innerHTML = `
+                <tr><td>CVR</td><td>${p1MetricsA.cvr}%</td><td>${p1MetricsB.cvr}%</td></tr>
+                <tr><td>Revenue/User Total</td><td>€${p1MetricsA.revPerUser}</td><td>€${p1MetricsB.revPerUser}</td></tr>
+                <tr style="background: #2d2d2d"><td><strong>Revenue/User/Day</strong></td><td><strong>€${p1MetricsA.revPerUserPerDay}</strong></td><td><strong>€${p1MetricsB.revPerUserPerDay}</strong></td></tr>
+            `;
+            
+            // Period 2 table
+            const changeA = ((parseFloat(p2MetricsA.revPerUserPerDay) - parseFloat(p1MetricsA.revPerUserPerDay)) / parseFloat(p1MetricsA.revPerUserPerDay) * 100).toFixed(1);
+            const changeB = ((parseFloat(p2MetricsB.revPerUserPerDay) - parseFloat(p1MetricsB.revPerUserPerDay)) / parseFloat(p1MetricsB.revPerUserPerDay) * 100).toFixed(1);
+            const colorA = changeA >= 0 ? '#10b981' : '#ef4444';
+            const colorB = changeB >= 0 ? '#10b981' : '#ef4444';
+            const symbolA = changeA >= 0 ? '✅' : '❌';
+            const symbolB = changeB >= 0 ? '✅' : '❌';
+            
+            document.getElementById('period2Stats').innerHTML = `
+                <tr><td>CVR</td><td>${p2MetricsA.cvr}%</td><td>${p2MetricsB.cvr}%</td></tr>
+                <tr><td>Revenue/User Total</td><td>€${p2MetricsA.revPerUser}</td><td>€${p2MetricsB.revPerUser}</td></tr>
+                <tr style="background: #2d2d2d">
+                    <td><strong>Revenue/User/Day</strong></td>
+                    <td style="color: ${colorA}"><strong>€${p2MetricsA.revPerUserPerDay}</strong></td>
+                    <td style="color: ${colorB}"><strong>€${p2MetricsB.revPerUserPerDay}</strong></td>
+                </tr>
+                <tr style="background: #1a1a1a">
+                    <td><strong>vs Period 1</strong></td>
+                    <td style="color: ${colorA}"><strong>${symbolA} ${changeA >= 0 ? '+' : ''}${changeA}%</strong></td>
+                    <td style="color: ${colorB}"><strong>${symbolB} ${changeB >= 0 ? '+' : ''}${changeB}%</strong></td>
+                </tr>
+            `;
+        }
+        
+        function updateMetrics(dataA, dataB, age, ptype) {
+            const totalConvertedA = dataA.reduce((sum,d) => sum+d.converted_users, 0);
+            const totalConvertedB = dataB.reduce((sum,d) => sum+d.converted_users, 0);
+            const totalRevenueA = dataA.reduce((sum,d) => sum+d.revenue, 0);
+            const totalRevenueB = dataB.reduce((sum,d) => sum+d.revenue, 0);
+            
+            let cvrA, cvrB, revPerUserA, revPerUserB, userTextA, userTextB;
+            
+            if (age === 'all' && ptype === 'All') {
+                // Use hardcoded values for overall view
+                const actualUsersA = currentSegment.totalUsers.A;
+                const actualUsersB = currentSegment.totalUsers.B;
+                const actualConvertersA = currentSegment.uniqueConverters.A;
+                const actualConvertersB = currentSegment.uniqueConverters.B;
+                
+                cvrA = (actualConvertersA / actualUsersA * 100);
+                cvrB = (actualConvertersB / actualUsersB * 100);
+                revPerUserA = totalRevenueA / actualUsersA;
+                revPerUserB = totalRevenueB / actualUsersB;
+                userTextA = `${actualConvertersA} / ${actualUsersA.toLocaleString()} users`;
+                userTextB = `${actualConvertersB} / ${actualUsersB.toLocaleString()} users`;
+            } else {
+                const dailyUsersA = dataA.reduce((sum,d) => sum+d.users, 0) / dataA.length;
+                const dailyUsersB = dataB.reduce((sum,d) => sum+d.users, 0) / dataB.length;
+                const estimatedUsersA = Math.round(dailyUsersA * dataA.length / 10);
+                const estimatedUsersB = Math.round(dailyUsersB * dataB.length / 10);
+                
+                cvrA = estimatedUsersA > 0 ? (totalConvertedA / estimatedUsersA * 100) : 0;
+                cvrB = estimatedUsersB > 0 ? (totalConvertedB / estimatedUsersB * 100) : 0;
+                revPerUserA = estimatedUsersA > 0 ? totalRevenueA / estimatedUsersA : 0;
+                revPerUserB = estimatedUsersB > 0 ? totalRevenueB / estimatedUsersB : 0;
+                userTextA = `${totalConvertedA} / ~${estimatedUsersA.toLocaleString()} users*`;
+                userTextB = `${totalConvertedB} / ~${estimatedUsersB.toLocaleString()} users*`;
+            }
+            
+            const cvrLift = cvrA > 0 ? ((cvrB-cvrA)/cvrA*100) : 0;
+            const revLift = revPerUserA > 0 ? ((revPerUserB-revPerUserA)/revPerUserA*100) : 0;
+            
+            const ptypeText = ptype === 'All' ? '' : ` (${ptype === 'Subscription Started' ? 'Act' : 'React'})`;
+            const segmentNote = (age !== 'all' || ptype !== 'All') ? '<div style="font-size:10px;color:#808080;margin-top:10px;">*Estimated unique users for this segment</div>' : '';
+            
+            document.getElementById('metrics').innerHTML = `
+                <div class="metric-card primary">
+                    <div class="metric-label">A - CVR${ptypeText}</div>
+                    <div class="metric-value">${cvrA.toFixed(2)}%</div>
+                    <div class="metric-sub">${userTextA}</div>
+                </div>
+                <div class="metric-card primary">
+                    <div class="metric-label">B - CVR${ptypeText}</div>
+                    <div class="metric-value">${cvrB.toFixed(2)}%</div>
+                    <div class="metric-sub">${userTextB}</div>
+                </div>
+                <div class="metric-card ${cvrLift>=0?'success':'warning'}">
+                    <div class="metric-label">CVR Lift</div>
+                    <div class="metric-value">${cvrLift>=0?'+':''}${cvrLift.toFixed(1)}%</div>
+                    <div class="metric-sub">${Math.abs(cvrB-cvrA).toFixed(2)}pp diff</div>
+                </div>
+                <div class="metric-card info">
+                    <div class="metric-label">Rev/User</div>
+                    <div class="metric-value">€${revPerUserA.toFixed(2)} | €${revPerUserB.toFixed(2)}</div>
+                    <div class="metric-sub">Total: €${totalRevenueA.toFixed(0)} | €${totalRevenueB.toFixed(0)}</div>
+                </div>
+                <div class="metric-card ${revLift>=0?'success':'warning'}">
+                    <div class="metric-label">Rev Lift</div>
+                    <div class="metric-value">${revLift>=0?'+':''}${revLift.toFixed(1)}%</div>
+                    <div class="metric-sub">${revPerUserB>revPerUserA?'B Wins':'A Wins'}</div>
+                </div>
+            ` + segmentNote;
+        }
+        
+        function updateChart(dataA, dataB, metric, smoothing, age, showTrendlines, showEvents) {
+            const dates = dataA.map(d => d.date);
+            const xIndices = dates.map((_,i) => i);
+            
+            let valuesA, valuesB;
+            
+            // Use daily CVR data for CVR metric
+            if (metric === 'user_cvr' && age === 'all') {
+                const cvrA = dailyCVRData.filter(d => d.group === 'A');
+                const cvrB = dailyCVRData.filter(d => d.group === 'B');
+                
+                // Map CVR data to match dates
+                valuesA = dates.map(date => {
+                    const match = cvrA.find(d => d.date === date);
+                    return match ? parseFloat(match.daily_cvr) : 0;
+                });
+                valuesB = dates.map(date => {
+                    const match = cvrB.find(d => d.date === date);
+                    return match ? parseFloat(match.daily_cvr) : 0;
+                });
+                
+                // Apply smoothing if needed
+                valuesA = movingAverage(valuesA, smoothing);
+                valuesB = movingAverage(valuesB, smoothing);
+            } else {
+                // Use existing data for other metrics
+                valuesA = movingAverage(dataA.map(d => d[metric]), smoothing);
+                valuesB = movingAverage(dataB.map(d => d[metric]), smoothing);
+            }
+            
+            const traces = [
+                {
+                    x:dates, y:valuesA, name:'Group A', type:'scatter', mode:'lines+markers',
+                    line:{color:'#3b82f6',width:3}, marker:{size:5},
+                    hovertemplate:'<b>A</b><br>%{x}<br>%{y:.2f}<extra></extra>'
+                },
+                {
+                    x:dates, y:valuesB, name:'Group B', type:'scatter', mode:'lines+markers',
+                    line:{color:'#10b981',width:3}, marker:{size:5},
+                    hovertemplate:'<b>B</b><br>%{x}<br>%{y:.2f}<extra></extra>'
+                }
+            ];
+            
+            if (showTrendlines) {
+                const regA = linearRegression(xIndices, valuesA);
+                const regB = linearRegression(xIndices, valuesB);
+                traces.push({
+                    x:dates, y:xIndices.map(i => regA.predict(i)),
+                    name:`A (${regA.slope.toFixed(3)})`,
+                    type:'scatter', mode:'lines',
+                    line:{color:'#3b82f6',width:2,dash:'dash'}, hoverinfo:'skip'
+                });
+                traces.push({
+                    x:dates, y:xIndices.map(i => regB.predict(i)),
+                    name:`B (${regB.slope.toFixed(3)})`,
+                    type:'scatter', mode:'lines',
+                    line:{color:'#10b981',width:2,dash:'dash'}, hoverinfo:'skip'
+                });
+            }
+            
+            const metricLabels = {
+                'user_cvr':'Daily CVR (%) — Unique Converters',
+                'revenue_per_user':'Revenue/User (€)',
+                'revenue':'Revenue (€)',
+                'users':'Users',
+                'converted_users':'Converters'
+            };
+            
+            const smoothText = smoothing === 1 ? 'Raw' : `${smoothing}d MA`;
+            
+            let shapes = [];
+            
+            if (showEvents) {
+                Object.entries(keyEvents).forEach(([eventId, eventData]) => {
+                    if (Array.isArray(eventData)) {
+                        eventData.forEach(e => {
+                            if (e.enabled) {
+                                shapes.push({
+                                    type:'line', x0:e.start, x1:e.start, y0:0, y1:1, yref:'paper',
+                                    line:{color:e.color,width:2,dash:'dot'}
+                                });
+                            }
+                        });
+                    } else {
+                        if (eventData.enabled) {
+                            if (eventData.start === eventData.end) {
+                                shapes.push({
+                                    type:'line', x0:eventData.start, x1:eventData.start, y0:0, y1:1, yref:'paper',
+                                    line:{color:eventData.color,width:2,dash:'dot'}
+                                });
+                            } else {
+                                shapes.push({
+                                    type:'rect', x0:eventData.start, x1:eventData.end, y0:0, y1:1, yref:'paper',
+                                    fillcolor:eventData.color, opacity:0.08, line:{width:0}
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+            
+            Plotly.newPlot('chart', traces, {
+                title:`${metricLabels[metric]} (${smoothText})`,
+                xaxis:{title:'Date',showgrid:true,gridcolor:'#333',tickangle:-45,color:'#a0a0a0'},
+                yaxis:{title:metricLabels[metric],showgrid:true,gridcolor:'#333',color:'#a0a0a0'},
+                hovermode:'x unified', showlegend:true,
+                legend:{x:0.02,y:0.98,bgcolor:'rgba(42,42,42,0.95)',bordercolor:'#404040',borderwidth:1,font:{color:'#e0e0e0'}},
+                margin:{l:70,r:30,t:60,b:100}, 
+                plot_bgcolor:'#1a1a1a',
+                paper_bgcolor:'#1a1a1a',
+                font:{color:'#e0e0e0'},
+                shapes:shapes
+            }, {responsive:true, displaylogo:false});
+        }
+    </script>
+</body>
+</html>

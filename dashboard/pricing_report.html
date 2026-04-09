@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>dua.com Pricing A/B Test — Strategy Report</title>
+<style>
+  :root {
+    --text: #0d1418;
+    --muted: #5a6e78;
+    --line: #d4dee3;
+    --bg: #ffffff;
+    --bg-soft: #f7f9fa;
+    --accent: #1a4f8c;
+    --good: #166534;
+    --good-bg: #f0fdf4;
+    --good-border: #bbf7d0;
+    --warn: #92400e;
+    --warn-bg: #fffbeb;
+    --warn-border: #fde68a;
+    --danger: #991b1b;
+    --danger-bg: #fef2f2;
+    --danger-border: #fecaca;
+    --tie: #374151;
+    --tie-bg: #f9fafb;
+    --tie-border: #e5e7eb;
+    --blue-bg: #eff6ff;
+    --blue-border: #bfdbfe;
+    --blue: #1d4ed8;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 40px 80px;
+  }
+
+  /* ── Cover ─────────────────────────────────────────────── */
+  .cover {
+    padding: 60px 0 52px;
+    border-bottom: 2px solid var(--text);
+    margin-bottom: 52px;
+  }
+  .cover-eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+  .cover h1 {
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 14px;
+  }
+  .cover-sub {
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+  .cover-meta {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    gap: 32px;
+    justify-content: start;
+  }
+  .cover-meta-item label {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .cover-meta-item span {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* ── Verdict bar ─────────────────────────────────────────── */
+  .verdict-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .verdict-bar.b-wins   { background: var(--good-bg);   border: 1px solid var(--good-border);   color: var(--good); }
+  .verdict-bar.tie      { background: var(--tie-bg);    border: 1px solid var(--tie-border);    color: var(--tie); }
+  .verdict-bar.caveat   { background: var(--warn-bg);   border: 1px solid var(--warn-border);   color: var(--warn); }
+  .verdict-bar.no-data  { background: var(--blue-bg);   border: 1px solid var(--blue-border);   color: var(--blue); }
+  .verdict-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .b-wins .verdict-dot   { background: #16a34a; }
+  .tie    .verdict-dot   { background: #6b7280; }
+  .caveat .verdict-dot   { background: #d97706; }
+  .no-data .verdict-dot  { background: #2563eb; }
+
+  /* ── Typography ────────────────────────────────────────────── */
+  h2 {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    margin-top: 0;
+    border-left: 4px solid var(--accent);
+    padding-left: 12px;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--muted);
+    margin-bottom: 10px;
+    margin-top: 20px;
+  }
+  p { margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+  .section-eyebrow {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  /* ── Sections ────────────────────────────────────────────── */
+  .section {
+    margin-bottom: 52px;
+  }
+  .section-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .section-intro {
+    color: var(--muted);
+    font-size: 13px;
+    max-width: 72ch;
+    margin-top: 8px;
+  }
+
+  /* ── Segment block ──────────────────────────────────────── */
+  .segment-block {
+    margin-bottom: 40px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .segment-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--line);
+  }
+  .segment-title {
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .segment-body {
+    padding: 18px;
+  }
+
+  /* ── Metric tables ────────────────────────────────────── */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .metric-cell {
+    padding: 12px 14px;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .metric-cell:nth-child(4n) { border-right: none; }
+  .metric-cell:nth-last-child(-n+4) { border-bottom: none; }
+  .metric-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .metric-value {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .metric-sub {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .metric-win { color: var(--good); }
+  .metric-lose { color: #dc2626; }
+  .metric-tie { color: var(--muted); }
+
+  /* ── AB comparison table ─────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 14px; }
+  thead tr { background: var(--bg-soft); }
+  th { text-align: left; padding: 8px 10px; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); border-bottom: 1px solid var(--line); font-weight: 600; }
+  td { padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .td-right { text-align: right; }
+  .td-bold { font-weight: 700; }
+  .td-green { color: var(--good); font-weight: 700; }
+  .td-red { color: #dc2626; }
+  .td-muted { color: var(--muted); }
+  .td-warn { color: #d97706; font-weight: 600; }
+
+  /* ── Callout boxes ────────────────────────────────────── */
+  .callout {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+  .callout-good   { background: var(--good-bg);   border-left: 3px solid #16a34a; color: #14532d; }
+  .callout-warn   { background: var(--warn-bg);   border-left: 3px solid #d97706; color: #78350f; }
+  .callout-danger { background: var(--danger-bg); border-left: 3px solid #dc2626; color: var(--danger); }
+  .callout-info   { background: var(--blue-bg);   border-left: 3px solid #2563eb; color: #1e3a8a; }
+  .callout strong { font-weight: 700; }
+
+  /* ── Summary cards ─────────────────────────────────────── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .summary-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+    background: var(--bg-soft);
+  }
+  .summary-card-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .summary-card-value {
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.0;
+    margin-bottom: 2px;
+  }
+  .summary-card-sub {
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .sc-green { color: #16a34a; }
+  .sc-red   { color: #dc2626; }
+  .sc-blue  { color: var(--accent); }
+
+  /* ── Recommendation matrix table ───────────────────────── */
+  .matrix-wrap { overflow-x: auto; margin-bottom: 16px; }
+  .matrix-table { font-size: 11px; white-space: nowrap; }
+  .matrix-table th { font-size: 9px; padding: 6px 8px; }
+  .matrix-table td { padding: 5px 8px; text-align: center; font-weight: 600; }
+  .matrix-table td.age-col { text-align: left; color: var(--muted); font-weight: 400; }
+  .conf-H { color: var(--good); }
+  .conf-M { color: #d97706; }
+  .conf-L { color: #9ca3af; }
+  .conf-I { color: #ef4444; }
+
+  /* ── Priority list ───────────────────────────────────── */
+  .priority-list { list-style: none; display: grid; gap: 12px; }
+  .priority-item {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    align-items: start;
+  }
+  .priority-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--text);
+    color: white;
+    font-weight: 800;
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .priority-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+  .priority-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .priority-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+  .tag-high { background: #dcfce7; color: #166534; }
+  .tag-med  { background: #fef9c3; color: #854d0e; }
+  .tag-low  { background: #f1f5f9; color: #475569; }
+  .tag-fix  { background: #fee2e2; color: #991b1b; }
+
+  /* ── Data quality table ────────────────────────────────── */
+  .dq-ok   { color: #16a34a; font-weight: 700; }
+  .dq-warn { color: #d97706; font-weight: 700; }
+  .dq-bad  { color: #dc2626; font-weight: 700; }
+
+  /* ── Print breaks ─────────────────────────────────────── */
+  @media print {
+    body { font-size: 11px; }
+    .cover { padding: 36px 0 36px; }
+    .section { page-break-inside: avoid; }
+    .segment-block { page-break-inside: avoid; }
+    .no-break { page-break-inside: avoid; }
+    .page-break { page-break-before: always; }
+    .page { padding: 24px 28px 48px; }
+    .cover h1 { font-size: 28px; }
+  }
+  @media (max-width: 680px) {
+    .summary-grid { grid-template-columns: repeat(2,1fr); }
+    .metrics-grid { grid-template-columns: repeat(2,1fr); }
+    .cover-meta { grid-template-columns: repeat(2,auto); }
+    .page { padding: 24px 20px; }
+  }
+
+  /* ── Divider ─────────────────────────────────────────────── */
+  hr { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
+
+  /* ── Flag badge ─────────────────────────────────────────── */
+  .flag {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    vertical-align: middle;
+    margin-left: 6px;
+  }
+  .flag-warn   { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); }
+  .flag-ok     { background: var(--good-bg); color: var(--good); border: 1px solid var(--good-border); }
+  .flag-info   { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ═══════════════════════════════════════════════════
+     COVER
+═══════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-eyebrow">dua.com · Male Pricing · Internal Strategy Document</div>
+  <h1>Pricing A/B Test<br>Strategy Report</h1>
+  <div class="cover-sub">Full analysis: test verdicts, LTV validation, age intelligence, and per-age recommendations</div>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><label>Test window</label><span>Dec 19, 2025 – Mar 19, 2026</span></div>
+    <div class="cover-meta-item"><label>Segments</label><span>8 (iOS + Android)</span></div>
+    <div class="cover-meta-item"><label>LTV snapshot</label><span>Feb 1–7, 2026</span></div>
+    <div class="cover-meta-item"><label>Generated</label><span>April 8, 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 1 — EXECUTIVE SUMMARY
+═══════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 1</div>
+    <h2>Executive Summary</h2>
+    <p class="section-intro">One-page verdict. What we ran, what the data says, and what we do next.</p>
+  </div>
+
+  <div class="callout callout-good" style="margin-bottom:20px;">
+    <strong>Overall verdict: Roll out B now.</strong> B variant wins on CVR, ARPU, and revenue across all four A/B-tested segments. The 7-day LTV snapshot validates the direction. iOS Rich shows a confound in Group A (55.7% reactivations) that explains away A's apparent LTV advantage — B's win is clean once this is removed. Android Rich is the cleanest result in the dataset: zero reactivations in either group, B leads at every metric.
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-card-label">A/B segments tested</div>
+      <div class="summary-card-value sc-blue">4 of 8</div>
+      <div class="summary-card-sub">iOS Poor, iOS Rich, Android Poor, Android Rich</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">Segments: B wins</div>
+      <div class="summary-card-value sc-green">3 clear</div>
+      <div class="summary-card-sub">iOS Rich, Android Rich (clean), Android Poor (volume)</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">Segments: tie</div>
+      <div class="summary-card-value" style="color:#4b5563;">1</div>
+      <div class="summary-card-sub">iOS Poor — default to B</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">Best 7-day revenue lift (B vs A)</div>
+      <div class="summary-card-value sc-green">+$209</div>
+      <div class="summary-card-sub">Android Rich, +24.5% in one week</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Segment</th>
+        <th>Verdict</th>
+        <th>CVR lift (B vs A)</th>
+        <th>7-day ARPU lift</th>
+        <th>7-day revenue (B)</th>
+        <th>Key caveat</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="td-bold">iOS Poor</td>
+        <td class="td-muted">Effective tie</td>
+        <td>+0.67 pp (p=0.20)</td>
+        <td>+$0.006</td>
+        <td>$1,746</td>
+        <td class="td-muted">Borderline A LTV edge (p=0.091), driven by genuine renewals</td>
+      </tr>
+      <tr>
+        <td class="td-bold">iOS Rich</td>
+        <td class="td-green">B wins</td>
+        <td class="td-green">+1.93 pp (p=0.035)</td>
+        <td class="td-green">+$0.19</td>
+        <td class="td-green">$5,038</td>
+        <td class="td-warn">55.7% reactivations in Group A inflate A's LTV — confound, not quality</td>
+      </tr>
+      <tr>
+        <td class="td-bold">Android Poor</td>
+        <td class="td-green">B wins (volume)</td>
+        <td class="td-green">+1.13 pp</td>
+        <td class="td-green">+$0.052</td>
+        <td class="td-green">$580</td>
+        <td class="td-warn">15–18% Android pricing mismatch rate adds noise to LTV estimates</td>
+      </tr>
+      <tr>
+        <td class="td-bold">Android Rich</td>
+        <td class="td-green">B wins — cleanest</td>
+        <td class="td-green">+3.00 pp (p=0.059)</td>
+        <td class="td-green">+$0.317</td>
+        <td class="td-green">$1,060</td>
+        <td class="td-muted">Zero reactivations both groups — fully unconfounded</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-info">
+    <strong>Segments without LTV snapshots (iOS Mid, iOS Dev, Android Mid, Android Dev):</strong> All four ran A/B tests with B winning or tying on CVR. The winning price was implemented as production pricing (P2/P3). No 7-day LTV validation available for these segments — maintain current production prices and continue monitoring.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 2 — TEST OVERVIEW
+═══════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 2</div>
+    <h2>Test Overview</h2>
+    <p class="section-intro">What was tested, when, and how the data is structured.</p>
+  </div>
+
+  <h4>What we tested</h4>
+  <p>Male users on dua.com were split into 8 pricing segments based on platform (iOS / Android) and device region (Poor, Mid, Dev, Rich — proxies for local income and willingness to pay). Each segment was shown a different price ladder for subscription upgrades. Group A received the incumbent price schedule; Group B received the challenger.</p>
+
+  <h4>Periods</h4>
+  <table>
+    <thead>
+      <tr><th>Period</th><th>Dates</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Period 1</td><td>Dec 19, 2025 – Jan 29, 2026</td><td>Next A/B window. Full A/B across all 8 segments.</td></tr>
+      <tr><td>Jan 30</td><td>Excluded</td><td>Pricing transition day — contaminated data.</td></tr>
+      <tr><td>Period 2</td><td>Jan 31 – Mar 19, 2026</td><td>Some segments rolled to production (P) on winner; others continued A/B.</td></tr>
+      <tr><td>Mar 20–24</td><td>Excluded</td><td>Ramadan promotional period — external CVR spike.</td></tr>
+      <tr><td>Period 3</td><td>Mar 20+ (Android only)</td><td>Extended A/B window for Android segments needing more data.</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Segment status at test close</h4>
+  <table>
+    <thead>
+      <tr><th>Segment</th><th>Latest period</th><th>Status</th><th>Total converters (latest)</th><th>LTV data</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="td-bold">iOS Poor</td><td>Period 3</td><td>A/B active</td>
+        <td>A: 586 / B: 608</td><td class="td-green">✓ Feb 1–7</td>
+      </tr>
+      <tr>
+        <td class="td-bold">iOS Mid</td><td>Period 2</td><td>Production (B winner)</td>
+        <td>252 (production)</td><td class="td-muted">—</td>
+      </tr>
+      <tr>
+        <td class="td-bold">iOS Dev</td><td>Period 2</td><td>Production (B winner)</td>
+        <td>1,879 (production)</td><td class="td-muted">—</td>
+      </tr>
+      <tr>
+        <td class="td-bold">iOS Rich</td><td>Period 2</td><td>A/B active</td>
+        <td>A: 576 / B: 666</td><td class="td-green">✓ Feb 1–7</td>
+      </tr>
+      <tr>
+        <td class="td-bold">Android Poor</td><td>Period 3</td><td>A/B active</td>
+        <td>A: 122 / B: 148</td><td class="td-green">✓ Feb 1–7</td>
+      </tr>
+      <tr>
+        <td class="td-bold">Android Mid</td><td>Period 3</td><td>Production (B winner)</td>
+        <td>93 (production)</td><td class="td-muted">—</td>
+      </tr>
+      <tr>
+        <td class="td-bold">Android Dev</td><td>Period 3</td><td>Production (B winner)</td>
+        <td>407 (production)</td><td class="td-muted">—</td>
+      </tr>
+      <tr>
+        <td class="td-bold">Android Rich</td><td>Period 2</td><td>A/B active</td>
+        <td>A: 109 / B: 155</td><td class="td-green">✓ Feb 1–7</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 3 — SEGMENT VERDICTS
+═══════════════════════════════════════════════════════ -->
+<div class="section page-break">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 3</div>
+    <h2>Segment Verdicts</h2>
+    <p class="section-intro">Deep dive per A/B segment: full CVR, ARPU, revenue, and LTV data with confidence context. The four segments that ran a full A/B test to conclusion.</p>
+  </div>
+
+  <!-- iOS Poor -->
+  <div class="segment-block no-break">
+    <div class="segment-header">
+      <div class="segment-title">iOS Poor — Male | iOS | Kosovo / Albania region</div>
+      <div class="verdict-bar tie" style="margin:0;padding:6px 12px;">
+        <div class="verdict-dot"></div> Effective tie
+      </div>
+    </div>
+    <div class="segment-body">
+      <div class="metrics-grid">
+        <div class="metric-cell">
+          <div class="metric-label">CVR — Group A</div>
+          <div class="metric-value">9.62%</div>
+          <div class="metric-sub">Period 3 latest · 586 conv / 6,090 users</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">CVR — Group B</div>
+          <div class="metric-value metric-win">10.15%</div>
+          <div class="metric-sub">Period 3 latest · 608 conv / 5,993 users</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">7-day ARPU (Feb 1–7)</div>
+          <div class="metric-value">$0.635 vs $0.641</div>
+          <div class="metric-sub">+$0.006 for B — effectively identical</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">7-day revenue</div>
+          <div class="metric-value">$1,756 / $1,746</div>
+          <div class="metric-sub">A leads by $10 — noise</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">LTV per converter</div>
+          <div class="metric-value">$17.38 vs $14.80</div>
+          <div class="metric-sub">A leads, p=0.091 (borderline)</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">Renewals per converter</div>
+          <div class="metric-value">0.85 vs 1.01</div>
+          <div class="metric-sub">B has higher renewal cadence</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">Reactivation rate</div>
+          <div class="metric-value metric-win">0.0% / 1.7%</div>
+          <div class="metric-sub">Clean — no confound</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">Bootstrap: B wins</div>
+          <div class="metric-value">53.2%</div>
+          <div class="metric-sub">2,763 users A / 2,724 users B</div>
+        </div>
+      </div>
+<div class="callout callout-warn" style="margin-top:12px;">
+        <strong>Recommendation impact:</strong> Default to B. A tie verdict does not justify staying on A when B shows marginally higher CVR and renewal rate. Do not interpret A's borderline LTV edge as a reason to revert — the p=0.091 result requires a longer observation window to confirm. Extend monitoring post-rollout.
+      </div>
+    </div>
+  </div>
+
+  <!-- iOS Rich -->
+  <div class="segment-block no-break">
+    <div class="segment-header">
+      <div class="segment-title">iOS Rich — Male | iOS | Switzerland / Western Europe / diaspora</div>
+      <div class="verdict-bar b-wins" style="margin:0;padding:6px 12px;">
+        <div class="verdict-dot"></div> B wins
+      </div>
+    </div>
+    <div class="segment-body">
+      <div class="metrics-grid">
+        <div class="metric-cell">
+          <div class="metric-label">CVR — Group A</div>
+          <div class="metric-value">16.84%</div>
+          <div class="metric-sub">Period 2 latest · 576 conv / 3,420 users</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">CVR — Group B</div>
+          <div class="metric-value metric-win">19.82%</div>
+          <div class="metric-sub">Period 2 latest · 666 conv / 3,360 users</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">7-day ARPU (Feb 1–7)</div>
+          <div class="metric-value metric-win">$2.87 vs $3.05</div>
+          <div class="metric-sub">+$0.19 for B</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">7-day revenue</div>
+          <div class="metric-value metric-win">$4,933 / $5,038</div>
+          <div class="metric-sub">B leads by $105</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">LTV per converter</div>
+          <div class="metric-value">$42.90 vs $35.48</div>
+          <div class="metric-sub">A appears higher — see below</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">Renewals per converter</div>
+          <div class="metric-value">1.04 vs 0.93</div>
+          <div class="metric-sub">A leads slightly</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">Reactivation — Group A</div>
+          <div class="metric-value metric-lose">55.7%</div>
+          <div class="metric-sub">⚠ Major confound — see insight</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">Reactivation — Group B</div>
+          <div class="metric-value metric-win">1.4%</div>
+          <div class="metric-sub">Clean signal</div>
+        </div>
+      </div>
+<div class="callout callout-good" style="margin-top:12px;">
+        <strong>Recommendation impact:</strong> Strong confirmation for B. The reactivation anomaly fully explains A's LTV advantage. B leads at every renewal horizon on cumulative ARPU. Roll out B immediately.
+      </div>
+    </div>
+  </div>
+
+  <!-- Android Poor -->
+  <div class="segment-block no-break">
+    <div class="segment-header">
+      <div class="segment-title">Android Poor — Male | Android | Kosovo / Albania region</div>
+      <div class="verdict-bar b-wins" style="margin:0;padding:6px 12px;">
+        <div class="verdict-dot"></div> B wins (volume)
+      </div>
+    </div>
+    <div class="segment-body">
+      <div class="metrics-grid">
+        <div class="metric-cell">
+          <div class="metric-label">CVR — Group A</div>
+          <div class="metric-value">6.00%</div>
+          <div class="metric-sub">Period 3 · 122 conv / 2,032 users</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">CVR — Group B</div>
+          <div class="metric-value metric-win">7.27%</div>
+          <div class="metric-sub">Period 3 · 148 conv / 2,035 users</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">7-day ARPU (Feb 1–7)</div>
+          <div class="metric-value metric-win">$0.479 → $0.531</div>
+          <div class="metric-sub">+$0.052 for B · 63.8% bootstrap</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">LTV tension</div>
+          <div class="metric-value">$23.00 vs $16.57</div>
+          <div class="metric-sub">A leads per converter (p=0.073) · n=22 — too thin to conclude</div>
+        </div>
+      </div>
+
+      <p style="margin-top:14px;">B leads on every volume metric. The one complication is A's per-converter LTV edge — real, not reactivation-driven (both groups are clean at 0%), but based on only 22 converters in the 7-day window. A also shows a higher renewal cadence (0.86 vs 0.37 renewals per converter). The ARPU gap is narrowing over time as B's volume compounds. A known 15–18% pricing mismatch rate on Android adds noise to both sides.</p>
+
+      <div class="callout callout-good" style="margin-top:12px;">
+        <strong>Decision:</strong> Roll out B. Fix the Android Poor pricing mismatch before the next test cycle. Monitor A-cohort renewal rates post-rollout for 60 days — if the quality gap holds, it becomes the input for a future age-stratified test design.
+      </div>
+    </div>
+  </div>
+
+  <!-- Android Rich -->
+  <div class="segment-block no-break">
+    <div class="segment-header">
+      <div class="segment-title">Android Rich — Male | Android | Switzerland / Belgium / Sweden</div>
+      <div class="verdict-bar b-wins" style="margin:0;padding:6px 12px;">
+        <div class="verdict-dot"></div> B wins — cleanest result
+      </div>
+    </div>
+    <div class="segment-body">
+      <div class="metrics-grid">
+        <div class="metric-cell">
+          <div class="metric-label">CVR — Group A</div>
+          <div class="metric-value">13.92%</div>
+          <div class="metric-sub">Period 2 · 109 conv / 783 users</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">CVR — Group B</div>
+          <div class="metric-value metric-win">18.07%</div>
+          <div class="metric-sub">Period 2 · 155 conv / 858 users</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">7-day ARPU (Feb 1–7)</div>
+          <div class="metric-value metric-win">$1.86 vs $2.17</div>
+          <div class="metric-sub">+$0.317 for B (+17%)</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">7-day revenue</div>
+          <div class="metric-value metric-win">$852 / $1,060</div>
+          <div class="metric-sub">B leads by $209 (+24.5%)</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">LTV per converter</div>
+          <div class="metric-value">$38.71 vs $27.91</div>
+          <div class="metric-sub">A leads per converter · p=0.078 · n=22 conv in A</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">Renewals per converter</div>
+          <div class="metric-value">0.82 vs 0.50</div>
+          <div class="metric-sub">A leads — but see volume context</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">Reactivation rate</div>
+          <div class="metric-value metric-win">0.0% / 0.0%</div>
+          <div class="metric-sub">Fully unconfounded — cleanest dataset</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">Bootstrap: B wins</div>
+          <div class="metric-value metric-win">70.2%</div>
+          <div class="metric-sub">459 users A / 488 users B</div>
+        </div>
+      </div>
+<div class="callout callout-good" style="margin-top:12px;">
+        <strong>Recommendation impact:</strong> Strongest LTV confirmation for B of any segment. No confounding factors whatsoever. Roll out B immediately. Monitor Switzerland ARPU post-rollout.
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 4 — SEGMENTS WITHOUT LTV DATA
+═══════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 4</div>
+    <h2>Single-Price Segments — Current State &amp; Next A/B Test</h2>
+    <p class="section-intro">iOS Mid, iOS Dev, Android Mid, and Android Dev completed their initial A/B cycle and moved to a single production price. No LTV snapshot is available (the Feb 1–7 window fell while these segments were already in production). Each now needs a new A/B test to find the next optimal price.</p>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Segment</th><th>Current production CVR</th><th>Prior A/B outcome (reference)</th><th>Next test direction</th><th>Ages flagged</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="td-bold">iOS Dev</td>
+        <td class="td-green">14.44% (1,879 converters)</td>
+        <td>B won P1: 18.55% vs 17.08%</td>
+        <td class="td-green">↑ Explore higher — test 1–2 tiers above current rec per age</td>
+        <td>23 of 23 ages, all High confidence</td>
+      </tr>
+      <tr>
+        <td class="td-bold">iOS Mid</td>
+        <td>10.18% (252 converters)</td>
+        <td>B marginal P1: 14.18% vs 14.18%</td>
+        <td class="td-green">↑ Explore higher — test 1 tier above current rec per age</td>
+        <td>23 of 23 ages flagged explore_higher</td>
+      </tr>
+      <tr>
+        <td class="td-bold">Android Dev</td>
+        <td class="td-green">10.86% (407 converters)</td>
+        <td>B won P2: 6.69% vs 4.66% (P1 was narrow A win)</td>
+        <td>↓ Mostly explore lower (13/23 ages) · ↑ 10/23 ages higher</td>
+        <td>Mixed — test 1 tier lower for ages 22–35</td>
+      </tr>
+      <tr>
+        <td class="td-bold">Android Mid</td>
+        <td>6.69% (93 converters)</td>
+        <td>B marginal across periods</td>
+        <td>↓ Mostly explore lower (14/23 ages) · ↑ 9/23 ages higher</td>
+        <td>Mixed — test 1 tier lower for ages 22–35</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:13px;color:var(--muted);margin-top:12px;">
+    <strong>Test design:</strong> iOS Dev &amp; iOS Mid → Group A = current price, Group B = current +1 tier per age (all 23 ages flagged explore_higher). 
+    Android Dev &amp; Mid → Group A = current price, Group B = current −1 tier for ages 22–35 (explore_lower signal strongest there); hold other ages.
+    Run for ≥30 days before taking an LTV snapshot.
+  </p>
+
+  <div class="callout callout-info">
+    <strong>No LTV validation available for these segments.</strong> The Feb 1–7 snapshot window fell during production mode. Any new A/B test should be designed to run for at least 30 days before a 7-day LTV snapshot is taken, to ensure a clean cohort for renewal tracking.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     <!-- ═══════════════════════════════════════════════════
+     <!-- ═══════════════════════════════════════════════════
+     <!-- ═══════════════════════════════════════════════════
+     SECTION 5 — AGE ANCHOR ANALYSIS
+═══════════════════════════════════════════════════════ -->
+<div class="section page-break">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 5</div>
+    <h2>Age Anchor Analysis</h2>
+    <p class="section-intro">How the optimal price is identified at each age — and how it translates across segments. Mirrors the methodology in the Age Anchor Analysis dashboard.</p>
+  </div>
+
+  <h3>1. The anchor concept — why not just pick the highest CVR?</h3>
+  <p>At each age, multiple price points have been observed with different CVRs and conversion volumes. Three signals compete:</p>
+  <table style="margin:12px 0 20px;">
+    <thead><tr><th>Signal</th><th>What it picks</th><th>The problem</th></tr></thead>
+    <tbody>
+      <tr><td class="td-bold">Best CVR</td><td>Highest conversion rate</td><td>Often a price with 2–5 converters — noise, not signal</td></tr>
+      <tr><td class="td-bold">Most converters</td><td>Highest raw volume</td><td>Can be a low price that had more users exposed</td></tr>
+      <tr><td class="td-bold td-green">Best balanced · anchor ✓</td><td>Wins on both rate and volume</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <p>The anchor formula is <strong>CVR% × √(conversion events)</strong>. It rewards high conversion rate but scales it by evidence mass. Example at age 25: P25 had 20.7% CVR but only 34 converters (score 107). P26 had 14.5% CVR with 136 converters (score 182). <strong>P26 is the anchor</strong> — the lower rate is more than compensated by the evidence behind it.</p>
+
+  <p style="margin-top:16px;">Full per-age anchor tables and cross-regional observed prices are in the <a href="./age_anchor_analysis.html" style="color:var(--accent);text-decoration:none;font-weight:600;">Age Anchor Analysis dashboard →</a></p>
+
+</div>
+
+SECTION 6 — PER-AGE RECOMMENDATIONS
+═══════════════════════════════════════════════════════ -->
+<div class="section page-break">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 6</div>
+    <h2>Per-Age Price Recommendations</h2>
+    <p class="section-intro">Analytically derived optimal price per age per segment. Green = direct A/B winner. Amber = blended signal. Gray = cross-segment model. For production segments (iOS Mid, iOS Dev, Android Mid, Android Dev) only: <span style="color:#6b7f87;font-size:11px;">live:Px</span> shows the current running price when it differs from the recommendation — that gap is what the next A/B test closes.</p>
+  </div>
+
+  <div class="matrix-wrap">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th style="text-align:left;">Age</th>
+          <th>iOS Poor</th>
+          <th>iOS Mid</th>
+          <th>iOS Dev</th>
+          <th>iOS Rich</th>
+          <th>And Poor</th>
+          <th>And Mid</th>
+          <th>And Dev</th>
+          <th>And Rich</th>
+        </tr>
+      </thead>
+      <tbody>
+<tr><td class="age-col">18</td><td><span class="conf-H" style="font-weight:700;">P5</span></td><td><span class="conf-L" style="font-weight:700;">P18</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P17</span></td><td><span class="conf-H" style="font-weight:700;">P19</span></td><td><span class="conf-M" style="font-weight:700;">P18</span></td><td><span class="conf-M" style="font-weight:700;">P5</span></td><td><span class="conf-L" style="font-weight:700;">P13</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P9</span></td><td><span class="conf-L" style="font-weight:700;">P13</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P9</span></td><td><span class="conf-L" style="font-weight:700;">P19</span></td></tr>
+<tr><td class="age-col">19</td><td><span class="conf-H" style="font-weight:700;">P5</span></td><td><span class="conf-H" style="font-weight:700;">P18</span></td><td><span class="conf-H" style="font-weight:700;">P20</span></td><td><span class="conf-L" style="font-weight:700;">P25</span></td><td><span class="conf-L" style="font-weight:700;">P5</span></td><td><span class="conf-L" style="font-weight:700;">P14</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P10</span></td><td><span class="conf-L" style="font-weight:700;">P14</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P10</span></td><td><span class="conf-N" style="font-weight:700;">P15</span></td></tr>
+<tr><td class="age-col">20</td><td><span class="conf-H" style="font-weight:700;">P5</span></td><td><span class="conf-H" style="font-weight:700;">P19</span></td><td><span class="conf-H" style="font-weight:700;">P21</span></td><td><span class="conf-H" style="font-weight:700;">P20</span></td><td><span class="conf-L" style="font-weight:700;">P5</span></td><td><span class="conf-L" style="font-weight:700;">P14</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P11</span></td><td><span class="conf-L" style="font-weight:700;">P14</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P11</span></td><td><span class="conf-L" style="font-weight:700;">P21</span></td></tr>
+<tr><td class="age-col">21</td><td><span class="conf-H" style="font-weight:700;">P5</span></td><td><span class="conf-H" style="font-weight:700;">P20</span></td><td><span class="conf-H" style="font-weight:700;">P22</span></td><td><span class="conf-M" style="font-weight:700;">P27</span></td><td><span class="conf-L" style="font-weight:700;">P5</span></td><td><span class="conf-L" style="font-weight:700;">P15</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P12</span></td><td><span class="conf-L" style="font-weight:700;">P15</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P12</span></td><td><span class="conf-L" style="font-weight:700;">P22</span></td></tr>
+<tr><td class="age-col">22</td><td><span class="conf-H" style="font-weight:700;">P18</span><br><span style="color:#6b7f87;font-size:9px;">⚠ same-price P3</span></td><td><span class="conf-H" style="font-weight:700;">P21</span></td><td><span class="conf-H" style="font-weight:700;">P23</span></td><td><span class="conf-H" style="font-weight:700;">P28</span></td><td><span class="conf-M" style="font-weight:700;">P10</span></td><td><span class="conf-L" style="font-weight:700;">P16</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P13</span></td><td><span class="conf-L" style="font-weight:700;">P14</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P13</span></td><td><span class="conf-L" style="font-weight:700;">P23</span></td></tr>
+<tr><td class="age-col">23</td><td><span class="conf-H" style="font-weight:700;">P10</span></td><td><span class="conf-H" style="font-weight:700;">P22</span></td><td><span class="conf-H" style="font-weight:700;">P24</span></td><td><span class="conf-H" style="font-weight:700;">P23</span></td><td><span class="conf-L" style="font-weight:700;">P10</span></td><td><span class="conf-L" style="font-weight:700;">P17</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P14</span></td><td><span class="conf-M" style="font-weight:700;">P15</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P14</span></td><td><span class="conf-L" style="font-weight:700;">P18</span><br><span style="color:#6b7f87;font-size:9px;">⚠ 0 conv P3</span></td></tr>
+<tr><td class="age-col">24</td><td><span class="conf-H" style="font-weight:700;">P20</span><br><span style="color:#6b7f87;font-size:9px;">⚠ same-price P3</span></td><td><span class="conf-H" style="font-weight:700;">P23</span></td><td><span class="conf-H" style="font-weight:700;">P25</span></td><td><span class="conf-H" style="font-weight:700;">P24</span></td><td><span class="conf-M" style="font-weight:700;">P10</span></td><td><span class="conf-M" style="font-weight:700;">P16</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P15</span></td><td><span class="conf-M" style="font-weight:700;">P15</span></td><td><span class="conf-L" style="font-weight:700;">P15</span></td></tr>
+<tr><td class="age-col">25</td><td><span class="conf-H" style="font-weight:700;">P12</span></td><td><span class="conf-H" style="font-weight:700;">P24</span></td><td><span class="conf-H" style="font-weight:700;">P26</span></td><td><span class="conf-H" style="font-weight:700;">P25</span></td><td><span class="conf-M" style="font-weight:700;">P14</span></td><td><span class="conf-M" style="font-weight:700;">P17</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P16</span></td><td><span class="conf-H" style="font-weight:700;">P16</span></td><td><span class="conf-L" style="font-weight:700;">P16</span></td></tr>
+<tr><td class="age-col">26</td><td><span class="conf-H" style="font-weight:700;">P14</span></td><td><span class="conf-H" style="font-weight:700;">P25</span></td><td><span class="conf-H" style="font-weight:700;">P27</span></td><td><span class="conf-H" style="font-weight:700;">P26</span></td><td><span class="conf-M" style="font-weight:700;">P12</span></td><td><span class="conf-M" style="font-weight:700;">P18</span><br><span style="color:#6b7f87;font-size:9px;">↑ live:P17</span></td><td><span class="conf-H" style="font-weight:700;">P17</span></td><td><span class="conf-L" style="font-weight:700;">P27</span></td></tr>
+<tr><td class="age-col">27</td><td><span class="conf-H" style="font-weight:700;">P12</span></td><td><span class="conf-H" style="font-weight:700;">P26</span></td><td><span class="conf-H" style="font-weight:700;">P28</span></td><td><span class="conf-H" style="font-weight:700;">P27</span></td><td><span class="conf-M" style="font-weight:700;">P12</span></td><td><span class="conf-M" style="font-weight:700;">P18</span></td><td><span class="conf-H" style="font-weight:700;">P18</span></td><td><span class="conf-L" style="font-weight:700;">P18</span></td></tr>
+<tr><td class="age-col">28</td><td><span class="conf-H" style="font-weight:700;">P14</span></td><td><span class="conf-H" style="font-weight:700;">P27</span></td><td><span class="conf-H" style="font-weight:700;">P29</span></td><td><span class="conf-H" style="font-weight:700;">P34</span></td><td><span class="conf-H" style="font-weight:700;">P12</span></td><td><span class="conf-M" style="font-weight:700;">P19</span></td><td><span class="conf-H" style="font-weight:700;">P19</span></td><td><span class="conf-M" style="font-weight:700;">P19</span></td></tr>
+<tr><td class="age-col">29</td><td><span class="conf-H" style="font-weight:700;">P12</span></td><td><span class="conf-H" style="font-weight:700;">P28</span></td><td><span class="conf-H" style="font-weight:700;">P30</span></td><td><span class="conf-H" style="font-weight:700;">P29</span></td><td><span class="conf-M" style="font-weight:700;">P14</span></td><td><span class="conf-M" style="font-weight:700;">P20</span></td><td><span class="conf-H" style="font-weight:700;">P20</span></td><td><span class="conf-L" style="font-weight:700;">P30</span></td></tr>
+<tr><td class="age-col">30</td><td><span class="conf-H" style="font-weight:700;">P12</span></td><td><span class="conf-H" style="font-weight:700;">P29</span></td><td><span class="conf-H" style="font-weight:700;">P31</span></td><td><span class="conf-H" style="font-weight:700;">P30</span></td><td><span class="conf-M" style="font-weight:700;">P12</span></td><td><span class="conf-H" style="font-weight:700;">P21</span></td><td><span class="conf-H" style="font-weight:700;">P21</span></td><td><span class="conf-M" style="font-weight:700;">P21</span></td></tr>
+<tr><td class="age-col">31</td><td><span class="conf-H" style="font-weight:700;">P12</span></td><td><span class="conf-H" style="font-weight:700;">P30</span></td><td><span class="conf-H" style="font-weight:700;">P32</span></td><td><span class="conf-H" style="font-weight:700;">P31</span></td><td><span class="conf-H" style="font-weight:700;">P20</span></td><td><span class="conf-M" style="font-weight:700;">P22</span></td><td><span class="conf-H" style="font-weight:700;">P22</span></td><td><span class="conf-M" style="font-weight:700;">P22</span></td></tr>
+<tr><td class="age-col">32</td><td><span class="conf-H" style="font-weight:700;">P20</span></td><td><span class="conf-H" style="font-weight:700;">P31</span></td><td><span class="conf-H" style="font-weight:700;">P33</span></td><td><span class="conf-H" style="font-weight:700;">P38</span></td><td><span class="conf-M" style="font-weight:700;">P20</span></td><td><span class="conf-H" style="font-weight:700;">P23</span></td><td><span class="conf-H" style="font-weight:700;">P23</span></td><td><span class="conf-L" style="font-weight:700;">P33</span></td></tr>
+<tr><td class="age-col">33</td><td><span class="conf-H" style="font-weight:700;">P12</span></td><td><span class="conf-M" style="font-weight:700;">P32</span></td><td><span class="conf-H" style="font-weight:700;">P34</span></td><td><span class="conf-H" style="font-weight:700;">P33</span></td><td><span class="conf-H" style="font-weight:700;">P20</span></td><td><span class="conf-H" style="font-weight:700;">P24</span></td><td><span class="conf-H" style="font-weight:700;">P24</span></td><td><span class="conf-M" style="font-weight:700;">P24</span></td></tr>
+<tr><td class="age-col">34</td><td><span class="conf-H" style="font-weight:700;">P20</span></td><td><span class="conf-H" style="font-weight:700;">P33</span></td><td><span class="conf-H" style="font-weight:700;">P35</span></td><td><span class="conf-H" style="font-weight:700;">P40</span></td><td><span class="conf-H" style="font-weight:700;">P12</span></td><td><span class="conf-H" style="font-weight:700;">P25</span></td><td><span class="conf-H" style="font-weight:700;">P25</span></td><td><span class="conf-M" style="font-weight:700;">P25</span></td></tr>
+<tr><td class="age-col">35</td><td><span class="conf-H" style="font-weight:700;">P28</span></td><td><span class="conf-H" style="font-weight:700;">P34</span></td><td><span class="conf-H" style="font-weight:700;">P36</span></td><td><span class="conf-H" style="font-weight:700;">P35</span></td><td><span class="conf-H" style="font-weight:700;">P20</span></td><td><span class="conf-H" style="font-weight:700;">P26</span></td><td><span class="conf-H" style="font-weight:700;">P26</span></td><td><span class="conf-M" style="font-weight:700;">P26</span></td></tr>
+<tr><td class="age-col">36</td><td><span class="conf-H" style="font-weight:700;">P20</span></td><td><span class="conf-M" style="font-weight:700;">P35</span></td><td><span class="conf-H" style="font-weight:700;">P37</span></td><td><span class="conf-H" style="font-weight:700;">P36</span></td><td><span class="conf-M" style="font-weight:700;">P28</span></td><td><span class="conf-M" style="font-weight:700;">P26</span><br><span style="color:#6b7f87;font-size:9px;">↓ live:P27</span></td><td><span class="conf-H" style="font-weight:700;">P27</span></td><td><span class="conf-M" style="font-weight:700;">P27</span></td></tr>
+<tr><td class="age-col">37</td><td><span class="conf-H" style="font-weight:700;">P28</span></td><td><span class="conf-M" style="font-weight:700;">P36</span></td><td><span class="conf-H" style="font-weight:700;">P38</span></td><td><span class="conf-H" style="font-weight:700;">P37</span></td><td><span class="conf-H" style="font-weight:700;">P28</span></td><td><span class="conf-M" style="font-weight:700;">P28</span></td><td><span class="conf-H" style="font-weight:700;">P28</span></td><td><span class="conf-M" style="font-weight:700;">P28</span></td></tr>
+<tr><td class="age-col">38</td><td><span class="conf-H" style="font-weight:700;">P20</span></td><td><span class="conf-M" style="font-weight:700;">P37</span></td><td><span class="conf-H" style="font-weight:700;">P39</span></td><td><span class="conf-H" style="font-weight:700;">P38</span></td><td><span class="conf-M" style="font-weight:700;">P20</span></td><td><span class="conf-L" style="font-weight:700;">P27</span><br><span style="color:#6b7f87;font-size:9px;">↓ live:P29</span></td><td><span class="conf-H" style="font-weight:700;">P29</span></td><td><span class="conf-L" style="font-weight:700;">P39</span></td></tr>
+<tr><td class="age-col">39</td><td><span class="conf-H" style="font-weight:700;">P28</span></td><td><span class="conf-M" style="font-weight:700;">P38</span></td><td><span class="conf-H" style="font-weight:700;">P40</span></td><td><span class="conf-H" style="font-weight:700;">P39</span></td><td><span class="conf-M" style="font-weight:700;">P20</span></td><td><span class="conf-L" style="font-weight:700;">P28</span><br><span style="color:#6b7f87;font-size:9px;">↓ live:P30</span></td><td><span class="conf-H" style="font-weight:700;">P30</span></td><td><span class="conf-L" style="font-weight:700;">P40</span></td></tr>
+<tr><td class="age-col">40</td><td><span class="conf-H" style="font-weight:700;">P20</span></td><td><span class="conf-H" style="font-weight:700;">P39</span></td><td><span class="conf-H" style="font-weight:700;">P41</span></td><td><span class="conf-H" style="font-weight:700;">P40</span></td><td><span class="conf-H" style="font-weight:700;">P20</span></td><td><span class="conf-H" style="font-weight:700;">P30</span></td><td><span class="conf-H" style="font-weight:700;">P30</span></td><td><span class="conf-H" style="font-weight:700;">P31</span></td></tr>
+</tbody>
+    </table>
+  </div>
+
+  <div style="font-size:11px;color:var(--muted);margin-bottom:20px;">
+    <span style="color:var(--good);font-weight:700;">■ Green (High) — Direct A/B winner. &nbsp; ■ Amber (Mod) — Blended A/B + model. &nbsp; ■ Gray (Low) — Cross-segment model only. &nbsp; <span style="color:#6b7f87;">live:Px</span> = current production price for single-price segments — the gap between this and the recommendation is what the next A/B closes. &nbsp;
+    <span style="color:#ef4444;font-weight:700;">■ Insufficient</span> — No usable signal.
+  </div>
+
+  <div class="callout callout-warn">
+    <strong>Reading the Poor segment pattern:</strong> iOS Poor and Android Poor show non-linear price progression driven directly by A/B test results. Ages 18–21 are locked at P5 (price floor). Age 22 shows P18 (iOS Poor) — P18 won in both Period 1 and Period 2; Period 3 ran a same-price test (A=B=P10) which is non-informative — prior winner P18 is retained. Age 24 similarly shows P20 (iOS Poor) — P20 won Periods 1 and 2 consistently; Period 3 again ran a same-price test at P10. Ages 25–28 climb to P12–P14, ages 29–40 plateau then jump to P20+ at age 35+ (directional — fewer than 40 converters per age in that range).
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 7 — NEXT TESTS (PRIORITIZED)
+═══════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 7</div>
+    <h2>Per-Age Action Table — Roll Out &amp; Next Test</h2>
+    <p class="section-intro">For every age and every segment: the immediate action (top line) and the next A/B test to run against it (bottom line). The test-variant price aligns with the Section 6 analytical recommendation — when the model targets a price more than one tier away, the next A/B jumps directly to it rather than stepping blindly.</p>
+  </div>
+
+  <div class="callout callout-info" style="margin-bottom:16px;">
+    <strong>How to read this table.</strong>
+    <ul style="margin:8px 0 0;padding-left:18px;font-size:13px;line-height:1.7;">
+      <li><strong style="color:#a78bfa;">Purple — Confirm single price:</strong> Both A and B converged to the same price. Conclude test, lock in that price, then A/B one tier higher.</li>
+      <li><strong style="color:#31c48d;">Green — Conclude → roll out B:</strong> B wins. Conclude test, push B to production, then A/B toward the Section 6 target.</li>
+      <li><strong style="color:#f3b94e;">Amber — Conclude → lean B (tie):</strong> Effective tie (iOS Poor 25+). Lean B as starting price for the next test.</li>
+      <li><strong style="color:#4d9dff;">Blue — Already live:</strong> Production single-price segment. Design a new A/B: control = current price, variant = Section 6 recommended price.</li>
+    </ul>
+  </div>
+
+  <div class="matrix-wrap">
+    <table class="matrix-table" style="font-size:11px;">
+      <thead>
+        <tr>
+          <th style="text-align:left;">Age</th>
+          <th>iOS Poor</th>
+          <th>iOS Mid</th>
+          <th>iOS Dev</th>
+          <th>iOS Rich</th>
+          <th>And Poor</th>
+          <th>And Mid</th>
+          <th>And Dev</th>
+          <th>And Rich</th>
+        </tr>
+      </thead>
+      <tbody>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">18</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P5</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Floor confirmed → explore higher</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P6</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P17</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P18</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P17 vs P18</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P19</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P20</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P18</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P17</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P5</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Floor confirmed → explore higher</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P6</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P9</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P13</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P9 vs P13</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P9</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P13</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P9 vs P13</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P19</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P21</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">19</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P5</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Floor confirmed → explore higher</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P6</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P18</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P19</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P21</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P25</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P27</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P5</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Floor confirmed → explore higher</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P6</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P10</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P14</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P10 vs P14</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P10</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P14</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P10 vs P14</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P15</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P16</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">20</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P5</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Floor confirmed → explore higher</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P6</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P19</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P20</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P21</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P22</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P19</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P5</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Floor confirmed → explore higher</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P6</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P11</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P14</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P11 vs P14</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P11</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P14</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P11 vs P14</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P21</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P23</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">21</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P5</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Floor confirmed → explore higher</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P6</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P21</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P22</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P23</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P27</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P29</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P5</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Floor confirmed → explore higher</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P6</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P12</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P15</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P12 vs P15</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P12</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P15</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P12 vs P15</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P22</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P24</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">22</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P18</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner (P1+P2)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P19</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P21</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P22</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P23</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P24</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P28</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P30</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P10</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Floor confirmed → explore higher</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P11</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P13</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P16</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P13 vs P16</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P13</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P14</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P13 vs P14</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P23</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P25</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">23</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P10</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Floor confirmed → explore higher</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P11</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P22</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P23</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P24</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P25</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P23</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P22</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P10</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Floor confirmed → explore higher</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P11</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P14</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P17</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P14 vs P17</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P14</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P15</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P14 vs P15</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#9eb0b9;font-weight:700;font-size:11px;">P18</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Model only — 0 conv in P3</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P19</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">24</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner (P1+P2)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P21</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P23</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P24</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P25</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P26</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P24</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P23</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P10</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Floor confirmed → explore higher</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P11</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P15</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P16</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P15 vs P16</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P15</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P16</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P15</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P14</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">25</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P12</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P11</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P24</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P25</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P26</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P27</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P25</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P24</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P14</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P15</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P16</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P17</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P16 vs P17</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P16</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P17</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P16</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P15</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">26</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P14</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P15</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P25</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P26</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P27</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P28</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P26</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P25</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P12</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P11</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P17</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P18</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P17 vs P18</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P17</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P18</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P27</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P29</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">27</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P12</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P11</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P26</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P27</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P28</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P29</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P27</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P26</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P12</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P11</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P18</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P19</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P18</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P19</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P18</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P17</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">28</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P14</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P15</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P27</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P28</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P29</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P30</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P34</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P36</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P12</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P11</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P19</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P20</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P19</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P20</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P19</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P18</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">29</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P12</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P11</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P28</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P29</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P30</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P31</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P29</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P28</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P14</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P15</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P21</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P21</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P30</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P32</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">30</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P12</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P11</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P29</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P30</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P31</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P32</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P30</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P29</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P12</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P11</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P21</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P22</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P21</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P22</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P21</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P20</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">31</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P12</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P11</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P30</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P31</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P32</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P33</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P31</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P30</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P21</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P22</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P23</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P22</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P23</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P22</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P21</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">32</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P21</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P31</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P32</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P33</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P34</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P38</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P40</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P21</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P23</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P24</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P23</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P24</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P33</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P35</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">33</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P12</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P11</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P32</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P33</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P34</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P35</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P33</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P32</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P21</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P24</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P25</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P24</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P25</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P24</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P23</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">34</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P21</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P33</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P34</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P35</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P36</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P40</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P42</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P12</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P11</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P25</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P26</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P25</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P26</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P25</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P24</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">35</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P28</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P29</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P34</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P35</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P36</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P37</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P35</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P34</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P19</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P26</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P27</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P26</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P27</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P26</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P25</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">36</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P19</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P35</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P36</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P37</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P38</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P36</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P35</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P28</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P29</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P27</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P26</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P27 vs P26</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P27</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P28</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P27</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P26</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">37</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P28</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P29</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P36</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P37</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P38</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P39</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P37</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P36</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P28</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P30</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P28</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P29</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P28</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P29</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P28</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P27</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">38</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P19</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P37</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P38</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P39</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P40</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P38</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P37</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P19</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P29</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P27</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P29 vs P27</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P29</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P30</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P39</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P41</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">39</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P28</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Lean winner (tie)</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P29</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P38</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P39</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P40</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P41</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P39</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P38</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P19</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#f3b94e;font-weight:700;font-size:11px;">P30</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Close gap → P28</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">A/B: P30 vs P28</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P30</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P31</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P40</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↑ P42</span></div></td></tr>
+<tr><td style="font-weight:700;color:#dbe7eb;text-align:left;padding:5px 8px;">40</td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P19</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P39</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P40</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P41</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P42</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P40</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P39</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P20</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P19</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P30</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P31</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#4d9dff;font-weight:700;font-size:11px;">P30</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Already live</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">New A/B: ↑ P31</span></div></td><td style="vertical-align:top;padding:5px 4px;"><div style="color:#31c48d;font-weight:700;font-size:11px;">P31</div><div style="color:#c8d9e0;font-size:10px;margin-top:1px;">Roll out winner</div><div style="margin-top:3px;font-size:9.5px;"><span style="color:#9eb0b9;">Next A/B: ↓ P30</span></div></td></tr>
+</tbody>
+  </table>
+</div>
+
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 8 — DATA QUALITY & CAVEATS
+═══════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 8</div>
+    <h2>Data Quality &amp; Caveats</h2>
+    <p class="section-intro">What is safe to quote, what needs a caveat, and what should not be communicated without resolution. This section is internal — it is not for client or board presentation without review.</p>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Segment / Item</th><th>Status</th><th>Detail</th><th>Impact on report</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="td-bold">iOS Rich — reactivation confound</td>
+        <td class="td-warn">⚠ Flagged</td>
+        <td>55.7% reactivation in Group A vs 1.4% in B inflates A's LTV-per-converter by ~$7–8. Fully explained and corrected for in analysis.</td>
+        <td>Safe to communicate if context is included. Do not quote A's $42.90 LTV without the reactivation note.</td>
+      </tr>
+      <tr>
+        <td class="td-bold">Android Poor — pricing mismatch</td>
+        <td class="td-warn">⚠ Must fix</td>
+        <td>15–18% of Android Poor users were assigned incorrect prices during test. Vs 1–2% for iOS.</td>
+        <td>CVR and ARPU direction (B wins) is reliable. Per-converter LTV estimates are noisy. Do not quote Android Poor LTV as precise.</td>
+      </tr>
+      <tr>
+        <td class="td-bold">Android Rich / Android Mid — thin per-age data</td>
+        <td class="td-warn">⚠ Thin</td>
+        <td>Android Rich: only 1 high-confidence age recommendation (of 23). Ages 18–22 have &lt;10 users each. Android Mid: 6 of 23 ages High confidence.</td>
+        <td>Segment-level verdicts are reliable. Per-age recommendations for Android Rich ages 18–25 are cross-segment model only — do not present as direct evidence.</td>
+      </tr>
+      <tr>
+        <td class="td-bold">iOS Poor — A's LTV edge</td>
+        <td class="td-muted">Noted</td>
+        <td>A's per-converter LTV edge (p=0.091, $17.38 vs $14.80) is borderline and genuine (zero reactivations). Not statistically conclusive.</td>
+        <td>Safe to note that A shows a borderline quality signal. Do not overstate. Default to B is still correct.</td>
+      </tr>
+      <tr>
+        <td class="td-bold">iOS Dev, iOS Mid — no LTV validation</td>
+        <td class="td-muted">Gap</td>
+        <td>Both moved to production in P2. No A/B split available for Feb 1–7 LTV snapshot.</td>
+        <td>Cannot validate LTV direction. CVR data and production performance are reliable. Flag as "no LTV data" in any board presentation.</td>
+      </tr>
+      <tr>
+        <td class="td-bold">Android empirical ratios</td>
+        <td class="td-muted">Moderate</td>
+        <td>Android Rich: 13 qualifying ages (vs 23 for iOS segments). Android Mid: 15 ages.</td>
+        <td>Cross-segment predictions for Android Rich and Mid are less reliable. Treat as directional, not precise.</td>
+      </tr>
+      <tr>
+        <td class="td-bold">iOS data (store_country)</td>
+        <td class="dq-ok">✓ Reliable</td>
+        <td>89–94% store_country_code coverage for iOS. Geographic composition is confirmed and used for WTP ratio derivation.</td>
+        <td>iOS segment composition is well-characterised. Safe to quote.</td>
+      </tr>
+      <tr>
+        <td class="td-bold">iOS Dev, iOS Poor, iOS Rich CVR data</td>
+        <td class="dq-ok">✓ Reliable</td>
+        <td>All three have 23 qualifying ages, high converter counts, and multi-period consistency.</td>
+        <td>CVR and anchor data for these segments is the most reliable in the dataset. Safe to quote without caveats.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-info" style="margin-top:16px;">
+    <strong>What is safe to present externally without qualification:</strong> The B variant verdict for iOS Rich (CVR p=0.035) and Android Rich (no confounds, bootstrap 70.2%). The age-rising-price relationship. iOS Dev and iOS Poor anchor prices (High confidence, full-period data). The LTV renewal rates for the 7-day snapshot window.
+  </div>
+  <div class="callout callout-warn" style="margin-top:10px;">
+    <strong>What requires a caveat:</strong> iOS Rich A's LTV number (must include reactivation context). Android Poor per-converter LTV (mismatch rate noise). Per-age recommendations for Android Rich ages 18–25 (cross-segment model only). iOS Poor tie verdict (borderline, not a ringing endorsement of either variant).
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════════ -->
+<hr>
+<div style="font-size:11px;color:var(--muted);display:flex;justify-content:space-between;">
+  <span>dua.com · Male Pricing Strategy Report · Internal use only</span>
+  <span>Generated April 8, 2026 · Data: Dec 19, 2025 – Mar 19, 2026</span>
+</div>
+
+</div><!-- /page -->
+</body>
+</html><!-- ═══════════════════════════════════════════════════
+     

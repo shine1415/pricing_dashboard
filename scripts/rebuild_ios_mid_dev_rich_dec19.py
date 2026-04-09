@@ -1,0 +1,337 @@
+#!/usr/bin/env python3
+
+import csv
+import json
+from collections import defaultdict
+from datetime import date, datetime
+from pathlib import Path
+
+try:
+    import pycountry
+except Exception:
+    pycountry = None
+
+
+RAW_CSV = Path("/Users/ardittrikshiqi/Desktop/pricing-test-results/pricing_matrix_inc_store_country.csv")
+DASHBOARD_DIR = Path("/Users/ardittrikshiqi/Desktop/pricing-test-results/dashboard")
+SUMMARY_JSON = DASHBOARD_DIR / "segment_metrics_v2.json"
+RATES_JSON = Path("/Users/ardittrikshiqi/Documents/New project/store_currency_rates.json")
+HELPER_SCRIPT = Path("/Users/ardittrikshiqi/Documents/New project/rebuild_dashboard_revenue_and_duration.py")
+
+ns = {}
+exec(HELPER_SCRIPT.read_text(), ns)
+PRODUCT_MAPPING = ns["PRODUCT_MAPPING"]
+convert_nominal_price_to_eur = ns["convert_nominal_price_to_eur"]
+
+DURATIONS = ["All", "Weekly", "Monthly", "3 Months"]
+DURATION_FROM_MAPPING = {
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "3months": "3 Months",
+}
+EXCLUDED_DATES = {date(2026, 1, 30)}
+ISO3_MANUAL = {
+    "XKS": "Kosovo",
+    "GBR": "United Kingdom",
+    "USA": "United States",
+    "CHE": "Switzerland",
+    "DEU": "Germany",
+    "AUT": "Austria",
+    "BEL": "Belgium",
+    "HRV": "Croatia",
+    "MKD": "North Macedonia",
+    "ALB": "Albania",
+    "SRB": "Serbia",
+    "MNE": "Montenegro",
+    "SVN": "Slovenia",
+    "GRC": "Greece",
+    "ITA": "Italy",
+    "SWE": "Sweden",
+    "DNK": "Denmark",
+    "BIH": "Bosnia and Herzegovina",
+    "EGY": "Egypt",
+    "KAZ": "Kazakhstan",
+    "FRA": "France",
+}
+
+SEGMENTS = {
+    "mid_ios": {
+        "mode": "production",
+        "os": "ios",
+        "region": "mid",
+        "period1_start": date(2025, 12, 19),
+        "period1_end": date(2026, 1, 29),
+        "period2_start": date(2026, 1, 31),
+        "period2_end": date(2026, 3, 19),
+        "data_file": DASHBOARD_DIR / "dashboard_data_mid_region.csv",
+        "cvr_file": DASHBOARD_DIR / "daily_cvr_ios_mid_mar19.csv",
+        "period1_expected": {age: (f"P{age-2}", f"P{age-1}") for age in range(18, 41)},
+    },
+    "dev_ios": {
+        "mode": "production",
+        "os": "ios",
+        "region": "dev",
+        "period1_start": date(2025, 12, 19),
+        "period1_end": date(2026, 1, 29),
+        "period2_start": date(2026, 1, 31),
+        "period2_end": date(2026, 3, 19),
+        "data_file": DASHBOARD_DIR / "dashboard_data_dev_region.csv",
+        "cvr_file": DASHBOARD_DIR / "daily_cvr_ios_dev_mar19.csv",
+        "period1_expected": {age: (f"P{age}", f"P{age+1}") for age in range(18, 41)},
+    },
+    "rich": {
+        "mode": "ab",
+        "os": "ios",
+        "region": "rich",
+        "period1_start": date(2025, 12, 19),
+        "period1_end": date(2026, 1, 29),
+        "period2_start": date(2026, 1, 31),
+        "period2_end": date(2026, 3, 19),
+        "data_file": DASHBOARD_DIR / "dashboard_data_rich_region.csv",
+        "cvr_file": DASHBOARD_DIR / "daily_cvr_ios_rich_mar19.csv",
+        "period1_expected": {age: (f"P{age+6}", f"P{age+7}") for age in range(18, 40)} | {40: ("P46", "P46")},
+        "period2_expected": {age: (f"P{age+6}", f"P{age}") for age in range(18, 41)},
+    },
+}
+
+
+def country_from_store_code(code):
+    code = (code or "").strip().upper()
+    if not code:
+        return None
+    if code in ISO3_MANUAL:
+        return ISO3_MANUAL[code]
+    if pycountry:
+        match = pycountry.countries.get(alpha_3=code)
+        if match:
+            return match.name
+    return None
+
+
+def parse_date(value):
+    return datetime.strptime((value or "").strip(), "%d.%m.%Y").date()
+
+
+def empty_bucket():
+    return {"users": set(), "converters": set(), "conversion_events": 0, "revenue": 0.0}
+
+
+def finalize_bucket(bucket, days):
+    users = len(bucket["users"])
+    converters = len(bucket["converters"])
+    revenue = round(bucket["revenue"], 2)
+    conversion_events = bucket["conversion_events"]
+    cvr = (converters / users * 100) if users else 0
+    rev_per_user = (revenue / users) if users else 0
+    rev_per_user_day = (rev_per_user / days) if users else 0
+    return {
+        "users": users,
+        "converters": converters,
+        "conversion_events": conversion_events,
+        "cvr": round(cvr, 4),
+        "revenue": revenue,
+        "revPerUser": round(rev_per_user, 4),
+        "revPerUserDay": round(rev_per_user_day, 4),
+    }
+
+
+def matches_expected_pair(row, expected_pair):
+    apval = (row.get("apval") or "").strip()
+    bpval = (row.get("bpval") or "").strip()
+    if apval.isdigit():
+        apval = f"P{apval}"
+    if bpval.isdigit():
+        bpval = f"P{bpval}"
+    return (apval, bpval) == expected_pair
+
+
+def rebuild_segment(segment_key, cfg, rates):
+    daily = defaultdict(empty_bucket)
+    summary = defaultdict(empty_bucket)
+    overall_days = (cfg["period1_end"] - cfg["period1_start"]).days + 1 + (cfg["period2_end"] - cfg["period2_start"]).days + 1
+
+    with RAW_CSV.open(newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if (row.get("gender") or "").strip().lower() not in {"m", "male"}:
+                continue
+            if (row.get("os") or "").strip().lower() != cfg["os"]:
+                continue
+            if (row.get("region") or "").strip().lower() != cfg["region"]:
+                continue
+
+            row_date = parse_date(row.get("date"))
+            if row_date in EXCLUDED_DATES:
+                continue
+
+            age_raw = (row.get("age") or "").strip()
+            if not age_raw.isdigit():
+                continue
+            age = int(age_raw)
+            user_id = (row.get("cognito_user_id") or "").strip()
+            if not user_id:
+                continue
+
+            group = None
+            period_key = None
+
+            if cfg["period1_start"] <= row_date <= cfg["period1_end"]:
+                period_key = "period1"
+                if cfg["mode"] == "production":
+                    if (row.get("abchosen") or "").strip() != "2":
+                        continue
+                expected = cfg["period1_expected"].get(age)
+                if not expected or not matches_expected_pair(row, expected):
+                    continue
+                group = (row.get("ab_type") or "").strip()
+                if group not in {"A", "B"}:
+                    continue
+            elif cfg["period2_start"] <= row_date <= cfg["period2_end"]:
+                period_key = "period2"
+                if cfg["mode"] == "production":
+                    if (row.get("abchosen") or "").strip() != "1":
+                        continue
+                    group = "P"
+                else:
+                    expected = cfg["period2_expected"].get(age)
+                    if not expected or not matches_expected_pair(row, expected):
+                        continue
+                    group = (row.get("ab_type") or "").strip()
+                    if group not in {"A", "B"}:
+                        continue
+            else:
+                continue
+
+            row_date_iso = row_date.isoformat()
+            for duration in DURATIONS:
+                daily[(row_date_iso, str(age), group, duration)]["users"].add(user_id)
+                summary[("overall", duration, group)]["users"].add(user_id)
+                summary[(period_key, duration, group)]["users"].add(user_id)
+
+            product_id = (row.get("product_id") or "").strip()
+            mapping = PRODUCT_MAPPING.get(product_id)
+            if not mapping:
+                continue
+
+            _, duration_key, nominal_price = mapping
+            duration_label = DURATION_FROM_MAPPING[duration_key]
+            country = country_from_store_code(row.get("store_country_code")) or (row.get("country") or "").strip()
+            eur_price = convert_nominal_price_to_eur(nominal_price, cfg["os"], country, rates)
+
+            for duration in ("All", duration_label):
+                daily_bucket = daily[(row_date_iso, str(age), group, duration)]
+                daily_bucket["conversion_events"] += 1
+                daily_bucket["revenue"] += eur_price
+                daily_bucket["converters"].add(user_id)
+
+                summary[("overall", duration, group)]["conversion_events"] += 1
+                summary[("overall", duration, group)]["revenue"] += eur_price
+                summary[("overall", duration, group)]["converters"].add(user_id)
+
+                summary[(period_key, duration, group)]["conversion_events"] += 1
+                summary[(period_key, duration, group)]["revenue"] += eur_price
+                summary[(period_key, duration, group)]["converters"].add(user_id)
+
+    dashboard_rows = []
+    for (row_date, age, group, duration), bucket in sorted(daily.items()):
+        users = len(bucket["users"])
+        unique_converters = len(bucket["converters"])
+        conversion_events = bucket["conversion_events"]
+        revenue = round(bucket["revenue"], 2)
+        user_cvr = round((unique_converters / users * 100), 4) if users else 0
+        revenue_per_user = round((revenue / users), 4) if users else 0
+        dashboard_rows.append({
+            "date": row_date,
+            "age": age,
+            "group": group,
+            "duration": duration,
+            "purchase_type": "All",
+            "users": users,
+            "exposures": users,
+            "unique_converters": unique_converters,
+            "converted_users": conversion_events,
+            "events": conversion_events,
+            "user_cvr": user_cvr,
+            "revenue": revenue,
+            "revenue_per_user": revenue_per_user,
+        })
+
+    cvr_rows = []
+    daily_totals = defaultdict(empty_bucket)
+    for (row_date, _age, group, duration), bucket in daily.items():
+        total_bucket = daily_totals[(row_date, group, duration)]
+        total_bucket["users"].update(bucket["users"])
+        total_bucket["converters"].update(bucket["converters"])
+        total_bucket["conversion_events"] += bucket["conversion_events"]
+
+    for (row_date, group, duration), bucket in sorted(daily_totals.items()):
+        users = len(bucket["users"])
+        converters = len(bucket["converters"])
+        cvr_rows.append({
+            "date": row_date,
+            "group": group,
+            "duration": duration,
+            "unique_users": users,
+            "unique_converters": converters,
+            "conversion_events": bucket["conversion_events"],
+            "daily_cvr": round((converters / users * 100), 4) if users else 0,
+        })
+
+    payload = {"mode": cfg["mode"], "overall": {}, "periods": {}}
+    group_keys = ["A", "B"] if cfg["mode"] == "ab" else ["A", "B", "P"]
+    for duration in DURATIONS:
+        payload["overall"][duration] = {
+            group: finalize_bucket(summary[("overall", duration, group)], overall_days)
+            for group in group_keys
+        }
+    p1_days = (cfg["period1_end"] - cfg["period1_start"]).days + 1
+    p2_days = (cfg["period2_end"] - cfg["period2_start"]).days + 1
+    payload["periods"]["period1"] = {
+        duration: {
+            group: finalize_bucket(summary[("period1", duration, group)], p1_days)
+            for group in ["A", "B"]
+        }
+        for duration in DURATIONS
+    }
+    payload["periods"]["period2"] = {
+        duration: {
+            group: finalize_bucket(summary[("period2", duration, group)], p2_days)
+            for group in (["A", "B"] if cfg["mode"] == "ab" else ["P"])
+        }
+        for duration in DURATIONS
+    }
+
+    with cfg["data_file"].open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(
+            f,
+            fieldnames=[
+                "date", "age", "group", "duration", "purchase_type", "users", "exposures",
+                "unique_converters", "converted_users", "events", "user_cvr", "revenue", "revenue_per_user",
+            ],
+        )
+        writer.writeheader()
+        writer.writerows(dashboard_rows)
+
+    with cfg["cvr_file"].open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(
+            f,
+            fieldnames=["date", "group", "duration", "unique_users", "unique_converters", "conversion_events", "daily_cvr"],
+        )
+        writer.writeheader()
+        writer.writerows(cvr_rows)
+
+    return payload
+
+
+def main():
+    rates = json.loads(RATES_JSON.read_text())
+    all_summary = json.loads(SUMMARY_JSON.read_text())
+    for key, cfg in SEGMENTS.items():
+        payload = rebuild_segment(key, cfg, rates)
+        all_summary[key] = payload
+        print(key, json.dumps(payload["overall"]["All"], indent=2))
+    SUMMARY_JSON.write_text(json.dumps(all_summary, indent=2))
+
+
+if __name__ == "__main__":
+    main()

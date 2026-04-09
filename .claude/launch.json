@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "pricing-dashboard",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["/Users/ardittrikshiqi/Desktop/pricing-v2/serve.py"],
+      "port": 8003
+    }
+  ]
+}
