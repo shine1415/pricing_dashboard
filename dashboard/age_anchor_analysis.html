@@ -402,7 +402,7 @@
     <div class="section">
       <div class="panel">
         <h2>3. Cross-regional anchoring</h2>
-        <p class="section-copy">Each segment's best-observed price for this age, split by platform. The <strong>Predicted</strong> column uses the same-platform Dev price as the reference anchor and applies empirical WTP ratios. For iOS Poor and Android Poor, an <strong>age-income factor</strong> is applied for ages 18–27 — younger Kosovo/Albania users have proportionally less disposable income relative to their German-cohort peers. Factor reaches 1.0 at age 28.</p>
+        <p class="section-copy">Each segment's best-observed price for this age, split by platform.</p>
         <div id="crossRegionalAnchor"></div>
       </div>
     </div>
@@ -744,43 +744,12 @@
       // Step 3: cross-regional
       if (anchorRoot) {
         const equivs = ageData.cross_regional_anchor?.regional_equivalents || [];
-        const ratios  = recData?.empirical_ratios || {};
-        const ageRecs = recData?.recommendations?.[String(age)] || {};
 
-        // iOS Dev reference
-        const iosDevRec      = ageRecs['dev_ios'];
-        const iosDevPrice    = iosDevRec?.direct_evidence?.winner_price || iosDevRec?.recommended_price;
-        const iosDevPriceInt = iosDevPrice ? parseInt(iosDevPrice.replace('P','')) : null;
-
-        // Android Dev reference
-        const andDevRec      = ageRecs['dev_android'];
-        const andDevPrice    = andDevRec?.direct_evidence?.winner_price || andDevRec?.recommended_price;
-        const andDevPriceInt = andDevPrice ? parseInt(andDevPrice.replace('P','')) : null;
-
-        // Split by platform (JSON now has 'platform' field per row)
         const iosEquivs = equivs.filter(r => r.platform === 'iOS');
         const andEquivs = equivs.filter(r => r.platform === 'Android');
 
-        function renderEquivRows(rows, refPriceInt) {
+        function renderEquivRows(rows) {
           return rows.map(r => {
-            const segKey    = r.segment_key || null;
-            const ratio     = segKey ? ratios[segKey] : null;
-            const ageFactor = getAgeFactor(segKey, age);
-            const pred      = (refPriceInt && ratio) ? Math.round(refPriceInt * ratio * ageFactor) : null;
-            const factorNote = (ageFactor !== 1.00)
-              ? `<span style="color:#f59e0b;font-size:10px;display:block;margin-top:2px;">${ageFactor.toFixed(2)}× age</span>`
-              : '';
-            const obs      = r.best_p_value ? parseInt(r.best_p_value.replace('P','')) : null;
-            const diff     = (obs != null && pred != null) ? (obs - pred) : null;
-            const absDiff  = diff != null ? Math.abs(diff) : null;
-            const matchColor = absDiff == null ? 'var(--muted)'
-              : absDiff === 0 ? 'var(--good)'
-              : absDiff <= 2  ? '#f59e0b'
-              : '#ef4444';
-            const matchLabel = absDiff == null ? '—'
-              : absDiff === 0 ? '✓ exact'
-              : diff > 0     ? `+${diff} tiers above`
-              : `${diff} tiers below`;
             const thinNote = r.users < 25
               ? ` <span style="color:#f59e0b;font-size:10px;">(thin)</span>` : '';
             return `
@@ -791,14 +760,11 @@
               <td>${fmtInt(r.converters)}</td>
               <td>${fmtPct(r.cvr)}</td>
               <td>${r.gap_to_anchor_cvr == null ? '—' : `${r.gap_to_anchor_cvr > 0 ? '+' : ''}${Number(r.gap_to_anchor_cvr).toFixed(2)} pp`}</td>
-              ${refPriceInt ? `
-              <td><strong style="color:var(--accent)">${pred != null ? 'P'+pred : '—'}</strong>${ratio ? `<span style="color:var(--muted);font-size:11px;margin-left:6px;">${ratio}×</span>` : ''}${factorNote}</td>
-              <td style="color:${matchColor};font-size:12px;">${matchLabel}</td>` : '<td>—</td><td>—</td>'}
             </tr>`;
           }).join('');
         }
 
-        function platformTable(label, rows, refPrice, refPriceInt) {
+        function platformTable(label, rows) {
           if (!rows.length) return '';
           return `
             <p style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:16px 0 6px;">${label}</p>
@@ -808,21 +774,15 @@
                 <th>Best observed</th>
                 <th>Users</th><th>Conv</th><th>CVR</th>
                 <th>Gap vs anchor</th>
-                <th>Predicted <span style="font-weight:400;color:var(--muted)">(${label.split(' ')[0]} Dev ${refPrice || '?'} × ratio)</span></th>
-                <th>Match</th>
               </tr></thead>
-              <tbody>${renderEquivRows(rows, refPriceInt)}</tbody>
+              <tbody>${renderEquivRows(rows)}</tbody>
             </table>`;
         }
 
         anchorRoot.innerHTML =
-          platformTable('iOS', iosEquivs, iosDevPrice, iosDevPriceInt) +
-          platformTable('Android', andEquivs, andDevPrice, andDevPriceInt) +
-          `<p class="section-copy" style="margin-top:12px;font-size:12px;">
-            Predicted = [platform] Dev price × WTP ratio [ × age-income factor for Poor segments, ages 18–27 ].
-            A match within ±2 tiers is consistent. <em>(thin)</em> = fewer than 25 users — treat with caution.
-          </p>
-          <p class="section-copy" style="margin-top:8px;">${ageData.cross_regional_anchor?.ppp_status || ''}</p>`;
+          platformTable('iOS', iosEquivs) +
+          platformTable('Android', andEquivs) +
+          `<p class="section-copy" style="margin-top:8px;font-size:12px;"><em>(thin)</em> = fewer than 25 users — treat with caution.</p>`;
       }
 
       // Step 4: anchor validation with score bars

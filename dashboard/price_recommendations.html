@@ -612,15 +612,7 @@
       }
     }
 
-    // --- Cross-segment signal ---
-    let crossHtml = '';
-    if (cross) {
-      crossHtml = `<div class="detail-card">
-        <div class="dc-label">Cross-segment signal</div>
-        <div class="dc-val" style="color:var(--warn)">${cross.scaled_price}</div>
-        <div class="dc-sub">iOS Dev age ${cross.source_age} (${cross.source_price}) × ${cross.ratio}× WTP ratio</div>
-      </div>`;
-    }
+    // Cross-segment signal card removed
 
     // --- Coherence chain ---
     function buildChain(age, seg, rec, ev, cross, color) {
@@ -672,31 +664,13 @@
         }
 
       } else {
-        // ── Non-reference segment: cross-segment estimate + direct evidence ──
-
-        if (cross) {
-          const crossNote = hasAnything
-            ? `<span style="color:var(--muted)">(context only — direct data drives the call; this age's ratio contributed to the ${cross.ratio}× median)</span>`
-            : `<span style="color:var(--muted)">(out-of-sample — this age has no direct data, so its ratio is NOT in the ${cross.ratio}× median)</span>`;
-          step(stepNum++, `<span>
-            <strong class="chain-val">iOS Dev age ${cross.source_age} → ${cross.source_price}</strong>
-            × <strong>${cross.ratio}×</strong> WTP ratio
-            = <strong class="chain-val">${cross.scaled_price}</strong> predicted
-            ${crossNote}
-          </span>`);
-        }
+        // ── Non-reference segment ──
 
         if (hasCurrentAB) {
-          const gap = cross ? Math.abs(recInt - cross.scaled_int) / Math.max(recInt, cross.scaled_int) : null;
-          const agreeStr = gap != null
-            ? (gap <= 0.20
-                ? `<span class="chain-agree"> ✓ agrees with prediction within ${(gap*100).toFixed(0)}%</span>`
-                : `<span class="chain-warn"> ⚠ diverges from prediction by ${(gap*100).toFixed(0)}% — direct data overrides</span>`)
-            : '';
           step(stepNum++, `<span>
             <strong class="chain-val">A/B direct: ${ev.winner_price} won</strong>
             (Group ${ev.winner_group}, ${fmtPct(ev.winner_cvr)} CVR, ${fmtInt(ev.winner_users)} users)
-            vs ${ev.loser_price} (Group ${ev.loser_group}, ${fmtPct(ev.loser_cvr)} CVR)${agreeStr}
+            vs ${ev.loser_price} (Group ${ev.loser_group}, ${fmtPct(ev.loser_cvr)} CVR)
           </span>`);
 
           // Prior period chain (A/B segments with multi-period history)
@@ -728,18 +702,17 @@
           step(stepNum++, `<span><strong class="chain-val">Live price: ${ev.winner_price}</strong>
             — ${fmtPct(ev.winner_cvr)} CVR, ${fmtInt(ev.winner_users)} users
             <span style="color:var(--muted)">(no challenger tested this period)</span></span>`);
-        } else if (cross) {
+        } else if (!ev) {
           step(stepNum++, `<span style="color:var(--muted)">
-            No direct A/B data for this age × segment —
-            cross-segment prediction <strong class="chain-val">${cross.scaled_price}</strong> is the sole signal
+            No direct A/B data for this age × segment — model-derived estimate only.
           </span>`);
         }
       }
 
       // Confidence
       const confBase = ev
-        ? `${fmtInt(ev.winner_users)} users on winning side${rec.signals_agree ? ' · cross-segment signal agrees' : ''}`
-        : 'cross-segment only — no local users';
+        ? `${fmtInt(ev.winner_users)} users on winning side`
+        : 'model-derived — no local A/B data';
       step(stepNum++, `<span>
         <strong class="chain-val">${rec.confidence_label} confidence</strong>
         <span style="color:var(--muted)"> — ${confBase}</span>
@@ -763,7 +736,6 @@
       <div class="detail-grid">
         ${recCard}
         ${evHtml}
-        ${crossHtml}
       </div>
       ${buildChain(age, seg, rec, ev, cross, color)}
       <div class="reasoning-box">${rec.reasoning}</div>
