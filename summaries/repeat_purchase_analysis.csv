@@ -1,0 +1,11 @@
+Region,Group,Unique Converters,Total Packages,Single Purchase,Repeat Purchase (2+),Repeat Rate,Avg Packages per Converter
+Poor,A,755,853,681,74,9.8%,1.13
+Poor,B,855,993,755,100,11.7%,1.16
+Poor,Difference,+13.2%,+16.4%,+10.9%,+35.1%,+1.9pp,+2.7%
+,,,,,,,
+Rich,A,801,"1,029",643,158,19.7%,1.28
+Rich,B,884,"1,151",696,188,21.3%,1.30
+Rich,Difference,+10.4%,+11.9%,+8.2%,+19.0%,+1.6pp,+1.6%
+,,,,,,,
+Key Finding:,Rich Region has 2x the repeat purchase rate vs Poor Region,,,,,,
+,Group B shows higher repeat rates in both regions,,,,,,

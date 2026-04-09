@@ -333,25 +333,6 @@
       `Empirical WTP ratio · iOS Dev = 1.000× baseline (derived from observed conversion prices, not GDP)`;
   }
 
-  // --- Helper: effective winner price for a recommendation ---
-  // For same-price tests or zero-converter tests, fall back to prior period evidence.
-  function effectiveWinner(rec) {
-    const de = rec.direct_evidence;
-    if (!de) return rec.recommended_price;
-    const lastChain = de.price_chain?.length > 0
-      ? de.price_chain[de.price_chain.length - 1]
-      : null;
-    // Same-price test: both groups ran at same price → noise, use last chain winner
-    if (de.same_price_latest && lastChain) return lastChain.winner_price;
-    // Zero converters in current period with very thin data: no signal.
-    // If the last chain period is also thin (<10 total users), trust the model's recommended_price instead.
-    if (de.winner_converters === 0 && de.winner_users < 5 && lastChain) {
-      const chainTotalUsers = (lastChain.A?.users || 0) + (lastChain.B?.users || 0);
-      return chainTotalUsers >= 10 ? lastChain.winner_price : rec.recommended_price;
-    }
-    return de.winner_price || rec.recommended_price;
-  }
-
   function renderMatrix(aaLookup) {
     const ages = data.ages;
     const segs = data.segments;
@@ -385,11 +366,11 @@
           return `<td><div class="rec-cell empty"></div></td>`;
         }
 
-        // Price to display: for A/B segs use the effective winner (respects same-price test overrides);
+        // Price to display: for A/B segs use the winner's price (A or B, whichever won);
         // for prod segments use recommended_price
         let displayPrice = rec.recommended_price;
         if (isABSeg) {
-          displayPrice = effectiveWinner(rec);
+          displayPrice = rec.direct_evidence?.winner_price || rec.recommended_price;
         }
 
         // live:Px subscript for production segments only
@@ -570,49 +551,13 @@
       }
     }
 
-    // For same-price tests: JSON next_test was built from the floor price (P10), but the real
-    // confirmed winner from prior periods should be the baseline for the next test.
-    if (ev?.same_price_latest && !ntOverride) {
-      const priorWin = effectiveWinner(rec);   // e.g. P18 or P20
-      const wi = parseInt(priorWin.replace('P',''));
-      const nextTest = `P${wi + 1}`;
-      const breakeven = parseFloat(((1 - wi/(wi+1)) * 100).toFixed(1));
-      const chainPeriods = (ev.price_chain || []).map((h, i) =>
-        `P${i+1}: ${h.A.p_value} (${h.A.cvr.toFixed(1)}% CVR) vs ${h.B.p_value} (${h.B.cvr.toFixed(1)}% CVR) → Group ${h.winner_group} (${h.winner_price}) won`
-      ).join(' · ');
-      ntOverride = {
-        type: 'explore_higher',
-        current_price: priorWin,
-        current_eur: eurMap[priorWin] || null,
-        test_price: nextTest,
-        test_eur: eurMap[nextTest] || null,
-        breakeven_lift: breakeven,
-        risk: breakeven < 4 ? 'Low' : breakeven < 8 ? 'Moderate' : 'High',
-        rationale: `Latest period ran both groups at P10 (same-price test — non-informative). ` +
-          `Prior evidence: ${chainPeriods}. ` +
-          `${priorWin} is the confirmed winner across all informative periods. ` +
-          `Next step: test ${nextTest} (€${eurMap[nextTest]?.mo || '?'}/mo) vs ${priorWin} to explore whether a higher price is viable. ` +
-          `Break-even: ${nextTest} needs ≥${breakeven}% CVR lift vs ${priorWin} to match revenue/user.`,
-      };
-    }
-
     // --- Recommended price card ---
-    // For same-price test or zero-converter cases, show effective winner (prior period evidence)
-    const displayRec = effectiveWinner(rec);
-    const isSamePriceOverride = ev?.same_price_latest && displayRec !== rec.recommended_price;
-    const isZeroConvOverride  = ev?.winner_converters === 0 && ev?.winner_users < 5 && displayRec !== rec.recommended_price;
-    const recOverrideNote = isSamePriceOverride
-      ? `<div class="dc-sub" style="color:var(--warn);margin-top:4px;">⚠ Same-price test in latest period — using prior winner</div>`
-      : isZeroConvOverride
-        ? `<div class="dc-sub" style="color:var(--warn);margin-top:4px;">⚠ 0 converters in latest period — using prior winner</div>`
-        : '';
     const recCard = `
       <div class="detail-card">
         <div class="dc-label">Recommendation</div>
-        <div class="dc-val" style="color:${color}">${displayRec}</div>
+        <div class="dc-val" style="color:${color}">${rec.recommended_price}</div>
         <div class="dc-sub" style="font-size:13px;margin-top:4px;">${e ? eurRow(e) : ''}</div>
         <div class="dc-sub">${rec.confidence_label} confidence · ${rec.method}</div>
-        ${recOverrideNote}
       </div>`;
 
     const pNum = n => parseFloat(String(n).replace('P',''));
@@ -621,20 +566,12 @@
     let evHtml = '';
     if (ev) {
       if (ev.same_price_latest) {
-        const lastChain = ev.price_chain?.length > 0 ? ev.price_chain[ev.price_chain.length - 1] : null;
-        const priorWinner = lastChain?.winner_price || ev.winner_price;
-        evHtml = `
-          <div class="detail-card" style="border-color:var(--good);">
-            <div class="dc-label" style="color:var(--good)">✓ Prior period winner (used as recommendation)</div>
-            <div class="dc-val" style="color:var(--good)">${priorWinner}</div>
-            <div class="dc-sub">Confirmed across ${ev.price_chain?.length || 1} prior A/B period${(ev.price_chain?.length || 1) > 1 ? 's' : ''}</div>
-          </div>
-          <div class="detail-card" style="border-color:var(--warn);">
-            <div class="dc-label" style="color:var(--warn)">⚠ Latest period — same-price test</div>
-            <div class="dc-val" style="color:var(--warn)">${ev.winner_price}</div>
-            <div class="dc-sub">Both groups at ${ev.winner_price} — no price differential, result is noise</div>
-            <div class="dc-sub">${ev.winner_cvr != null ? ev.winner_cvr.toFixed(2) + '% CVR (Group B)' : ''} vs ${ev.loser_cvr != null ? ev.loser_cvr.toFixed(2) + '% CVR (Group A)' : ''} — random variation only</div>
-          </div>`;
+        evHtml = `<div class="ev-card" style="border-color:var(--warn);background:rgba(245,158,11,0.06);background:var(--paper-2);border:1px solid var(--warn);border-radius:14px;padding:14px 16px;">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--warn);margin-bottom:6px;">Test concluded</div>
+          <div style="font-size:18px;font-weight:700;color:var(--warn);">${ev.winner_price}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">Both groups converged to this price — A/B test is no longer differentiating</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">${ev.winner_cvr != null ? ev.winner_cvr.toFixed(2) + '% CVR' : ''} · ${ev.winner_users != null ? ev.winner_users.toLocaleString() + ' users' : ''}</div>
+        </div>`;
       } else if (ev.is_ab) {
         const winGrp  = ev.winner_group ? `Group ${ev.winner_group} · ` : '';
         const losGrp  = ev.loser_group  ? `Group ${ev.loser_group} · `  : '';
@@ -723,16 +660,18 @@
         // ── Non-reference segment ──
 
         if (hasCurrentAB) {
-          // Show prior periods first (chronological), then current period last
-          const chainLen = ev.price_chain?.length || 0;
-          const totalPeriods = chainLen + 1; // prior + current
+          step(stepNum++, `<span>
+            <strong class="chain-val">A/B direct: ${ev.winner_price} won</strong>
+            (Group ${ev.winner_group}, ${fmtPct(ev.winner_cvr)} CVR, ${fmtInt(ev.winner_users)} users)
+            vs ${ev.loser_price} (Group ${ev.loser_group}, ${fmtPct(ev.loser_cvr)} CVR)
+          </span>`);
 
+          // Prior period chain (A/B segments with multi-period history)
           if (ev.price_chain && ev.price_chain.length > 0) {
             ev.price_chain.forEach(histStep => {
-              const pNum_ = histStep.period.replace('period', '');
-              const pLabel = `Period ${pNum_}`;
+              const pLabel = histStep.period.replace('period', 'Period ');
               step(stepNum++, `<span>
-                <strong class="chain-val">${pLabel}</strong>:
+                <strong class="chain-val">${pLabel} history</strong>:
                 <span style="color:var(--muted)">
                   ${histStep.A.p_value} (${histStep.A.cvr.toFixed(1)}% CVR) vs
                   ${histStep.B.p_value} (${histStep.B.cvr.toFixed(1)}% CVR)
@@ -740,38 +679,6 @@
                 → <strong class="chain-agree">Group ${histStep.winner_group} (${histStep.winner_price}) won</strong>
               </span>`);
             });
-          }
-
-          // Current period — label as "Period N (current)" and flag same-price tests
-          const currentLabel = `Period ${totalPeriods} (current)`;
-          if (ev.same_price_latest) {
-            const lastChainWinner = ev.price_chain?.length > 0
-              ? ev.price_chain[ev.price_chain.length - 1].winner_price
-              : ev.winner_price;
-            step(stepNum++, `<span>
-              <strong class="chain-val" style="color:var(--warn)">${currentLabel} — same-price test</strong>:
-              <span style="color:var(--warn)">Both groups at ${ev.winner_price}</span>
-              <span style="color:var(--muted)"> — no price differential, result is noise (${fmtPct(ev.winner_cvr)} vs ${fmtPct(ev.loser_cvr)})</span>
-              <br><span style="padding-left:16px;">→ <strong class="chain-warn">Prior winner ${lastChainWinner} retained</strong></span>
-            </span>`);
-          } else if (ev.winner_converters === 0 && ev.winner_users < 5) {
-            const lastChainWinner = ev.price_chain?.length > 0
-              ? ev.price_chain[ev.price_chain.length - 1].winner_price
-              : null;
-            step(stepNum++, `<span>
-              <strong class="chain-val" style="color:var(--warn)">${currentLabel} — insufficient data</strong>:
-              <span style="color:var(--warn)">${ev.winner_users + (ev.loser_users || 0)} total users, 0 converters</span>
-              <span style="color:var(--muted)"> — completely non-informative</span>
-              ${lastChainWinner ? `<br><span style="padding-left:16px;">→ <strong class="chain-warn">Prior winner ${lastChainWinner} used</strong></span>` : ''}
-            </span>`);
-          } else {
-            step(stepNum++, `<span>
-              <strong class="chain-val">${currentLabel}</strong>:
-              <span style="color:var(--good)">${ev.winner_price} won</span>
-              (Group ${ev.winner_group}, ${fmtPct(ev.winner_cvr)} CVR, ${fmtInt(ev.winner_users)} users)
-              vs <span style="color:var(--bad)">${ev.loser_price}</span>
-              (Group ${ev.loser_group}, ${fmtPct(ev.loser_cvr)} CVR)
-            </span>`);
           }
         } else if (hasPriorAB) {
           step(stepNum++, `<span>
@@ -796,20 +703,17 @@
       }
 
       // Confidence
-      const eff = effectiveWinner(rec);
       const confBase = ev
-        ? (ev.same_price_latest
-            ? `prior period evidence (same-price test in latest period)`
-            : `${fmtInt(ev.winner_users)} users on winning side`)
+        ? `${fmtInt(ev.winner_users)} users on winning side`
         : 'model-derived — no local A/B data';
       step(stepNum++, `<span>
         <strong class="chain-val">${rec.confidence_label} confidence</strong>
         <span style="color:var(--muted)"> — ${confBase}</span>
       </span>`);
 
-      // Recommendation — use effective winner (respects same-price overrides)
+      // Recommendation
       step(stepNum++, `<span>
-        <strong class="chain-val" style="color:${color}">Recommend ${eff}</strong>
+        <strong class="chain-val" style="color:${color}">Recommend ${rec.recommended_price}</strong>
         <span style="color:var(--muted)"> via ${rec.method}</span>
       </span>`);
 
@@ -821,7 +725,7 @@
 
     panel.className = 'detail-panel visible';
     panel.innerHTML = `
-      <h3>Age ${age} · ${SEG_LABELS[seg]} · <span style="color:${color}">${displayRec} — ${rec.confidence_label} (${rec.method})</span></h3>
+      <h3>Age ${age} · ${SEG_LABELS[seg]} · <span style="color:${color}">${rec.recommended_price} — ${rec.confidence_label} (${rec.method})</span></h3>
       <div class="detail-grid">
         ${recCard}
         ${evHtml}

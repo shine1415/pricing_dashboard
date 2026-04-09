@@ -1,0 +1,20 @@
+METRIC,Poor Region A,Poor Region B,Rich Region A,Rich Region B
+,,,,
+=== USER METRICS ===,,,,
+Unique Exposures,"2,523","2,541",919,"1,010"
+Unique Converters,169,213,149,194
+User CVR,6.70%,8.38%,16.21%,19.21%
+,,,,
+=== PACKAGE METRICS ===,,,,
+Total Packages Sold,199,242,176,229
+Packages per Converter,1.18x,1.14x,1.18x,1.18x
+Repeat Purchasers,22,23,20,32
+Repeat Rate,13.0%,10.8%,13.4%,16.5%
+,,,,
+=== KEY INSIGHTS ===,,,,
+User CVR Lift,,+25.1%,,+18.5%
+Package Volume Lift,,+21.6%,,+30.1%
+Winner,,Group B,,Group B
+,,,,
+Note: Filtered for correct P-values only,,,,
+"Note: Poor excluded 2,636 users | Rich excluded 688 users",,,,

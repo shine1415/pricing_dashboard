@@ -1004,9 +1004,6 @@
                         <span class="meta-pill">A/B periods use correct P-values</span>
                         <span class="meta-pill">8 segments across iOS and Android</span>
                     </div>
-                    <div style="margin-top:16px;">
-                        <a href="./index.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#d7e1e6;font-size:13px;text-decoration:none;transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">← Home</a>
-                    </div>
                 </div>
 
                 <div class="segment-select-card">
@@ -1051,7 +1048,6 @@
             <button class="tab-btn" data-tab="overview">Overview</button>
             <button class="tab-btn" data-tab="timeseries">Time Series</button>
             <button class="tab-btn" data-tab="logic">Pricing Logic</button>
-            <button class="tab-btn" data-tab="ltv">LTV A/B</button>
         </div>
 
         <section class="tab-panel active" id="tab-allregions">
@@ -1237,198 +1233,6 @@
                 </div>
             </div>
         </section>
-
-        <section class="tab-panel" id="tab-ltv">
-            <div class="panel-card">
-                <h3>LTV A/B Analysis — February 1–7, 2026</h3>
-                <p class="panel-copy">Seven-day LTV snapshot for the four A/B test segments. Read alongside the Overview and Time Series tabs: CVR and revenue/user are the pricing signal; LTV depth and renewal rates are the quality signal. Both point the same direction.</p>
-
-                <!-- Verdict banner -->
-                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0;">
-                    <div style="background:#0d2218;border:1px solid #1a5c36;border-left:4px solid #22c55e;border-radius:8px;padding:14px;">
-                        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#6b9e82;margin-bottom:6px;">iOS Rich · 60% of revenue</div>
-                        <div style="font-size:18px;font-weight:700;color:#22c55e;">B wins</div>
-                        <div style="font-size:12px;color:#a3c4b0;margin-top:4px;">+1.93pp CVR (p=0.035) · +$105 revenue · +$0.19 ARPU</div>
-                        <div style="font-size:11px;color:#f59e0b;margin-top:6px;">⚠ A's LTV inflated by 55.7% reactivations</div>
-                    </div>
-                    <div style="background:#1c1a0a;border:1px solid #4a4018;border-left:4px solid #eab308;border-radius:8px;padding:14px;">
-                        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#9e8e50;margin-bottom:6px;">iOS Poor · 21% of revenue</div>
-                        <div style="font-size:18px;font-weight:700;color:#eab308;">Tie</div>
-                        <div style="font-size:12px;color:#c4b87a;margin-top:4px;">CVR not significant (p=0.20) · ARPU $0.635 vs $0.641</div>
-                        <div style="font-size:11px;color:#94a3b8;margin-top:6px;">Extend test or default to B</div>
-                    </div>
-                    <div style="background:#0d2218;border:1px solid #1a5c36;border-left:4px solid #22c55e;border-radius:8px;padding:14px;">
-                        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#6b9e82;margin-bottom:6px;">Android Rich · 12% of revenue</div>
-                        <div style="font-size:18px;font-weight:700;color:#22c55e;">B wins — cleanest</div>
-                        <div style="font-size:12px;color:#a3c4b0;margin-top:4px;">+3.00pp CVR (p=0.059) · +$209 revenue · zero reactivations</div>
-                        <div style="font-size:11px;color:#22c55e;margin-top:6px;">✓ No confounding factors</div>
-                    </div>
-                    <div style="background:#0d2218;border:1px solid #1a5c36;border-left:4px solid #22c55e;border-radius:8px;padding:14px;">
-                        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#6b9e82;margin-bottom:6px;">Android Poor · 7% of revenue</div>
-                        <div style="font-size:18px;font-weight:700;color:#22c55e;">B wins (volume)</div>
-                        <div style="font-size:12px;color:#a3c4b0;margin-top:4px;">+1.13pp CVR · +$74 revenue · n=22 A converters</div>
-                        <div style="font-size:11px;color:#f59e0b;margin-top:6px;">Monitor LTV post-rollout</div>
-                    </div>
-                </div>
-
-                <!-- Four-segment overview table -->
-                <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:24px 0 10px;">Four-Segment Overview</h4>
-                <div style="overflow-x:auto;">
-                    <table class="pvalue-table">
-                        <thead>
-                            <tr>
-                                <th>Metric</th>
-                                <th>iOS Rich A</th><th>iOS Rich B</th>
-                                <th>iOS Poor A</th><th>iOS Poor B</th>
-                                <th>Android Rich A</th><th>Android Rich B</th>
-                                <th>Android Poor A</th><th>Android Poor B</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Users</td><td>1,721</td><td>1,650</td><td>2,763</td><td>2,724</td><td>459</td><td>488</td><td>1,056</td><td>1,092</td></tr>
-                            <tr><td>Converters</td><td>115</td><td>142</td><td>101</td><td>118</td><td>22</td><td>38</td><td>22</td><td>35</td></tr>
-                            <tr><td>CVR</td><td>6.68%</td><td style="color:#22c55e;font-weight:600;">8.61%</td><td>3.66%</td><td style="color:#22c55e;">4.33%</td><td>4.79%</td><td style="color:#22c55e;font-weight:600;">7.79%</td><td>2.08%</td><td style="color:#22c55e;">3.21%</td></tr>
-                            <tr><td>ARPU</td><td>$2.87</td><td style="color:#22c55e;font-weight:600;">$3.05</td><td>$0.635</td><td style="color:#22c55e;">$0.641</td><td>$1.86</td><td style="color:#22c55e;font-weight:600;">$2.17</td><td>$0.479</td><td style="color:#22c55e;">$0.531</td></tr>
-                            <tr><td>Total Revenue</td><td>$4,933</td><td style="color:#22c55e;font-weight:600;">$5,038</td><td style="color:#22c55e;">$1,756</td><td>$1,746</td><td>$852</td><td style="color:#22c55e;font-weight:600;">$1,060</td><td>$506</td><td style="color:#22c55e;font-weight:600;">$580</td></tr>
-                            <tr><td>Avg LTV / Converter</td><td style="color:#22c55e;">$42.90</td><td>$35.48</td><td style="color:#22c55e;">$17.38</td><td>$14.80</td><td style="color:#22c55e;">$38.71</td><td>$27.91</td><td style="color:#22c55e;">$23.00</td><td>$16.57</td></tr>
-                            <tr><td>Avg Renewals</td><td style="color:#22c55e;">1.04</td><td>0.93</td><td>0.85</td><td style="color:#22c55e;">1.01</td><td style="color:#22c55e;">0.82</td><td>0.50</td><td style="color:#22c55e;">0.86</td><td>0.37</td></tr>
-                            <tr><td style="color:#f59e0b;">Reactivation %</td><td style="color:#f59e0b;font-weight:700;">55.7%</td><td>1.4%</td><td>0.0%</td><td>1.7%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <p style="font-size:12px;color:var(--muted);margin-top:8px;">Green = leading group for that metric. A's LTV lead is entirely concentrated in iOS Rich reactivations — not a quality signal.</p>
-
-                <!-- Per-segment deep dives -->
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:28px;">
-
-                    <!-- iOS Rich -->
-                    <div style="background:var(--panel-soft);border-radius:10px;padding:18px;">
-                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-                            <div style="font-size:14px;font-weight:700;">iOS Rich</div>
-                            <div style="font-size:11px;background:#0d2218;border:1px solid #22c55e;color:#22c55e;border-radius:20px;padding:3px 10px;">B wins · p=0.035</div>
-                        </div>
-                        <table class="pvalue-table" style="font-size:12px;">
-                            <thead><tr><th>Metric</th><th>Group A</th><th>Group B</th><th>Diff</th></tr></thead>
-                            <tbody>
-                                <tr><td>CVR</td><td>6.68%</td><td style="color:#22c55e;font-weight:600;">8.61%</td><td>+1.93pp</td></tr>
-                                <tr><td>ARPU</td><td>$2.87</td><td style="color:#22c55e;font-weight:600;">$3.05</td><td>+$0.19</td></tr>
-                                <tr><td>Total Revenue</td><td>$4,933</td><td style="color:#22c55e;font-weight:600;">$5,038</td><td>+$105</td></tr>
-                                <tr><td>LTV / Converter</td><td style="color:#22c55e;">$42.90</td><td>$35.48</td><td style="color:#f59e0b;">A leads*</td></tr>
-                                <tr><td>Avg Renewals</td><td style="color:#22c55e;">1.04</td><td>0.93</td><td>p=0.529</td></tr>
-                                <tr><td style="color:#f59e0b;">Reactivation %</td><td style="color:#f59e0b;font-weight:700;">55.7%</td><td>1.4%</td><td>—</td></tr>
-                            </tbody>
-                        </table>
-                        <p style="font-size:11px;color:#f59e0b;margin-top:10px;">* A's LTV lead is confounded: 55.7% of A's converters are reactivations vs 1.4% in B. New subs only: A $43.81 vs B $35.61 — a real but smaller gap, offset by B's volume advantage.</p>
-                        <div style="margin-top:12px;font-size:11px;color:var(--muted);">
-                            <strong style="color:#c8d9e0;">Cumulative ARPU (B−A):</strong> +$0.235 at F0 → +$0.302 at F1 → +$0.187 at F4. B leads at every renewal horizon.
-                        </div>
-                        <div style="margin-top:10px;font-size:11px;color:var(--muted);">
-                            <strong style="color:#c8d9e0;">Standout markets:</strong> USA (B: 14.68% CVR, $5.68 ARPU) · Belgium (B: 8.08% CVR)
-                        </div>
-                    </div>
-
-                    <!-- iOS Poor -->
-                    <div style="background:var(--panel-soft);border-radius:10px;padding:18px;">
-                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-                            <div style="font-size:14px;font-weight:700;">iOS Poor</div>
-                            <div style="font-size:11px;background:#1c1a0a;border:1px solid #eab308;color:#eab308;border-radius:20px;padding:3px 10px;">Tie · p=0.20</div>
-                        </div>
-                        <table class="pvalue-table" style="font-size:12px;">
-                            <thead><tr><th>Metric</th><th>Group A</th><th>Group B</th><th>Diff</th></tr></thead>
-                            <tbody>
-                                <tr><td>CVR</td><td>3.66%</td><td>4.33%</td><td>+0.67pp</td></tr>
-                                <tr><td>ARPU</td><td>$0.635</td><td style="color:#22c55e;">$0.641</td><td>+$0.006</td></tr>
-                                <tr><td>Total Revenue</td><td style="color:#22c55e;">$1,756</td><td>$1,746</td><td>−$10</td></tr>
-                                <tr><td>LTV / Converter</td><td style="color:#22c55e;">$17.38</td><td>$14.80</td><td>p=0.091</td></tr>
-                                <tr><td>Avg Renewals</td><td>0.85</td><td style="color:#22c55e;">1.01</td><td>p=0.364</td></tr>
-                                <tr><td>Reactivation %</td><td>0.0%</td><td>1.7%</td><td>—</td></tr>
-                            </tbody>
-                        </table>
-                        <p style="font-size:11px;color:var(--muted);margin-top:10px;">Effective tie across all metrics. B's higher renewals (1.01 vs 0.85) may close the LTV gap over a longer window. No reactivation noise — A's LTV lead is genuine but borderline (p=0.091).</p>
-                        <div style="margin-top:10px;font-size:11px;color:var(--muted);">
-                            <strong style="color:#c8d9e0;">Cumulative ARPU:</strong> B overtakes A from F1 onwards but the margin is tiny ($0.006–$0.028).
-                        </div>
-                    </div>
-
-                    <!-- Android Rich -->
-                    <div style="background:var(--panel-soft);border-radius:10px;padding:18px;">
-                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-                            <div style="font-size:14px;font-weight:700;">Android Rich</div>
-                            <div style="font-size:11px;background:#0d2218;border:1px solid #22c55e;color:#22c55e;border-radius:20px;padding:3px 10px;">B wins — cleanest · p=0.059</div>
-                        </div>
-                        <table class="pvalue-table" style="font-size:12px;">
-                            <thead><tr><th>Metric</th><th>Group A</th><th>Group B</th><th>Diff</th></tr></thead>
-                            <tbody>
-                                <tr><td>CVR</td><td>4.79%</td><td style="color:#22c55e;font-weight:600;">7.79%</td><td>+3.00pp</td></tr>
-                                <tr><td>ARPU</td><td>$1.86</td><td style="color:#22c55e;font-weight:600;">$2.17</td><td>+$0.32</td></tr>
-                                <tr><td>Total Revenue</td><td>$852</td><td style="color:#22c55e;font-weight:600;">$1,060</td><td>+$209 (+24.5%)</td></tr>
-                                <tr><td>LTV / Converter</td><td style="color:#22c55e;">$38.71</td><td>$27.91</td><td>p=0.078</td></tr>
-                                <tr><td>Avg Renewals</td><td style="color:#22c55e;">0.82</td><td>0.50</td><td>p=0.312</td></tr>
-                                <tr><td>Reactivation %</td><td>0.0%</td><td>0.0%</td><td>✓ Clean</td></tr>
-                            </tbody>
-                        </table>
-                        <p style="font-size:11px;color:#22c55e;margin-top:10px;">Zero reactivations in either group — B's advantage is fully unconfounded. A's LTV lead (p=0.078) is based on only 22 converters and does not override B's volume and ARPU dominance.</p>
-                        <div style="margin-top:10px;font-size:11px;color:var(--muted);">
-                            <strong style="color:#c8d9e0;">Cumulative ARPU (B−A):</strong> +$0.458 at F0 → +$0.318 at F4. B leads at every horizon.
-                        </div>
-                        <div style="margin-top:6px;font-size:11px;color:var(--muted);">
-                            <strong style="color:#c8d9e0;">Exception:</strong> Switzerland only country where A leads ARPU ($4.22 vs $2.61).
-                        </div>
-                    </div>
-
-                    <!-- Android Poor -->
-                    <div style="background:var(--panel-soft);border-radius:10px;padding:18px;">
-                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-                            <div style="font-size:14px;font-weight:700;">Android Poor</div>
-                            <div style="font-size:11px;background:#0d2218;border:1px solid #22c55e;color:#22c55e;border-radius:20px;padding:3px 10px;">B wins (volume)</div>
-                        </div>
-                        <table class="pvalue-table" style="font-size:12px;">
-                            <thead><tr><th>Metric</th><th>Group A</th><th>Group B</th><th>Diff</th></tr></thead>
-                            <tbody>
-                                <tr><td>CVR</td><td>2.08%</td><td style="color:#22c55e;font-weight:600;">3.21%</td><td>+1.13pp</td></tr>
-                                <tr><td>ARPU</td><td>$0.479</td><td style="color:#22c55e;">$0.531</td><td>+$0.052</td></tr>
-                                <tr><td>Total Revenue</td><td>$506</td><td style="color:#22c55e;">$580</td><td>+$74</td></tr>
-                                <tr><td>LTV / Converter</td><td style="color:#22c55e;">$23.00</td><td>$16.57</td><td>p=0.073</td></tr>
-                                <tr><td>Avg Renewals</td><td style="color:#22c55e;">0.86</td><td>0.37</td><td>p=0.122</td></tr>
-                                <tr><td>Reactivation %</td><td>0.0%</td><td>0.0%</td><td>✓ Clean</td></tr>
-                            </tbody>
-                        </table>
-                        <p style="font-size:11px;color:var(--muted);margin-top:10px;">A has the most genuine per-converter quality edge of any segment (p=0.073, no reactivations) — but n=22 is too small to override B's volume win. ARPU gap is narrowing: $0.121 at F0 → $0.052 at F4. Monitor post-rollout.</p>
-                        <div style="margin-top:10px;font-size:11px;color:#f59e0b;">
-                            ⚠ 15–18% pricing mismatch rate (vs 1–2% for iOS). Fix pricing consistency before reading LTV results at face value.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Statistical confidence -->
-                <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:28px 0 10px;">ARPU Bootstrap Confidence</h4>
-                <div style="overflow-x:auto;">
-                    <table class="pvalue-table">
-                        <thead>
-                            <tr><th>Segment</th><th>ARPU Diff (B−A)</th><th>95% CI</th><th>P(B &gt; A)</th><th>Notes</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>iOS Rich</td><td style="color:#22c55e;">+$0.196</td><td>[$−0.634, +$1.013]</td><td>67.9%</td><td>Reactivation anomaly inflates variance</td></tr>
-                            <tr><td>iOS Poor</td><td>+$0.006</td><td>[$−0.200, +$0.214]</td><td>53.2%</td><td>Tie — extend test for clarity</td></tr>
-                            <tr><td>Android Rich</td><td style="color:#22c55e;font-weight:600;">+$0.317</td><td>[$−0.955, +$1.533]</td><td style="color:#22c55e;font-weight:600;">70.2%</td><td>Highest win probability, zero noise</td></tr>
-                            <tr><td>Android Poor</td><td style="color:#22c55e;">+$0.052</td><td>[$−0.280, +$0.360]</td><td>63.8%</td><td>Monitor — ARPU gap narrowing over time</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <p style="font-size:12px;color:var(--muted);margin-top:8px;">No segment reaches 95% significance on ARPU over 7 days — consistent with small converter samples. Directional advantage is consistent across all segments.</p>
-
-                <!-- Final recommendation -->
-                <div style="background:#0a1a10;border:1px solid #1a5c36;border-radius:10px;padding:18px;margin-top:24px;">
-                    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#6b9e82;margin-bottom:10px;">Overall verdict</div>
-                    <div style="font-size:16px;font-weight:700;color:#22c55e;margin-bottom:10px;">Roll out Variant B across all segments</div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;color:#c8d9e0;line-height:1.6;">
-                        <div>✅ B wins or ties on ARPU in all 4 segments<br>✅ B wins on CVR in all 4 segments<br>✅ B generates more revenue in 3 of 4 segments</div>
-                        <div>✅ A's LTV advantage isolated to iOS Rich reactivations<br>✅ In all zero-reactivation segments, B wins cleanly<br>⚠ iOS Poor: extend test or default to B</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
     </div>
 
     <script>
@@ -1647,9 +1451,9 @@
                     },
                     production: {
                         18:{P:'P19'}, 19:{P:'P20'}, 20:{P:'P21'}, 21:{P:'P22'}, 22:{P:'P23'}, 23:{P:'P24'},
-                        24:{P:'P25'}, 25:{P:'P26'}, 26:{P:'P27'}, 27:{P:'P28'}, 28:{P:'P29'}, 29:{P:'P30'},
-                        30:{P:'P31'}, 31:{P:'P32'}, 32:{P:'P33'}, 33:{P:'P34'}, 34:{P:'P35'}, 35:{P:'P36'},
-                        36:{P:'P37'}, 37:{P:'P38'}, 38:{P:'P39'}, 39:{P:'P40'}, 40:{P:'P41'}
+                        24:{P:'P19'}, 25:{P:'P25'}, 26:{P:'P26'}, 27:{P:'P27'}, 28:{P:'P28'}, 29:{P:'P29'},
+                        30:{P:'P30'}, 31:{P:'P31'}, 32:{P:'P32'}, 33:{P:'P33'}, 34:{P:'P34'}, 35:{P:'P35'},
+                        36:{P:'P36'}, 37:{P:'P37'}, 38:{P:'P38'}, 39:{P:'P39'}, 40:{P:'P41'}
                     }
                 }
             },
@@ -2442,34 +2246,6 @@
         function buildAgeLevelChartRecommendation(dataA, dataB, dataP, age, duration) {
             if (age === 'all') return null;
 
-            // Determine latest period key first (needed for same-price check)
-            const latestPeriodKeyEarly = (currentSegment.periodModel === 'three_periods' || currentSegment.periodModel === 'three_periods_production')
-                ? 'period3' : 'period2';
-
-            // Same-price detection: if both groups share the same price in the latest period,
-            // the A/B test has concluded — return a specific message instead of noisy comparison.
-            const latestPvalsCheck = currentSegment.pvalues?.[latestPeriodKeyEarly]?.[String(age)];
-            if (latestPvalsCheck && latestPvalsCheck.A && latestPvalsCheck.B && latestPvalsCheck.A === latestPvalsCheck.B) {
-                const confirmedPrice = latestPvalsCheck.A;
-                const p1Pvals = currentSegment.pvalues?.period1?.[String(age)];
-                const p2Pvals = currentSegment.pvalues?.period2?.[String(age)];
-                // Find the losing price from earlier periods
-                const p1Loser = p1Pvals
-                    ? (p1Pvals.A !== confirmedPrice ? p1Pvals.A : (p1Pvals.B !== confirmedPrice ? p1Pvals.B : null))
-                    : null;
-                const p2Loser = p2Pvals
-                    ? (p2Pvals.A !== confirmedPrice ? p2Pvals.A : (p2Pvals.B !== confirmedPrice ? p2Pvals.B : null))
-                    : null;
-                const loserNote = [p1Loser, p2Loser].filter(Boolean).join(', ');
-                const nextPrice = `P${parseInt(confirmedPrice.replace('P','')) + 1}`;
-                return {
-                    title: `Age ${age} — test concluded at ${confirmedPrice}`,
-                    copy: `Both groups were assigned ${confirmedPrice} in the latest period — the lower price won across earlier periods and the test has converged at this floor.`
-                        + (loserNote ? ` Higher prices tested (${loserNote}) all lost.` : '')
-                        + ` Consider testing ${nextPrice} to explore whether a small price lift is viable for revenue upside.`
-                };
-            }
-
             const period1End = currentSegment.periodModel === 'three_periods' || currentSegment.periodModel === 'three_periods_production'
                 ? '2026-01-12'
                 : '2026-01-29';
@@ -2557,24 +2333,6 @@
             const latestSignal = classifyABPeriod(latestA, latestB);
             const latestSupport = buildABSupportSummary(latestA, latestB);
 
-            // Compute period2 signal for three_periods segments
-            let p2Signal = null;
-            if (currentSegment.periodModel === 'three_periods') {
-                const p2RowsA = dataA.filter(d => d.date >= period2Start && d.date <= period2End);
-                const p2RowsB = dataB.filter(d => d.date >= period2Start && d.date <= period2End);
-                if (p2RowsA.length > 0 || p2RowsB.length > 0) {
-                    const p2A = {
-                        cvr: calculateSelectedMetricForPeriod(p2RowsA, 'user_cvr', age, 'A', 'period2', duration),
-                        revPerUserDay: calculateSelectedMetricForPeriod(p2RowsA, 'revenue_per_user_day', age, 'A', 'period2', duration)
-                    };
-                    const p2B = {
-                        cvr: calculateSelectedMetricForPeriod(p2RowsB, 'user_cvr', age, 'B', 'period2', duration),
-                        revPerUserDay: calculateSelectedMetricForPeriod(p2RowsB, 'revenue_per_user_day', age, 'B', 'period2', duration)
-                    };
-                    p2Signal = classifyABPeriod(p2A, p2B);
-                }
-            }
-
             if (latestSignal.winner === 'mixed' || (latestSupport.cvrWinner !== 'mixed' && latestSupport.revWinner !== 'mixed' && latestSupport.cvrWinner !== latestSupport.revWinner)) {
                 return {
                     title: `Age ${age} is mixed`,
@@ -2593,17 +2351,12 @@
                 };
             }
 
-            const p2Consistent = !p2Signal || p2Signal.winner === 'mixed' || p2Signal.winner === latestSignal.winner;
-            const consistent = (p1Signal.winner === latestSignal.winner || p1Signal.winner === 'mixed') && p2Consistent;
+            const consistent = p1Signal.winner === latestSignal.winner || p1Signal.winner === 'mixed';
             return {
                 title: `Age ${age} leans to Group ${latestSignal.winner}`,
                 copy: consistent
                     ? `The latest period still favors Group ${latestSignal.winner} for this age, and the earlier read does not meaningfully conflict with it. Keep the region recommendation as the primary decision.`
-                    : `The latest period favors Group ${latestSignal.winner} for this age, but ${
-                        !p2Consistent && p1Signal.winner !== 'mixed' && p1Signal.winner !== latestSignal.winner
-                            ? 'earlier periods (P1 and P2) were less consistent'
-                            : 'earlier periods were less consistent'
-                    }. Use this as supporting detail and keep the region recommendation as the higher-priority call.`
+                    : `The latest period favors Group ${latestSignal.winner} for this age, but earlier periods were less consistent. Use this as supporting detail and keep the region recommendation as the higher-priority call.`
             };
         }
 
